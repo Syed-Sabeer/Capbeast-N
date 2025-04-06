@@ -97,16 +97,17 @@
                                 </div>
                             </div>
                             <div class="d-flex justify-content-start align-items-center mb-4">
-                                {{-- <span
+                                <span
                                     class="avatar rounded-circle bg-label-success me-2 d-flex align-items-center justify-content-center"><i
-                                        class='ti ti-shopping-cart ti-sm'></i></span> --}}
-                                {{-- <h6 class="text-body text-nowrap mb-0">{{ $order->user->count() }} Orders</h6> --}}
+                                        class='ti ti-shopping-cart ti-sm'></i></span>
+                                        <h6 class="text-body text-nowrap mb-0">{{ $order->user->orders->count() }} Orders Placed</h6>
+
                             </div>
                             <div class="d-flex justify-content-between">
                                 <h6>Reseller info</h6>
 
                             </div>
-                            <p class="mb-1"> <x-user-reseller :isReseller="$order->user->is_reseller" :neqNumber="$order->user->neq_number" /></p>
+                            <p class="mb-1"> </p>
 
                         </div>
                     </div>
@@ -129,6 +130,8 @@
                                 {{ $order->ShippingDetails->email }}</p>
                             <p class="mb-0"><Span style="font-weight: bold">Phone:</Span>
                                 {{ $order->ShippingDetails->phone }}</p>
+                                <p class="mb-0"><Span style="font-weight: bold">Country:</Span>
+                                    {{ $order->ShippingDetails->country }}</p>
                             <p class="mb-0"><Span style="font-weight: bold">Address:</Span>
                                 {{ $order->ShippingDetails->address }}</p>
                             <p class="mb-0"><Span style="font-weight: bold">Additional Info:</Span>
@@ -178,13 +181,11 @@
                                 <th></th>
                                 <th>Products</th>
                                 <th>Qty</th>
+                                <th>Size</th>
                                 <th>Color</th>
                                 
-                                <th>Is Pom Pom</th>
-                                <th>Embroidery</th>
                                 <th>Product Price</th>
-                                <th>Printing</th>
-                                <th>Delivery </th>
+                             
                             </tr>
                         </thead>
                         <tbody>
@@ -193,75 +194,18 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $item->product->title }}</td>
                                     <td>{{ $item->quantity }}</td>
-                                    <td>{{ $item->color->componentColor->color_name }}</td>
+                                    <td>{{ $item->size ?? 'OSFA' }}</td>                                    
+                                    <td>
+                                        {{ $item->color->color_name_2 ? $item->color->color_name_1 . ' & ' . $item->color->color_name_2 : $item->color->color_name_1 }}
+                                    </td>
+
                                     
-                                      
-                                            
-                                 
+                                    <td>{{ $item->product_price}} $</td>
                                     
-                                    <td>{{ $item->is_pompom == 1 ? 'Yes' : 'No' }}</td>
-                                    <td>{{ $item->printing->title }}</td>
-                                    <td>{{ $item->product_price * $item->quantity }} $</td>
-                                    <td>{{ $item->printing_price * $item->quantity }} $</td>
-                                    <td>{{ $item->delivery_price * $item->quantity }} $</td>
+
+                                    
                                 </tr>
-                                @if ($item->orderArtwork)
-                                    <tr>
-                                        <td colspan="8" style="text-align: center;">
-                                            <table style="width: 100%; border: none;">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Artwork Type</th>
-                                                        <th>Details</th>
-                                                        <th>Patch Height</th>
-                                                        <th>Patch Length</th>
-                                                        <th>Font Style</th>
-                                                        <th>Imprint Color</th>
-                                                        @if ($item->printing->is_leather === 1)
-                                                        <th>Leather Color</th>
-                                                        @endif
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            @if ($item->orderArtwork->artwork_type == 1)
-                                                                Image
-                                                                @elseif ($item->orderArtwork->artwork_type == 2)
-                                                                Text
-                                                            @else
-                                                                N/A
-                                                            @endif
-                                                        </td>
-                                                        <td>
-                                                            @if ($item->orderArtwork->artwork_type == 1)
-                                                            <a href="{{ asset('storage/' . ($item->orderArtwork->artwork_dataImage ?? 'ProductImages/default.jpg')) }}" download>
-                                                                <img src="{{ asset('storage/' . ($item->orderArtwork->artwork_dataImage ?? 'ProductImages/default.jpg')) }}" alt="Artwork Image" width="50">
-                                                            </a>
-                                                            
-                                                            @elseif ($item->orderArtwork->artwork_type == 2)
-                                                                {{ $item->orderArtwork->artwork_dataText ?? 'No Text Available' }}
-                                                            @else
-                                                                No Artwork
-                                                            @endif
-                                                        </td>
-                                                        <td>{{ $item->orderArtwork->patch_height ?? 'N/A' }}</td>
-                                                        <td>{{ $item->orderArtwork->patch_length ?? 'N/A' }}</td>
-                                                        <td>{{ $item->orderArtwork->font_style ?? 'N/A' }}</td>
-                                                        <td>{{ implode(', ', $item->orderArtwork->imprint_color ?? []) }}</td>
-                                                        @if ($item->printing->is_leather === 1)
-                                                        <td>{{ $item->orderArtwork->leathercolor ?? 'N/A' }}</td>
-                                                        @endif
-                                                    </tr>
-                                                    
-                                                </tbody>
-                                            </table>
-                                        </td>
-                                        
-                                    </tr>
-                                    
-                                    
-                                @endif
+                              
                             @endforeach
                         </tbody>
                         
@@ -273,14 +217,22 @@
                                 <span class="w-px-100 text-heading">Subtotal:</span>
                                 <h6 class="mb-0">${{ $order->subtotal_price }}</h6>
                             </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="w-px-200 text-heading">TVQ Tax {{ $order->TaxDetails->tvq_tax_percentage }}% ({{ $order->TaxDetails->tvq_tax_no }}) : </span>
-                                <h6 class="mb-0">${{ $order->tvq_tax_price }}</h6>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="w-px-200 text-heading">TPS Tax {{ $order->TaxDetails->tps_tax_percentage }}% ({{ $order->TaxDetails->tps_tax_no }}) :</span>
-                                <h6 class="mb-0">${{ $order->tps_tax_price }}</h6>
-                            </div>
+                            @if($order->TaxDetails)
+                            @if($order->TaxDetails->tvq_tax_percentage)
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="w-px-200 text-heading">TVQ Tax {{ $order->TaxDetails->tvq_tax_percentage }}% ({{ $order->TaxDetails->tvq_tax_no }}) :</span>
+                                    <h6 class="mb-0">${{ $order->tvq_tax_price }}</h6>
+                                </div>
+                            @endif
+                        
+                            @if($order->TaxDetails->tps_tax_percentage)
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="w-px-200 text-heading">TPS Tax {{ $order->TaxDetails->tps_tax_percentage }}% ({{ $order->TaxDetails->tps_tax_no }}) :</span>
+                                    <h6 class="mb-0">${{ $order->tps_tax_price }}</h6>
+                                </div>
+                            @endif
+                        @endif
+                        
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="w-px-100 text-heading">Discount:</span>
                                 <h6 class="mb-0">- ${{ $order->discount_price }}</h6>

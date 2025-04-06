@@ -144,7 +144,7 @@ class OrderController extends Controller
                     'total_price' => $totalPrice,
                     'subtotal_price' => $subtotalPrice,
                     'discount_price' => $discountAmount,
-                    'payment_status' => 'completed',
+                    'status' => 0,
                 ]);
     
                 if (!empty($request->TPStaxNumber) && $request->TPStaxPercentage > 0
@@ -226,9 +226,9 @@ class OrderController extends Controller
     {
         $userId = auth()->id();
 
-        $orderhistory = Order::with(['TaxDetails','items' => function ($query) {
-            $query->with('orderArtwork');
-        }, 'user'])->where('user_id', $userId)->get();
+        
+
+        $orderhistory = Order::where('user_id', $userId)->get();
 
         return view('main.pages.orderhistory', ['orderhistory' => $orderhistory]);
     }

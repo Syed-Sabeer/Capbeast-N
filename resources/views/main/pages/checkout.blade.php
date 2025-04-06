@@ -87,7 +87,7 @@
                     <div class="mt-4 pt-2">
                         <div class="d-flex align-items-center mb-4">
                             <div class="flex-grow-1">
-                                <h5 class="mb-0">Shipping Address</h5>
+                                <h5 class="mb-0">Shipping Details</h5>
                             </div>
 
                         </div>
