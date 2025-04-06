@@ -15,9 +15,11 @@ class EcommerceOrderDetails extends Controller
     public function index($orderId)
 {
    
-    $order = Order::with(['TaxDetails','user', 'Order_files', 'ShippingDetails', 'items' => function ($query) {
-        $query->with('orderArtwork');
-    }])->findOrFail($orderId);
+    // $order = Order::with(['TaxDetails','user', 'Order_files', 'ShippingDetails', 'items' => function ($query) {
+    //     $query->with('orderArtwork');
+    // }])->findOrFail($orderId);
+
+    $order = Order::findOrFail($orderId);
 
     
     $latestStatus = OrderInternalStatus::where('order_id', $orderId)

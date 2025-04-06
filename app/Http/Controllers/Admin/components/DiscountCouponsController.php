@@ -8,6 +8,7 @@ use App\Models\InternalStatus;
 use App\Models\Product;
 use App\Models\DiscountCoupon;
 use App\Models\ProductPrinting;
+use Monarobase\CountryList\CountryList;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -17,7 +18,8 @@ class DiscountCouponsController extends Controller
 {
     public function index()
     {
-        return view('admin.content.component.discountCouponAdd');
+        $countries = (new CountryList())->getList('en');
+        return view('admin.content.component.discountCouponAdd', compact('countries'));
     }
 
     public function getItems(Request $request)

@@ -81,64 +81,13 @@
 
                         <div class="mb-3">
                             <label class="form-label">Coupon Country</label>
-                            <select name="coupon_country" id="couponCountry" class="select2 form-select form-select-lg">
-                                <option value="">Loading...</option> 
+                            <select name="coupon_country" id="couponCountry" class="select2 form-select form-select-lg" required>
+                                <option value="0">All</option>
+                                @foreach ($countries as $code => $name)
+                                    <option value="{{ $code }}">{{ $name }}</option>
+                                @endforeach
                             </select>
                         </div>
-                        
-
-                        <script>
-                     document.addEventListener('DOMContentLoaded', function () {
-    const countriesRoute = "{{ route('countries.index') }}";
-
-    let countrySelect = document.getElementById('couponCountry');
-    
-    // Show loading indicator
-    function setLoading(selectElement) {
-        selectElement.innerHTML = '<option value="">Loading...</option>';
-        selectElement.disabled = true;
-    }
-
-    // Remove loading indicator and set placeholder text
-    function removeLoading(selectElement, placeholder) {
-        selectElement.innerHTML = '';  // Clear existing options
-        const placeholderOption = document.createElement('option');
-        placeholderOption.value = '';
-        placeholderOption.textContent = placeholder;
-        selectElement.appendChild(placeholderOption);
-        selectElement.disabled = false;
-    }
-
-    // Fetch countries
-    setLoading(countrySelect);
-    fetch(countriesRoute)
-        .then(response => response.json())
-        .then(data => {
-            removeLoading(countrySelect, "Select Country");
-            
-            // Add 'All' option
-            const allOption = document.createElement('option');
-            allOption.value = "0";
-            allOption.textContent = "All";
-            countrySelect.appendChild(allOption);
-            
-            // Add other country options dynamically
-            for (const [code, name] of Object.entries(data)) {
-                const option = document.createElement('option');
-                option.value = code;
-                option.textContent = name;
-                countrySelect.appendChild(option);
-            }
-        })
-        .catch(error => {
-            removeLoading(countrySelect, "Failed to load countries, Kindly Refresh the page");
-            console.error(error);
-        });
-});
-
-
-                        </script>
-                        
                        
 
                         <div class="mb-3">

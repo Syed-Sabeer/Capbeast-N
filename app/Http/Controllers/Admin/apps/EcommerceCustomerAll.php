@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\UserRegisteredMail;
 use App\Http\Controllers\Controller;
-
+use Monarobase\CountryList\CountryList;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Admin\Apps\BaseAdminController;
 use App\Models\User;
@@ -16,7 +16,7 @@ class EcommerceCustomerAll extends Controller
 {
     public function index()
     {
-        $users = User::all();
+        $users = User::paginate(25);
         return view('admin.content.apps.app-ecommerce-customer-all', compact('users'));
     }
 
@@ -42,9 +42,10 @@ class EcommerceCustomerAll extends Controller
     public function edit($id)
     {
         // dd(Auth::user());
+        $countries = (new CountryList())->getList('en');
         $authUser = Auth::user();
         $user = User::findOrFail($id);
-        return view("admin.content.apps.edit-customer", compact('user'));
+        return view("admin.content.apps.edit-customer", compact('user','countries'));
     }
 
     public function update($id, Request $request)
@@ -52,25 +53,32 @@ class EcommerceCustomerAll extends Controller
         $request->validate([
             'first_name' => 'required',
             'last_name' => 'required',
-            'language' => 'required',
             'contact_number' => 'required',
             'email' => 'required|email',
             'password' => 'nullable|min:6',
-           
-            'status' => 'required|boolean',
             'country' => 'required',
         ]);
-        
+    
         $user = User::findOrFail($id);
-        $data = $request->all();
-        if (!$request->filled('password')) {
-            unset($data['password']);
+        
+        // Only fill non-password fields
+        $user->first_name = $request->first_name;
+        $user->last_name = $request->last_name;
+        $user->contact_number = $request->contact_number;
+        $user->email = $request->email;
+        $user->country = $request->country;
+    
+        // Hash and update password only if filled
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
         }
-        $user->update($data);
-
-        return redirect()->route(app('authUser')->role . '.app-ecommerce-customer-all')->with('success', 'User updated successfully');
+    
+        $user->save();
+    
+        return redirect()->route(app('authUser')->role . '.app-ecommerce-customer-all')
+                         ->with('success', 'User updated successfully');
     }
-
+    
     public function destroy($id)
     {
         $user = User::findOrFail($id);

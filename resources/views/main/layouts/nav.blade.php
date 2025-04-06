@@ -258,13 +258,15 @@
                             @auth
         <h6 class="dropdown-header">Welcome {{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</h6>
                             
-                            <a class="dropdown-item" href="order-history.html"><i class="bi bi-cart4 text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Order History</span></a>
-                            <a class="dropdown-item" href="track-order.html"><i class="bi bi-truck text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Track Orders</span></a>
-                            <a class="dropdown-item" href="../backend/index.html"><i class="bi bi-speedometer2 text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Dashboard</span></a>
-                            <a class="dropdown-item" href="ecommerce-faq.html"><i class="mdi mdi-lifebuoy text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Help</span></a>
+        <a class="dropdown-item" href="{{ route('main.pages.orderhistory') }}"><i
+            class="bi bi-cart4 text-muted fs-16 align-middle me-1"></i>
+        <span class="align-middle">Order History</span></a>
+                            {{-- <a class="dropdown-item" href="track-order.html"><i class="bi bi-truck text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Track Orders</span></a> --}}
+                            {{-- <a class="dropdown-item" href="../backend/index.html"><i class="bi bi-speedometer2 text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Dashboard</span></a> --}}
+                            {{-- <a class="dropdown-item" href="ecommerce-faq.html"><i class="mdi mdi-lifebuoy text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Help</span></a> --}}
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="account.html"><i class="bi bi-coin text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Balance : <b>$8451.36</b></span></a>
-                            <a class="dropdown-item" href="account.html"><span class="badge bg-success-subtle text-success mt-1 float-end">New</span><i class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Settings</span></a>
+                            {{-- <a class="dropdown-item" href="account.html"><i class="bi bi-coin text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Balance : <b>$8451.36</b></span></a> --}}
+                            {{-- <a class="dropdown-item" href="account.html"><span class="badge bg-success-subtle text-success mt-1 float-end">New</span><i class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Settings</span></a> --}}
                              <!-- Logout Form -->
         <form action="{{ route('user.logout') }}" method="POST">
             @csrf

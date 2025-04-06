@@ -6,7 +6,8 @@
         'pageRoute' => 'main.pages.orderhistory',
     ])
     @endcomponent
-
+    {{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script> --}}
     <section class="section">
         <div class="container">
             <div class="row">
@@ -16,6 +17,7 @@
                             <table class="table fs-15 align-middle table-nowrap">
                                 <thead>
                                     <tr>
+      
                                         <th scope="col">Order ID</th>
                                         <th scope="col">Date</th>
                                         <th scope="col">Total Payment</th>
@@ -88,15 +90,13 @@
                             <thead>
                                 <tr>
                                     <th>Product</th>
+                                    <th>Product Price</th>
                                     <th>Quantity</th>
                                     <th>Color</th>
-
-                                    <th>With Pom Pom</th>
-                                    <th>Embroidery</th>
-                                    <th>Delivery Price</th>
-                                    <th>Embroidery Price</th>
-                                    <th>Product Price</th>
-                                    <th>Type</th>
+                                    <th>Size</th>
+                                    
+                                    
+                                    
                                 </tr>
                             </thead>
                             <tbody id="viewModal-products-list">
@@ -140,10 +140,10 @@
                                             {{-- <h6><span class="text-muted fw-normal">Legal Registration No:</span> <span
                                                     id="legal-register-no">123456</span></h6> --}}
                                             <h6><span class="text-muted fw-normal">Email:</span> <span id="email">
-                                                    sales@monkeybeanies.com</span></h6>
+                                                    sales@capbeast.com</span></h6>
                                             <h6><span class="text-muted fw-normal">Website:</span> <a
-                                                    href="https://themesbrand.com/" class="link-primary" target="_blank"
-                                                    id="website">www.monkeybeanies.com</a></h6>
+                                                    href="https://capbeast.com/" class="link-primary" target="_blank"
+                                                    id="website">www.capbeast.com</a></h6>
                                             <h6 class="mb-0"><span class="text-muted fw-normal">Contact No: </span><span
                                                     id="contact-no"> +1 855 932 6752</span></h6>
                                         </div>
@@ -208,7 +208,8 @@
                                                     <th scope="col">Product Details</th>
                                                     {{-- <th scope="col">Rate</th> --}}
                                                     <th scope="col">Quantity</th>
-                                                    <th scope="col" class="text-end">Amount</th>
+                                                    <th scope="col">Amount</th>
+                                                    <th scope="col" class="text-end">Total</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="invoice-products-list"></tbody>
@@ -292,78 +293,18 @@
                     let productRow = `
                 <tr>
                     <td>${item.product.title}</td>
+                      <td>${item.product_price}</td>
                     <td>${item.quantity}</td>
-                    <td>${item.color.component_color.color_name || 'N/A'}</td>
-                      <td>${item.is_pompom == 1 ? 'Yes' : 'No'}</td>
-                    <td>${item.printing.title}</td>
-                    <td>${item.delivery_price}</td>
-                    <td>${item.printing_price}</td>
-                    <td>${item.product_price}</td>
-                    <td>${item.beanie_type == 1 ? 'Flipped' : 'Unflipped'}</td>
+                    <td>
+    ${item.color.color_name_1 || 'N/A'} 
+    ${item.color.color_name_2 ? `& ${item.color.color_name_2}` : ''}
+</td>
+
+                      <td>${item.size || 'OSFA'}</td>
                 </tr>
             `;
 
-                    // Check if artwork data exists and append it
-                    if (item.order_artwork) {
-                        const artworkDetails = `
-                    <tr>
-            <td colspan="8">
-                <table class="table table-sm table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Font Style</th>
-                            
-                            <th>Patch Length </th>
-                            <th>Patch Height </th>
-                             <th>Num of imprint </th>
-                             ${item.printing.is_leather === 1 ? '<th>Leather Color Code</th>' : ''}
-                             <th>Imprint Colors</th>
-                            ${item.order_artwork.artwork_type == 1 ? '<th>Artwork Image</th>' : '<th>Artwork Text</th>'}
-                             
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>${item.order_artwork.font_style || 'N/A'}</td>
-                           
-                            <td>${item.order_artwork.patch_length || 'N/A'} </td>
-                             <td> ${item.order_artwork.patch_height || 'N/A'}</td>
-                              <td> ${item.order_artwork.num_of_imprint || 'N/A'}</td>
-                            
-   
-       ${item.printing.is_leather === 1 ? `<td>${item.order_artwork.leathercolor || 'N/A'}</td>` : ''}
-
-
-<td>
-    ${(item.order_artwork?.imprint_color && Array.isArray(item.order_artwork.imprint_color))
-        ? item.order_artwork.imprint_color.join(', ')
-        : (item.order_artwork?.imprint_color
-            ? JSON.parse(item.order_artwork.imprint_color).join(', ')
-            : 'N/A')}
-</td>
-
-
-
-
-<td>
-    ${item.order_artwork.artwork_type == 1
-        ? `<img src="http://localhost/Beanies/public/storage/${item.order_artwork.artwork_dataImage || 'CustomerArtworkImages/images/default.jpg'}" alt="Artwork Image" class="img-fluid" width="100" />`
-        : (item.order_artwork.artwork_dataText || 'No additional text data available.')
-    }
-</td>
-
-
-
-                        </tr>
-                    </tbody>
-                </table>
-            </td>
-        </tr>
-                `;
-                        productRow += artworkDetails;
-
-                    }
-
+             
                     return productRow;
                 });
 
@@ -428,6 +369,7 @@
             <td>${index + 1}</td>
             <td>${item.product.title}</td>
             <td>${item.quantity}</td>
+            <td>${item.product_price}</td>
             <td>$${(((parseFloat(item.product_price) || 0) + (parseFloat(item.printing_price) || 0) + (parseFloat(item.pompom_price) || 0)) * (parseInt(item.quantity) || 0) + (parseFloat(item.delivery_price) || 0)).toFixed(2)}</td>
         </tr>
     `;
