@@ -37,7 +37,7 @@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
 
         <div class="d-flex flex-column justify-content-center gap-2 gap-sm-0">
-            <h5 class="mb-1 mt-3 d-flex flex-wrap gap-2 align-items-end">Order #{{ $order->order_id }} 
+            <h5 class="mb-1 mt-3 d-flex flex-wrap gap-2 align-items-end">Order #{{ $order->order_id }}
                     {{-- <span class="badge bg-label-success">Paid</span>  --}}
                     @if ($latestStatus && $latestStatus->internalStatus)
             <span class="badge bg-label-info">{{ $latestStatus->internalStatus->title }}</span>
@@ -81,7 +81,7 @@
                             </div>
                             <span class="badge bg-label-info " style="margin-right: 5%">{{ $order->user->country }}</span>
                         </div>
-                        
+
                         <div class="card-body">
                             <div class="d-flex justify-content-start align-items-center mb-4">
                                 <div class="avatar me-2">
@@ -92,8 +92,8 @@
                                         <h6 class="mb-0">{{ $order->user->email }}</h6>
                                     </a>
                                     <small class="text-muted">Customer ID: #{{ $order->user->id }}</small>
-                                    
-                                   
+
+
                                 </div>
                             </div>
                             <div class="d-flex justify-content-start align-items-center mb-4">
@@ -149,7 +149,7 @@
                           <select name="internal_status_id" id="select2Basic" class="select2 form-select form-select-lg">
                               <option value="">Select Status</option>
                               @foreach ($statuses as $status)
-                                  <option value="{{ $status->id }}" 
+                                  <option value="{{ $status->id }}"
                                       {{ old('internal_status_id', optional($order->internalStatus)->id) == $status->id ? 'selected' : '' }}>
                                       {{ $status->title }}
                                       @if ($status->trashed()) <span class="text-muted">(Deleted)</span> @endif
@@ -163,11 +163,11 @@
                     </div>
                   </div>
               </div>
-              
-              
+
+
             </div>
         </div>
- 
+
         <div class="col-12 col-lg-12 mt-5">
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -183,9 +183,9 @@
                                 <th>Qty</th>
                                 <th>Size</th>
                                 <th>Color</th>
-                                
+
                                 <th>Product Price</th>
-                             
+
                             </tr>
                         </thead>
                         <tbody>
@@ -194,23 +194,23 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $item->product->title }}</td>
                                     <td>{{ $item->quantity }}</td>
-                                    <td>{{ $item->size ?? 'OSFA' }}</td>                                    
+                                    <td>{{ $item->size ?? 'OSFA' }}</td>
                                     <td>
                                         {{ $item->color->color_name_2 ? $item->color->color_name_1 . ' & ' . $item->color->color_name_2 : $item->color->color_name_1 }}
                                     </td>
 
-                                    
-                                    <td>{{ $item->product_price}} $</td>
-                                    
 
-                                    
+                                    <td>{{ $item->product_price}} $</td>
+
+
+
                                 </tr>
-                              
+
                             @endforeach
                         </tbody>
-                        
+
                     </table>
-                    
+
                     <div class="d-flex justify-content-end align-items-center m-3 mb-2 p-1">
                         <div class="order-calculations">
                             <div class="d-flex justify-content-between mb-2">
@@ -224,7 +224,7 @@
                                     <h6 class="mb-0">${{ $order->TaxDetails->tvq_tax_price }}</h6>
                                 </div>
                             @endif
-                        
+
                             @if($order->TaxDetails->tps_tax_percentage)
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="w-px-200 text-heading">TPS Tax {{ $order->TaxDetails->tps_tax_percentage }}% ({{ $order->TaxDetails->tps_tax_no }}) :</span>
@@ -232,7 +232,7 @@
                                 </div>
                             @endif
                         @endif
-                        
+
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="w-px-100 text-heading">Discount:</span>
                                 <h6 class="mb-0">- ${{ $order->discount_price }}</h6>
@@ -262,7 +262,7 @@
                             @php
                                 $internalStatus = $status->internalStatus;
                             @endphp
-                    
+
                             @if ($status == $latestStatus)
                                 <!-- Last status (latest one) -->
                                 <li class="timeline-item timeline-item-transparent border-transparent pb-0">
@@ -290,7 +290,7 @@
                             @endif
                         @endforeach
                     </ul>
-                    
+
                 </div>
             </div>
         </div>
@@ -315,7 +315,7 @@
                                 <img width="45" src="{{ asset('assetsCommon/svgs/pdf.svg') }}" alt="">
                                 @elseif(in_array($fileExtension, ['doc','docx']))
                                 <img width="45" src="{{ asset('assetsCommon/svgs/doc.svg') }}" alt="">
-                                
+
 
                                 @elseif(in_array($fileExtension, ['xls','xlsm','xlsx','xltx']))
                                 <img width="45" src="{{ asset('assetsCommon/svgs/excel.svg') }}" alt="">
@@ -389,8 +389,3 @@
             {{-- @include('admin._partials/_modals/modal-edit-user')
             @include('admin._partials/_modals/modal-add-new-address') --}}
         @endsection
-
-
-
-
-  

@@ -27,7 +27,7 @@ class DiscountCouponsController extends Controller
             if ($request->type == 1) {
                 $items = Product::select('id', 'title')->get();
             }
-             
+
             else {
                 return response()->json([], 400);
             }
@@ -43,48 +43,48 @@ class DiscountCouponsController extends Controller
         try {
             // Log request data to debug
             Log::info('Form data:', $request->all());  // Log all form data to check
-    
+
             $request->validate([
                 'title' => 'required|string',
                 'code' => 'required|string|unique:discount_coupon',
                 'coupon_country' => 'required|string',
-                
+
                 'discount_type' => 'required|integer|in:1,3',
                 'item_id' => 'required|integer',
                 'percentage' => 'required|numeric|min:0|max:100',
                 // Validation for expiry fields
                 'is_expiry' => 'required|boolean', // For expiry switch
-                
+
                 'count' => 'nullable|integer|min:1', // If time limit is selected
                 'duration_from' => 'nullable|date',
 'duration_to' => 'nullable|date',
 
 
             ]);
-    
+
             $discountCoupon = new DiscountCoupon();
             $discountCoupon->title = $request->title;
             $discountCoupon->code = $request->code;
             $discountCoupon->coupon_country = $request->coupon_country;
-            
+
             $discountCoupon->discount_type = $request->discount_type;
             $discountCoupon->percentage = $request->percentage;
-    
+
             // Handle expiry functionality
             $discountCoupon->is_expiry = $request->is_expiry ? 1 : 0; // Set expiry status (1 if on, 0 if off)
-            
+
             if ($request->is_expiry) { // If expiry switch is on
-           
-    
-                
-               
-                    $discountCoupon->count = $request->count; 
-               
+
+
+
+
+                    $discountCoupon->count = $request->count;
+
                     $discountCoupon->duration_from = $request->duration_from;
                     $discountCoupon->duration_to = $request->duration_to;
-               
+
             }
-    
+
             // Handle the "Select All" case for item_id
             $discountCoupon->is_all = $request->item_id == 0 ? 1 : 0;
 
@@ -93,7 +93,7 @@ class DiscountCouponsController extends Controller
                 if ($request->discount_type == 1) {
                     $discountCoupon->discountable_type = Product::class;
                 }
-             
+
                 $discountCoupon->discountable_id = null; // Ensure ID is null
                 $discountCoupon->save(); // Save for global use
             } else {
@@ -103,12 +103,12 @@ class DiscountCouponsController extends Controller
                     $discountCoupon->discountable_type = Product::class;
                     $discountCoupon->discountable_id = $product->id;
                     $product->discountCoupons()->save($discountCoupon);
-                } 
-                
-            }
-            
+                }
 
-    
+            }
+
+
+
             return redirect()->back()->with('success', 'Discount coupon added successfully!');
         } catch (ValidationException $e) {
             Log::error(['error' => $e->getMessage()]);
@@ -121,7 +121,7 @@ class DiscountCouponsController extends Controller
             return redirect()->back()->with('error', 'Something went wrong! Please try again later.')->withInput();
         }
     }
-    
+
 
     public function list()
     {
@@ -148,7 +148,7 @@ public function update(Request $request, $id)
             'title' => 'required|string',
             'code' => 'required|string|unique:discount_coupon,code,' . $id,
             'coupon_country' => 'required|string',
-            
+
             'discount_type' => 'required|integer|in:1,3',
             'item_id' => 'required|integer',
             'percentage' => 'required|numeric|min:0|max:100',
@@ -162,7 +162,7 @@ public function update(Request $request, $id)
         $discountCoupon->title = $request->title;
         $discountCoupon->code = $request->code;
         $discountCoupon->coupon_country = $request->coupon_country;
-       
+
         $discountCoupon->discount_type = $request->discount_type;
         $discountCoupon->percentage = $request->percentage;
 
