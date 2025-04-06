@@ -1,0 +1,32 @@
+// Form control
+// *******************************************************************************
+
+// form input placeholder animation
+.form-control {
+  &::placeholder,
+  &:focus::placeholder {
+    transition: all 0.2s ease;
+  }
+
+  &:hover {
+    &:not([disabled]):not([focus]) {
+      border-color: $input-border-hover-color;
+    }
+  }
+}
+// ltr only
+@include ltr-only {
+  .form-control:not([readonly]) {
+    &:focus::placeholder {
+      transform: translateX(4px);
+    }
+  }
+}
+// rtl only
+@include rtl-only {
+  .form-control:not([readonly]) {
+    &:focus::placeholder {
+      transform: translateX(-4px);
+    }
+  }
+}

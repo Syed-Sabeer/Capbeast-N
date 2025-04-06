@@ -1,0 +1,15 @@
+// * Front Pages : Common Styles for ex: Navbar, footer etc...
+// *******************************************************************************
+
+@use '../_bootstrap-extended/include' as light;
+@use '../_bootstrap-extended/include-dark' as dark;
+@import '../_custom-variables/pages';
+
+// Variables
+@import './front/variables';
+// Common scss
+@import 'front/common';
+// Navbar
+@import 'front/navbar';
+// Footer
+@import 'front/footer';

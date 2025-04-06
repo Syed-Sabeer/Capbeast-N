@@ -1,0 +1,29 @@
+// * App eCommerce
+// *******************************************************************************
+
+@use '../_bootstrap-extended/include' as light;
+@use '../_bootstrap-extended/include-dark' as dark;
+@import '../_custom-variables/pages';
+
+// Variables
+$dz-box-padding: 0rem !default;
+
+// App eCommerce quill editor settings
+
+.app-ecommerce-category,
+.app-ecommerce {
+  .comment-editor {
+    .ql-editor {
+      min-height: 7rem;
+    }
+  }
+}
+
+@include light.media-breakpoint-down(sm) {
+  .widget-separator {
+    .border-shift.border-end {
+      border-right: none !important;
+      border-left: none !important;
+    }
+  }
+}

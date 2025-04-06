@@ -1,0 +1,18 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "product": "iPhone 14 Pro",
+      "company_name": "Super Retina XDR display footnote Pro Motion technology",
+      "product_image": "product-1.png",
+      "reviewer": "Zane Scraggs",
+      "email": "zscraggs0@flavors.me",
+      "avatar": "",
+      "date": "5/28/2020",
+      "status": "Published",
+      "review": 2,
+      "head": "lorem ipsum dolor",
+      "para": "Nulla ut erat id mauris vulputate elementum. Nullam varius. Nulla facilisi."
+    }
+  ]
+}

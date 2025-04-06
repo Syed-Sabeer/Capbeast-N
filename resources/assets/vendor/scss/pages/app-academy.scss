@@ -1,0 +1,47 @@
+// * App Academy
+// *******************************************************************************
+
+@use '../_bootstrap-extended/include' as light;
+@use '../_bootstrap-extended/include-dark' as dark;
+@import '../_custom-variables/pages';
+
+.app-academy {
+  .app-academy-img-height {
+    height: 130px;
+  }
+}
+@include light.media-breakpoint-up(md) {
+  .app-academy {
+    .app-academy-md-25 {
+      width: 25%;
+    }
+    .app-academy-md-50 {
+      width: 50%;
+    }
+    .app-academy-md-80 {
+      width: 80%;
+    }
+  }
+}
+
+@include light.media-breakpoint-up(sm) {
+  .app-academy {
+    .app-academy-sm-40 {
+      width: 40% !important;
+    }
+    .app-academy-sm-60 {
+      width: 60% !important;
+    }
+  }
+}
+
+@include light.media-breakpoint-up(xl) {
+  .app-academy {
+    .app-academy-xl-100 {
+      width: 100% !important;
+    }
+    .app-academy-xl-100 {
+      width: 100% !important;
+    }
+  }
+}

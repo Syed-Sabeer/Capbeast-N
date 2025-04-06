@@ -1,0 +1,101 @@
+<div id="template-customizer" class="invert-bg-white">
+  <a href="javascript:void(0)" class="template-customizer-open-btn" tabindex="-1"></a>
+
+  <div class="p-4 m-0 lh-1 border-bottom template-customizer-header position-relative py-3">
+    <h4 class="template-customizer-t-panel_header mb-2"></h4>
+    <p class="template-customizer-t-panel_sub_header mb-0"></p>
+    <div class="d-flex align-items-center gap-2 position-absolute end-0 top-0 mt-4 me-3">
+      <a
+        href="javascript:void(0)"
+        class="template-customizer-reset-btn text-body"
+        data-bs-toggle="tooltip"
+        data-bs-placement="bottom"
+        title="Reset Customizer"
+        ><i class="ti ti-refresh ti-sm"></i
+        ><span class="badge rounded-pill bg-danger badge-dot badge-notifications d-none"></span
+      ></a>
+      <a href="javascript:void(0)" class="template-customizer-close-btn fw-light text-body" tabindex="-1"
+        ><i class="ti ti-x ti-sm"></i
+      ></a>
+    </div>
+  </div>
+
+  <div class="template-customizer-inner pt-4">
+    <!-- Theming -->
+    <div class="template-customizer-theming">
+      <h5 class="m-0 px-4 py-4 lh-1 d-block">
+        <span class="template-customizer-t-theming_header bg-label-primary rounded-1 py-1 px-2 fs-big"></span>
+      </h5>
+
+      <!-- Style -->
+      <div class="m-0 px-4 pb-3 pt-1 template-customizer-style w-100">
+        <label for="customizerStyle" class="form-label d-block template-customizer-t-style_label"></label>
+        <div class="row px-1 template-customizer-styles-options"></div>
+      </div>
+
+      <!-- Themes -->
+      <div class="m-0 px-4 pt-3 template-customizer-themes w-100">
+        <label for="customizerTheme" class="form-label template-customizer-t-theme_label"></label>
+        <div class="row px-1 template-customizer-themes-options"></div>
+      </div>
+    </div>
+    <!--/ Theming -->
+
+    <!-- Layout -->
+    <div class="template-customizer-layout">
+      <hr class="m-0 px-4 my-4" />
+      <h5 class="m-0 px-4 pb-4 pt-2 d-block">
+        <span class="template-customizer-t-layout_header bg-label-primary rounded-1 py-1 px-2 fs-big"></span>
+      </h5>
+
+      <!-- Layout(Menu) -->
+      <div class="m-0 px-4 pb-3 d-block template-customizer-layouts">
+        <label for="customizerStyle" class="form-label d-block template-customizer-t-layout_label"></label>
+        <div class="row px-1 template-customizer-layouts-options">
+          <!--? Uncomment If using offcanvas layout -->
+          <!-- <div class="col-12">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="layoutRadios" id="layoutRadios-offcanvas"
+                value="static-offcanvas">
+              <label class="form-check-label template-customizer-t-layout_offcanvas"
+                for="layoutRadios-offcanvas"></label>
+            </div>
+          </div> -->
+          <!-- <div class="col-12">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="layoutRadios" id="layoutRadios-fixed_offcanvas"
+                value="fixed-offcanvas">
+              <label class="form-check-label template-customizer-t-layout_fixed_offcanvas"
+                for="layoutRadios-fixed_offcanvas"></label>
+            </div>
+          </div> -->
+        </div>
+      </div>
+
+      <!-- Header Options for Horizontal -->
+      <div class="m-0 px-4 pb-3 template-customizer-headerOptions w-100">
+        <label for="customizerHeader" class="form-label template-customizer-t-layout_header_label"></label>
+        <div class="row px-1 template-customizer-header-options"></div>
+      </div>
+
+      <!-- Fixed navbar -->
+      <div class="m-0 px-4 pb-3 template-customizer-layoutNavbarOptions w-100">
+        <label for="customizerNavbar" class="form-label template-customizer-t-layout_navbar_label"></label>
+        <div class="row px-1 template-customizer-navbar-options"></div>
+      </div>
+
+      <!-- Content -->
+      <div class="m-0 px-4 pb-3 template-customizer-content w-100">
+        <label for="customizerContent" class="form-label template-customizer-t-content_label"></label>
+        <div class="row px-1 template-customizer-content-options"></div>
+      </div>
+
+      <!-- Directions -->
+      <div class="m-0 px-4 pb-3 template-customizer-directions w-100">
+        <label for="customizerDirection" class="form-label template-customizer-t-direction_label"></label>
+        <div class="row px-1 template-customizer-directions-options"></div>
+      </div>
+    </div>
+    <!--/ Layout -->
+  </div>
+</div>

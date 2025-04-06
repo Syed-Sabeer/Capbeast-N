@@ -1,0 +1,106 @@
+[
+    {
+        "name": "Red",
+        "hex": "#FF0000"
+    },
+    {
+        "name": "Green",
+        "hex": "#00FF00"
+    },
+    {
+        "name": "Blue",
+        "hex": "#0000FF"
+    },
+    {
+        "name": "White",
+        "hex": "#FFFFFF"
+    },
+    {
+        "name": "Black",
+        "hex": "#000000"
+    },
+    {
+        "name": "Yellow",
+        "hex": "#FFFF00"
+    },
+    {
+        "name": "Cyan",
+        "hex": "#00FFFF"
+    },
+    {
+        "name": "Magenta",
+        "hex": "#FF00FF"
+    },
+    {
+        "name": "Navy",
+        "hex": "#000080"
+    },
+    {
+        "name": "Royal Blue",
+        "hex": "#4169E1"
+    },
+    {
+        "name": "Dark Grey",
+        "hex": "#A9A9A9"
+    },
+    {
+        "name": "Heather Grey",
+        "hex": "#B7B8B6"
+    },
+    {
+        "name": "Gold",
+        "hex": "#FFD700"
+    },
+    {
+        "name": "Maroon",
+        "hex": "#800000"
+    },
+    {
+        "name": "Purple",
+        "hex": "#800080"
+    },
+    {
+        "name": "Spruce",
+        "hex": "#008B45"
+    },
+    {
+        "name": "Caramel",
+        "hex": "#AF6E4D"
+    },
+    {
+        "name": "Baby Pink",
+        "hex": "#F4C2C2"
+    },
+    {
+        "name": "Blaze Orange",
+        "hex": "#FF4500"
+    },
+    {
+        "name": "Safety Green",
+        "hex": "#88E500"
+    },
+    {
+        "name": "Carolina Blue",
+        "hex": "#56A3E8"
+    },
+    {
+        "name": "Safety Yellow",
+        "hex": "#FFD800"
+    },
+    {
+        "name": "Olive",
+        "hex": "#808000"
+    },
+    {
+        "name": "Brown",
+        "hex": "#8B4513"
+    },
+    {
+        "name": "Caramel",
+        "hex": "#AF6E4D"
+    },
+    {
+        "name": "Baby Pink",
+        "hex": "#FFB6C1"
+    }
+]

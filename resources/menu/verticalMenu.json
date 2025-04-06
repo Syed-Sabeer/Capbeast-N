@@ -1,0 +1,160 @@
+{
+
+      "menu": [
+        {
+          "url": "admin/dashboard",
+          "name": "Dashboard",
+          "slug": "app-ecommerce-dashboard"
+        },
+        {
+          "name": "Products",
+          "slug": "app-ecommerce-product",
+          "submenu": [
+            {
+              "url": "admin/product/list",
+              "name": "Product List",
+              "slug": "app-ecommerce-product-list"
+            },
+            {
+              "url": "admin/product/add",
+              "name": "Add Product",
+              "slug": "app-ecommerce-product-add"
+            }
+            
+          ]
+        },
+        {
+          "name": "Embroidery",
+          "slug": "app-ecommerce-printing",
+          "submenu": [
+            {
+              "url": "admin/printing/list",
+              "name": "Embroidery List",
+              "slug": "app-ecommerce-printing-list"
+            },
+            {
+              "url": "admin/printing/add",
+              "name": "Add Embroidery",
+              "slug": "app-ecommerce-printing-add"
+            }
+          ]
+        },
+        {
+          "name": "Deliveries",
+          "slug": "app-ecommerce-delivery",
+          "submenu": [
+            {
+              "url": "admin/delivery/list",
+              "name": "Delivery List",
+              "slug": "app-ecommerce-delivery-list"
+            },
+            {
+              "url": "admin/delivery/add",
+              "name": "Add Delivery",
+              "slug": "app-ecommerce-delivery-add"
+            }
+          ]
+        },
+        {
+          "name": "Order",
+          "slug": "app-ecommerce-order",
+          "submenu": [
+            {
+              "url": "admin/order/list",
+              "name": "Order List",
+              "slug": "app-ecommerce-order-list"
+            }
+          ]
+        },
+        {
+          "name": "Customer",
+          "slug": "app-ecommerce-customer",
+          "submenu": [
+            {
+              "url": "admin/customer/all",
+              "name": "All Customers",
+              "slug": "app-ecommerce-customer-all"
+            }
+          ]
+        },
+          {
+          "name": "Components",
+          "slug": "app-ecommerce-components",
+          "submenu": [
+           
+            {
+              "name": "Product Color",
+              "slug": "app-ecommerce-product-color",
+              "submenu": [
+                {
+                  "url": "admin/component/productcolor/add",
+                  "name": "Add Color",
+                  "slug": "content-product-color-add"
+                },
+                {
+                  "url": "admin/component/productcolor/list",
+                  "name": "View Color",
+                  "slug": "content-product-color-list"
+                }
+              ]
+            },
+            {
+              "name": "Internal Statuses",
+              "slug": "app-ecommerce-customer-details",
+              "submenu": [
+                {
+                  "url": "admin/component/InternalStatus/add",
+                  "name": "Add Internal Status",
+                  "slug": "app-ecommerce-customer-details-overview"
+                },
+                {
+                  "url": "admin/component/InternalStatus/list",
+                  "name": "View Internal Status",
+                  "slug": "app-ecommerce-customer-details-security"
+                }
+              ]
+            },
+            {
+              "name": "TPS Tax",
+              "slug": "app-ecommerce-customer-details",
+              "submenu": [
+                {
+                  "url": "admin/component/TPS_TaxPrice/list",
+                  "name": "Modify Tax",
+                  "slug": "app-ecommerce-customer-details-overview"
+                }
+              ]
+            },
+            {
+              "name": "TVQ Tax",
+              "slug": "app-ecommerce-customer-details",
+              "submenu": [
+                {
+                  "url": "admin/component/TVQ_TaxPrice/list",
+                  "name": "Modify Tax",
+                  "slug": "app-ecommerce-customer-details-overview"
+                }
+              ]
+            },
+            {
+              "name": "Discount Coupons",
+              "slug": "app-ecommerce-customer-details",
+              "submenu": [
+                {
+                  "url": "admin/component/discountcoupon/add",
+                  "name": "Add Discount Coupons",
+                  "slug": "app-ecommerce-customer-details-overview"
+                },
+                {
+                  "url": "admin/component/discountcoupon/list",
+                  "name": "View Discount Coupons",
+                  "slug": "app-ecommerce-customer-details-security"
+                }
+              ]
+            }
+          ]
+        }
+        
+      ]
+ 
+}

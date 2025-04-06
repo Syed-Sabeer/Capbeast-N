@@ -1,0 +1,331 @@
+// * Landing
+// *******************************************************************************
+
+@use '../_bootstrap-extended/include' as light;
+@use '../_bootstrap-extended/include-dark' as dark;
+@import '../_custom-variables/pages';
+
+// Variables
+@import './front/variables';
+
+.section-py {
+  padding: 6.25rem 0;
+  @include light.media-breakpoint-down(xl) {
+    padding: 5rem 0;
+  }
+  @include light.media-breakpoint-down(md) {
+    padding: 3rem 0;
+  }
+}
+
+// Hero
+.landing-hero {
+  border-radius: 0 0 3.5rem 3.5rem;
+  padding-top: 10.2rem;
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+  @include light.media-breakpoint-up(lg) {
+    .hero-text-box {
+      max-width: 34.375rem;
+      margin: 0 auto;
+    }
+  }
+  .hero-title {
+    background: linear-gradient(to right, #28c76f 0%, #5a4aff 47.92%, #ff3739 100%);
+    background-size: 200% auto;
+    color: light.$headings-color;
+    background-clip: text;
+    line-height: 1.2;
+    text-fill-color: transparent;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 2s ease-in-out infinite alternate;
+  }
+  .hero-sub-title {
+    line-height: 28px;
+  }
+  .landing-hero-btn {
+    .hero-btn-item {
+      inset-inline-start: -86%;
+      top: 80%;
+    }
+  }
+  .hero-animation-img {
+    margin-bottom: -32rem;
+    @include light.media-breakpoint-down(xl) {
+      margin-bottom: -20rem;
+    }
+    @include light.media-breakpoint-down(sm) {
+      margin-bottom: -10rem;
+    }
+    .hero-dashboard-img {
+      width: 80%;
+      margin: 0 auto;
+      will-change: transform;
+      transform-style: preserve-3d;
+      transition: all 0.1s;
+      img {
+        width: 100%;
+      }
+    }
+  }
+}
+.landing-hero-blank {
+  padding-top: 26rem;
+  @include light.media-breakpoint-down(xl) {
+    padding-top: 15rem;
+  }
+  @include light.media-breakpoint-down(sm) {
+    padding-top: 7rem;
+  }
+}
+@keyframes shine {
+  0% {
+    background-position: 0% 50%;
+  }
+  80% {
+    background-position: 50% 90%;
+  }
+  100% {
+    background-position: 91% 100%;
+  }
+}
+
+// Useful features
+.landing-features {
+  .features-icon-wrapper {
+    .features-icon-box {
+      .features-icon-description {
+        max-width: 19.25rem;
+        margin: 0 auto;
+      }
+    }
+  }
+}
+
+// Real customers reviews
+.landing-reviews {
+  @include light.border-top-radius($section-radius);
+  .landing-reviews-btns {
+    .reviews-btn {
+      padding: 0.45rem;
+    }
+  }
+  .swiper-reviews-carousel {
+    .swiper-button-prev,
+    .swiper-button-next {
+      display: none;
+    }
+    .swiper-slide {
+      height: auto;
+    }
+    .client-logo {
+      height: 1.375rem;
+      object-fit: contain;
+    }
+  }
+  .swiper-logo-carousel {
+    .swiper {
+      max-width: 45rem;
+      .swiper-slide {
+        display: flex;
+        justify-content: center;
+      }
+      .client-logo {
+        max-height: 2.5rem;
+        max-width: 95%;
+        object-fit: contain;
+      }
+    }
+  }
+}
+
+// our great team
+.landing-team {
+  .card {
+    &,
+    .team-image-box {
+      border-top-left-radius: 5.625rem;
+      border-top-right-radius: 1.25rem;
+    }
+    .card-body {
+      border-bottom-left-radius: light.$border-radius;
+      border-bottom-right-radius: light.$border-radius;
+    }
+  }
+  .team-image-box {
+    height: 11.5625rem;
+    .card-img-position {
+      height: 15rem;
+      transform: translateX(-50%);
+      @include light.media-breakpoint-down(lg) {
+        height: 13rem;
+      }
+    }
+    @include light.media-breakpoint-down(sm) {
+      height: 11rem;
+    }
+  }
+  .card {
+    .team-media-icons {
+      i {
+        transition: light.$card-transition;
+      }
+    }
+  }
+}
+
+// Pricing plans
+.landing-pricing {
+  border-radius: $section-radius;
+  .pricing-plans-item {
+    inset-inline-end: -60%;
+    bottom: 0;
+    @include light.media-breakpoint-down(md) {
+      inset-inline-end: 0;
+      bottom: 1rem;
+    }
+  }
+  .price-yearly-toggle {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .card {
+    .card-header,
+    .card-body {
+      padding: 2rem;
+    }
+  }
+}
+
+// FAQs
+.landing-faq {
+  @include light.border-top-radius($section-radius);
+  .faq-image {
+    max-width: 20rem;
+    width: 80%;
+  }
+}
+
+// CTA
+.landing-cta {
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+// Contact US
+.landing-contact {
+  .text-heading {
+    overflow-wrap: anywhere;
+  }
+  .contact-img-box {
+    &,
+    .contact-img {
+      border-radius: 3.75rem light.$border-radius light.$border-radius light.$border-radius;
+    }
+    &::before {
+      content: url('../../../img/front-pages/icons/contact-border.png');
+      position: absolute;
+      inset-block-start: -2.5rem;
+      inset-inline-start: -2.8125rem;
+      @include light.media-breakpoint-down(md) {
+        display: none;
+      }
+    }
+  }
+}
+
+// Light style
+@if $enable-light-style {
+  .light-style {
+    // Hero
+    .landing-hero {
+      background: $hero-bg;
+      &::after {
+        background-color: light.$card-bg;
+      }
+    }
+    //CTA
+    .landing-cta {
+      background-image: url('../../../img/front-pages/backgrounds/cta-bg.png');
+    }
+  }
+}
+
+// Dark style
+@if $enable-dark-style {
+  .dark-style {
+    // Hero
+    .landing-hero {
+      background: $hero-dark-bg;
+      &::after {
+        background-color: dark.$card-bg;
+      }
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        height: 100%;
+        background: url('../../../img/front-pages/backgrounds/hero-bg-dark.png') center no-repeat;
+        background-size: contain;
+      }
+    }
+    //CTA
+    .landing-cta {
+      background-image: url('../../../img/front-pages/backgrounds/cta-bg-dark.png');
+    }
+  }
+}
+
+// RTL
+@if $enable-rtl-support {
+  [dir='rtl'] {
+    // our great team
+    .landing-team {
+      .team-image-box {
+        .card-img-position {
+          transform: translateX(50%) !important;
+        }
+      }
+    }
+    // Pricing plans
+    .landing-pricing {
+      .switch {
+        .switch-label {
+          padding-right: 0;
+          &:first-child {
+            padding-left: 0.5rem;
+          }
+        }
+        .switch-input {
+          ~ .switch-label {
+            padding-right: 3rem;
+          }
+        }
+      }
+    }
+    // Contact US
+    .landing-contact {
+      .contact-img-box {
+        border-radius: light.$border-radius 3.75rem light.$border-radius light.$border-radius;
+        &::before {
+          inset-block-start: -1.875rem;
+          inset-inline-start: -3.125rem;
+          transform: rotate(90deg);
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+// Cards
+// *******************************************************************************
+
+// color border bottom and shadow in card
+@mixin template-card-border-shadow-variant($parent, $background) {
+  $border-color: shade-color($background, $card-border-color-scale, $card-bg);
+  .card {
+    &#{$parent} {
+      &::after {
+        border-bottom-color: $border-color;
+      }
+      &:hover {
+        &::after {
+          border-bottom-color: $background;
+        }
+      }
+    }
+  }
+}
+
+// card hover border color
+@mixin template-card-hover-border-variant($parent, $background) {
+  $border-color: shade-color($background, $card-hover-border-scale, $card-bg);
+  .card {
+    &#{$parent},
+    #{$parent} {
+      &:hover {
+        border-color: $border-color;
+      }
+    }
+  }
+}

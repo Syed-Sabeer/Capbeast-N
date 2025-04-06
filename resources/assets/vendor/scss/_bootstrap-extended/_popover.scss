@@ -1,0 +1,42 @@
+// Popovers
+// *******************************************************************************
+
+@each $color, $value in $theme-colors {
+  @if $color != primary and $color != light {
+    @include template-popover-variant(
+      '.popover-#{$color}, .popover-#{$color} > .popover, .ngb-popover-#{$color} + ngb-popover-window',
+      rgba-to-hex($value, $rgba-to-hex-bg)
+    );
+  }
+}
+
+.modal-open .popover {
+  z-index: $zindex-modal + 1;
+}
+
+.popover {
+  box-shadow: $popover-box-shadow;
+
+  // Popover header padding and font-size
+  .popover-header {
+    padding-bottom: 0;
+    font-size: $h5-font-size;
+  }
+
+  // Popover body padding
+  .popover-body {
+    padding-top: $spacer;
+  }
+  .popover-arrow {
+    z-index: 1;
+  }
+}
+
+// RTL
+// *******************************************************************************
+
+@include rtl-only {
+  .popover {
+    text-align: right;
+  }
+}

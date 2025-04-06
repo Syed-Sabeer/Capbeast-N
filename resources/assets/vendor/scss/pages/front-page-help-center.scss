@@ -1,0 +1,18 @@
+// * Help center
+// *******************************************************************************
+
+@use '../_bootstrap-extended/include' as light;
+@use '../_bootstrap-extended/include-dark' as dark;
+@import '../_custom-variables/pages';
+
+.help-center-header {
+  background: url('../../../img/pages/header.png') no-repeat;
+  background-size: cover;
+
+  .input-wrapper {
+    max-width: 31.25rem;
+    @include light.media-breakpoint-down(sm) {
+      max-width: 80%;
+    }
+  }
+}

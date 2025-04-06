@@ -1,0 +1,14 @@
+@use '../_bootstrap-extended/include' as light;
+@use '../_bootstrap-extended/include-dark' as dark;
+@import '../_custom-variables/pages';
+
+// To remove border end in small screen
+@include light.media-breakpoint-down(lg) {
+  .section-py {
+    .card-body {
+      &.border-end {
+        border: 0 !important;
+      }
+    }
+  }
+}
