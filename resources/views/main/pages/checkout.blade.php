@@ -62,7 +62,7 @@
 
                                         @foreach ($cart as $item)
                                         @php
-                                        $itemTotal = $item->product->selling_price * $item->quantity; 
+                                        $itemTotal = $item->product->selling_price * $item->quantity;
                                         $subtotal += $itemTotal;
                                         @endphp
 
@@ -147,9 +147,9 @@
                                     <input type="text" id="address" name="address" class="form-control" required />
                                 </div>
 
-                  
-                                                   
-                                
+
+
+
 
 
                                 <div data-mdb-input-init class="form-outline mb-4">
@@ -161,7 +161,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                
+
 
                                 <!-- Email input -->
                                 <div data-mdb-input-init class="form-outline mb-4">
@@ -229,7 +229,7 @@
                                     <input type="text" id="cvv" name="cvv" class="form-control"
                                         placeholder="123">
                                 </div>
-                                
+
                                 <input type="hidden" id="discount" name="discount" value="">
                             </div>
                         </div>
@@ -286,43 +286,43 @@
                                                 <tr>
                                                     <td>Sub Total :</td>
                                                     <td class="text-end cart-subtotal">
-                                                      
+
                                                        {{ number_format($subtotal, 2) }}
                                                     </td>
                                                 </tr>
-                                                
+
                                                 <tr>
                                                     <td>Discount :</td>
                                                     <td class="text-end cart-discount">
                                                        <span id="discount-amount">0.00</span>
                                                     </td>
                                                 </tr>
-                                                
-                                                
+
+
                                                 <tr>
                                                     <td>TPS Tax {{ $TPStaxPercentage->percentage }}% ({{ $TPStaxPercentage->taxno }}) :</td>
-                                                    <td class="text-end tps-cart-tax" 
-                                                        tps-data-percentage="{{ $TPStaxPercentage->percentage }}" 
-                                                        tps-data-taxno="{{ $TPStaxPercentage->taxno }}" 
+                                                    <td class="text-end tps-cart-tax"
+                                                        tps-data-percentage="{{ $TPStaxPercentage->percentage }}"
+                                                        tps-data-taxno="{{ $TPStaxPercentage->taxno }}"
                                                         tps-data-tax="{{ $TPStaxPercentage->percentage }}">
-                                                        
+
                                                         {{-- Dynamic currency symbols with JS updatable ID --}}
                                                         <span id="tps-tax-amount">0.00</span>
                                                     </td>
                                                 </tr>
-                                                
+
                                                 <tr>
                                                     <td>TVQ Tax {{ $TVQtaxPercentage->percentage }}% ({{ $TVQtaxPercentage->taxno }}) :</td>
-                                                    <td class="text-end tvq-cart-tax" 
-                                                        tvq-data-percentage="{{ $TVQtaxPercentage->percentage }}" 
-                                                        tvq-data-taxno="{{ $TVQtaxPercentage->taxno }}" 
+                                                    <td class="text-end tvq-cart-tax"
+                                                        tvq-data-percentage="{{ $TVQtaxPercentage->percentage }}"
+                                                        tvq-data-taxno="{{ $TVQtaxPercentage->taxno }}"
                                                         tvq-data-tax="{{ $TVQtaxPercentage->percentage }}">
-                                                        
+
                                                         {{-- Dynamic currency symbols with JS updatable ID --}}
                                                         <span id="tvq-tax-amount">0.00</span>
                                                     </td>
                                                 </tr>
-                                                
+
 
                                                 <tr class="table-active">
                                                     <th>Total (  ) :</th>
@@ -331,7 +331,7 @@
                                                      <span id="final-total-amount">{{ number_format($subtotal, 2) }}</span>
                                                     </td>
                                                 </tr>
-                                                
+
                                             </tbody>
                                         </table>
                                     </div>
@@ -353,40 +353,40 @@
                 </div><!--end row-->
             </div><!--end container-->
         </section>
-        
+
         <script>
-            let appliedDiscount = 0; 
+            let appliedDiscount = 0;
             let discountId = null;
-        
+
             document.addEventListener('DOMContentLoaded', function () {
-        
+
                 // Function to update tax and total amounts
                 function updateTaxAndTotal(subtotal, appliedDiscount = 0) {
                     let TPStaxElement = document.querySelector('.tps-cart-tax');
                     let TVQtaxElement = document.querySelector('.tvq-cart-tax');
                     let totalElement = document.querySelector('.cart-total');
-        
+
                     // Get tax percentages from the server-side variables
                     let TPStaxPercentage = parseFloat(TPStaxElement.getAttribute('tps-data-tax')) || 0;
                     let TVQtaxPercentage = parseFloat(TVQtaxElement.getAttribute('tvq-data-tax')) || 0;
-        
+
                     let discountedTotal = subtotal - appliedDiscount;
                     if (discountedTotal < 0) discountedTotal = 0; // Prevent negative totals
-        
+
                     // Update userCountry dynamically
                     let userCountry = $('#country').val();
 
-        
+
                     // If the country is Canada, apply TPS and TVQ taxes
                     let TPStaxAmount = userCountry === "CA" ? (discountedTotal * TPStaxPercentage) / 100 : 0;
                     let TVQtaxAmount = userCountry === "CA" ? (discountedTotal * TVQtaxPercentage) / 100 : 0;
                     let finalTotal = discountedTotal + TPStaxAmount + TVQtaxAmount;
-        
+
                     // ✅ Only update the amount, keep symbols intact
                     document.getElementById('tps-tax-amount').textContent = TPStaxAmount.toFixed(2);
                     document.getElementById('tvq-tax-amount').textContent = TVQtaxAmount.toFixed(2);
                     document.getElementById('final-total-amount').textContent = finalTotal.toFixed(2);
-        
+
                     console.log("User Country:", userCountry);
                     console.log("Discount Id:", discountId);
                     console.log("Subtotal: $" + subtotal.toFixed(2));
@@ -395,19 +395,19 @@
                     console.log("TVQ Tax Amount: $" + TVQtaxAmount.toFixed(2));
                     console.log("Total after Tax: $" + finalTotal.toFixed(2));
                 }
-        
+
                 // Function to get the subtotal value from the DOM
                 function getSubtotal() {
                     let subtotalElement = document.querySelector('.cart-subtotal');
                     return parseFloat(subtotalElement.innerText.replace(/[^0-9.]/g, '')) || 0;
                 }
-        
+
                 // Initial Tax Calculation on Load
                 updateTaxAndTotal(getSubtotal());
-        
+
                 document.getElementById('applyCoupon').addEventListener('click', function () {
                     let couponCode = document.getElementById('couponCode').value;
-        
+
                     fetch("{{ route('apply.discount') }}", {
                         method: "POST",
                         headers: {
@@ -420,14 +420,14 @@
                     .then(result => {
                         if (result.success) {
                             alert(result.message);
-                            appliedDiscount = parseFloat(result.discount) || 0; 
+                            appliedDiscount = parseFloat(result.discount) || 0;
                             discountId = result.discountId ?? null;
-        
+
                             // ✅ Only update the amount, keep symbols intact
                             document.getElementById('discount-amount').textContent = appliedDiscount.toFixed(2);
-        
+
                             updateTaxAndTotal(getSubtotal(), appliedDiscount);
-        
+
                             console.log("Applied Discount: $" + appliedDiscount.toFixed(2));
                             console.log("Discount ID:", discountId); // ✅ Log discountId in console
                         } else {
@@ -436,32 +436,32 @@
                     })
                     .catch(error => console.error('Error:', error));
                 });
-        
+
                 // Checkout function
                 function proceedToCheckout() {
                     if (confirm('Are you sure you want to proceed to checkout?')) {
                         let checkoutButton = document.getElementById('checkoutButton');
                         checkoutButton.innerHTML = 'Processing... <span class="spinner-border spinner-border-sm"></span>';
                         checkoutButton.disabled = true;
-        
+
                         let subtotalElement = document.querySelector('.cart-subtotal');
                         let subtotal = parseFloat(subtotalElement.innerText.replace(/[^0-9.]/g, '')) || 0;
-        
+
                         let TPStaxElement = document.querySelector('.tps-cart-tax');
                         let TPStaxAmount = parseFloat(TPStaxElement.innerText.replace(/[^0-9.]/g, '')) || 0;
                         let TPStaxNumber = TPStaxElement.getAttribute('tps-data-taxno'); // Extract TPS Tax Number
                         let TPStaxPercentage = TPStaxElement.getAttribute('tps-data-percentage'); // Extract TPS Tax Percentage
-        
+
                         let TVQtaxElement = document.querySelector('.tvq-cart-tax');
                         let TVQtaxAmount = parseFloat(TVQtaxElement.innerText.replace(/[^0-9.]/g, '')) || 0;
                         let TVQtaxNumber = TVQtaxElement.getAttribute('tvq-data-taxno'); // Extract TVQ Tax Number
                         let TVQtaxPercentage = TVQtaxElement.getAttribute('tvq-data-percentage');
-        
+
                         let finalTotal = subtotal - appliedDiscount + TPStaxAmount + TVQtaxAmount;
-        
+
                         console.log("Subtotal: $" + subtotal.toFixed(2));
                         console.log("Applied Discount: $" + appliedDiscount.toFixed(2));
-                        console.log("Discount ID:", discountId); 
+                        console.log("Discount ID:", discountId);
                         console.log("TPS Tax Amount: $" + TPStaxAmount.toFixed(2));
                         console.log("TPS Tax Number:", TPStaxNumber);
                         console.log("TPS Tax Percentage:", TPStaxPercentage);
@@ -469,7 +469,7 @@
                         console.log("TVQ Tax Number:", TVQtaxNumber);
                         console.log("TVQ Tax Percentage:", TVQtaxPercentage);
                         console.log("Total after Tax: $" + finalTotal.toFixed(2));
-        
+
                         const formData = {
                             firstname: document.getElementById('firstname').value,
                             lastname: document.getElementById('lastname').value,
@@ -481,7 +481,7 @@
                             additional_info: document.getElementById('additional_info').value,
                             paymentMethod: document.querySelector('input[name="paymentMethod"]:checked')?.value,
                             DiscountAmount: appliedDiscount,
-                            discountId: discountId ? discountId : null,  
+                            discountId: discountId ? discountId : null,
                             subtotal: subtotal,
                             TPStaxAmount: TPStaxAmount,
                             TPStaxNumber: TPStaxNumber,
@@ -492,7 +492,7 @@
                             TVQtaxNumber: TVQtaxNumber,
                             finalTotal: finalTotal
                         };
-        
+
                         fetch("{{ route('checkout.add') }}", {
                             method: "POST",
                             headers: {
@@ -522,25 +522,25 @@
                         });
                     }
                 }
-        
+
                 // Country select logic
                 const countriesRoute = "{{ route('countries.index') }}";
                 let countrySelect = document.getElementById('country');
                 let tpsTaxRow = document.querySelector('.tps-cart-tax').parentElement;
                 let tvqTaxRow = document.querySelector('.tvq-cart-tax').parentElement;
-        
+
                 // Show loading indicator
                 function setLoading(selectElement) {
                     selectElement.innerHTML = '<option value="">Loading...</option>';
                     selectElement.disabled = true;
                 }
-        
+
                 // Remove loading indicator
                 function removeLoading(selectElement, placeholder) {
                     selectElement.innerHTML = `<option value="">${placeholder}</option>`;
                     selectElement.disabled = false;
                 }
-        
+
                 // Fetch countries
                 setLoading(countrySelect);
                 fetch(countriesRoute)
@@ -550,7 +550,7 @@
                         for (const [code, name] of Object.entries(data)) {
                             countrySelect.innerHTML += `<option value="${code}">${name}</option>`;
                         }
-        
+
                         // Trigger tax rows visibility check based on the selected country
                         updateTaxRowsVisibility();
                     })
@@ -558,7 +558,7 @@
                         removeLoading(countrySelect, "Failed to load countries, Kindly Refresh the page");
                         console.error(error);
                     });
-        
+
                 // Function to update tax row visibility
                 function updateTaxRowsVisibility() {
                     if (countrySelect.value === "CA") {
@@ -570,20 +570,21 @@
                         tvqTaxRow.style.display = 'none';
                     }
                 }
-        
+
                 // Event listener for country change
-                
+
                 $('#country').on('change', function () {
     console.log("Selected country code:", $(this).val());
     updateTaxRowsVisibility();
 });
 
-        
+
                 // Initial check for Canada tax rows visibility
                 updateTaxRowsVisibility();
                 document.getElementById('checkoutButton').addEventListener('click', proceedToCheckout);
             });
         </script>
-        
+
+
 
     @endsection
