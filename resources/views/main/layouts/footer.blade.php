@@ -58,9 +58,9 @@
                                 <li><a href="tel:18559326752"><i class="fa-solid fa-phone white-color">&nbsp; </i> +1
                                         (855)
                                         932-6752</a></li>
-                                <li><a href="mailto:sales@monkeybeanies.com"><i
+                                <li><a href="mailto:support@capbeast.com"><i
                                             class="white-color fa-solid fa-envelope">&nbsp;</i>
-                                        sales@monkeybeanies.com</a></li>
+                                    support@capbeast.com</a></li>
                             </ul>
                         </div>
                     </div>
@@ -72,7 +72,7 @@
             <div class="col-sm-6">
 
                 <p>© <script>document.write(new Date().getFullYear())
-      </script> Monkey Beanies. All Rights Reserved</p>
+      </script> CapBeast. All Rights Reserved</p>
             </div>
             <div class="col-sm-6">
                 <div class="text-sm-end d-none d-sm-block">

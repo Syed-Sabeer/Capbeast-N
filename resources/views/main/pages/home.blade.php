@@ -46,8 +46,8 @@ var mixer = mixitup('.row', {
               </div>
           </div>
           <div class="carousel-item">
-              <div class="ecommerce-home bg-primary-subtle" style="background-image: url('../assets/images/ecommerce/home/img-2.png');">
-                  <div class="container">
+              <div class="ecommerce-home bg-primary-subtle" style=" background-image: url('{{ asset('assetsMain/images/banner/banner2.jpeg') }}');">
+                  {{-- <div class="container">
                       <div class="row">
                           <div class="col-lg-6">
                               <div>
@@ -58,12 +58,12 @@ var mixer = mixitup('.row', {
                               </div>
                           </div>
                       </div>
-                  </div>
+                  </div> --}}
               </div>
           </div>
           <div class="carousel-item">
-              <div class="ecommerce-home" style="background-image: url('../assets/images/ecommerce/home/img-6.jpg');background-size: cover;">
-                  <div class="container">
+              <div class="ecommerce-home" style=" background-image: url('{{ asset('assetsMain/images/banner/banner4.jpeg') }}');background-size: cover;">
+                  {{-- <div class="container">
                       <div class="row justify-content-end">
                           <div class="col-lg-6">
                               <div class="text-end">
@@ -77,7 +77,7 @@ var mixer = mixitup('.row', {
                               </div>
                           </div>
                       </div>
-                  </div>
+                  </div> --}}
               </div>
           </div>
       </div>
