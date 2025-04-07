@@ -221,14 +221,14 @@
                             @if($order->TaxDetails->tvq_tax_percentage)
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="w-px-200 text-heading">TVQ Tax {{ $order->TaxDetails->tvq_tax_percentage }}% ({{ $order->TaxDetails->tvq_tax_no }}) :</span>
-                                    <h6 class="mb-0">${{ $order->tvq_tax_price }}</h6>
+                                    <h6 class="mb-0">${{ $order->TaxDetails->tvq_tax_price }}</h6>
                                 </div>
                             @endif
                         
                             @if($order->TaxDetails->tps_tax_percentage)
                                 <div class="d-flex justify-content-between mb-2">
                                     <span class="w-px-200 text-heading">TPS Tax {{ $order->TaxDetails->tps_tax_percentage }}% ({{ $order->TaxDetails->tps_tax_no }}) :</span>
-                                    <h6 class="mb-0">${{ $order->tps_tax_price }}</h6>
+                                    <h6 class="mb-0">${{ $order->TaxDetails->tps_tax_price }}</h6>
                                 </div>
                             @endif
                         @endif

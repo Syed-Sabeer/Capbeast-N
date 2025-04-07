@@ -53,7 +53,13 @@ $cartItem = Cart::create([
                     'size' => $validated['size'],
 ]);
            
-            return response()->json(['success' => true, 'message' => 'Item added to cart!', 'cartItem' => $cartItem]);
+return response()->json([
+    'success' => true,
+    'message' => 'Item added to cart!',
+    'cartItem' => $cartItem,
+    'redirect_url' => route('cart')  // Add the cart route for redirection
+]);
+
         } catch (\Exception $e) {
             Log::error('Error adding to cart: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Failed to add item to cart.'], 500);
@@ -62,16 +68,15 @@ $cartItem = Cart::create([
     public function remove($itemId)
     {
         try {
-   
-            $cartItem = Cart::findOrFail($itemId);          
+            $cartItem = Cart::findOrFail($itemId);
             $cartItem->delete();
-        
+    
             return response()->json(['success' => true, 'message' => 'Item removed from cart!']);
         } catch (\Exception $e) {
-           
             return response()->json(['success' => false, 'message' => 'Failed to remove item from cart.'], 500);
         }
     }
+    
     public function clear()
     {
         try {

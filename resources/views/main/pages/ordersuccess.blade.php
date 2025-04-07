@@ -139,7 +139,7 @@
                         </td>
                         <td style="padding: 12px 8px; font-size: 15px;text-align: end;">
                             <h6 style="font-size: 15px; margin: 0px; font-weight: 600; font-family: 'Inter', sans-serif;">
-                                ${{ number_format($order->tvq_tax_price, 2) ?? 0 }}
+                                ${{ number_format($order->TaxDetails->tvq_tax_price, 2) ?? 0 }}
                             </h6>
                         </td>
                     </tr>
@@ -152,7 +152,7 @@
                         </td>
                         <td style="padding: 12px 8px; font-size: 15px;text-align: end;">
                             <h6 style="font-size: 15px; margin: 0px; font-weight: 600; font-family: 'Inter', sans-serif;">
-                                ${{ number_format($order->tps_tax_price, 2) ?? 0 }}
+                                ${{ number_format($order->TaxDetails->tps_tax_price, 2) ?? 0 }}
                             </h6>
                         </td>
                     </tr>

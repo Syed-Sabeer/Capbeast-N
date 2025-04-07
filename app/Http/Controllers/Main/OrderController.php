@@ -146,16 +146,20 @@ class OrderController extends Controller
                     'status' => 0,
                 ]);
     
-                if (!empty($request->TPStaxNumber) && $request->TPStaxPercentage > 0
-                 || !empty($request->TVQtaxNumber) && $request->TVQtaxPercentage > 0 ) {
+                $country = session('checkout_details')['country'] ?? null;
+                if (($TPStaxAmount > 0 || $TVQtaxAmount > 0) && $country === 'CA') {
+               
 
                     OrderTaxDetails::create([
                         'order_id' => $order->id,
-                        'tps_tax_no' => $request->TPStaxNumber,
-                        'tps_tax_percentage' => $request->TPStaxPercentage,
-                        'tvq_tax_no' => $request->TVQtaxNumber,
-                        'tvq_tax_percentage' => $request->TVQtaxPercentage,
+                        'tps_tax_no' => $TPStaxNumber,
+                        'tps_tax_percentage' => $TPStaxPercentage,
+                        'tps_tax_price' => $TPStaxAmount,
+                        'tvq_tax_no' => $TVQtaxNumber,
+                        'tvq_tax_percentage' => $TVQtaxPercentage,
+                        'tvq_tax_price' => $TVQtaxAmount,
                     ]);
+                    
                 }
                 
     

@@ -11,6 +11,6 @@ class OrderTaxDetails extends Model
 
     protected $table = 'order_tax_details'; 
 
-    protected $fillable = ['order_id','tps_tax_no','tps_tax_percentage','tvq_tax_no','tvq_tax_percentage'];
+    protected $fillable = ['order_id','tps_tax_no','tps_tax_percentage','tps_tax_price','tvq_tax_no','tvq_tax_percentage','tvq_tax_price'];
 
 }

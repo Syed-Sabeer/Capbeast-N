@@ -68,6 +68,7 @@ Route::middleware(['web'])->group(function () {
 
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
     Route::delete('/cart/remove/{itemId}', [CartController::class, 'remove'])->name('cart.remove');
+
     Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
     Route::get('/checkout', [OrderController::class, 'index'])->name('checkout');
     Route::post('/checkout/add', [OrderController::class, 'add'])->name('checkout.add');
