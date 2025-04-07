@@ -85,7 +85,9 @@ $subtotal += $itemTotal;
             <div class="col-sm">
                 <div class="d-flex flex-wrap my-n1">
                     <div>
-                        <a href="#!" class="d-block text-body p-1 px-2" data-bs-toggle="modal" data-bs-target="#removeItemModal"><i class="ri-delete-bin-fill text-muted align-bottom me-1"></i> Remove</a>
+                        <a href="javascript:void(0);" class="d-block text-body p-1 px-2 remove-item-btn" data-item-id="{{ $cart->id }}">
+                            <i class="ri-delete-bin-fill text-muted align-bottom me-1"></i> Remove
+                        </a>
                     </div>
                     <div>
                         <a href="#!" class="d-block text-body p-1 px-2"><i class="ri-star-fill text-muted align-bottom me-1"></i> Add Wishlist</a>
@@ -175,38 +177,39 @@ $subtotal += $itemTotal;
 <script>
     // Remove a single item from the cart
     document.querySelectorAll('.remove-item-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            const cartItemId = this.getAttribute('data-item-id'); // Fetching the cart item ID
+    button.addEventListener('click', function () {
+        const cartItemId = this.getAttribute('data-item-id'); // Fetching the cart item ID
 
-            // Confirm deletion
-            if (confirm("Are you sure you want to delete this item from your cart?")) {
-                // Generate the URL using the route helper
-                const url = "{{ route('cart.remove', ['itemId' => '__ITEM_ID__']) }}".replace('__ITEM_ID__', cartItemId);
+        // Confirm deletion
+        if (confirm("Are you sure you want to delete this item from your cart?")) {
+            // Generate the URL using the route helper
+            const url = "{{ route('cart.remove', ['itemId' => '__ITEM_ID__']) }}".replace('__ITEM_ID__', cartItemId);
 
-                // Sending a DELETE request
-                fetch(url, {
-                    method: "DELETE", // Ensure the HTTP method is DELETE
-                    headers: {
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}", // CSRF token for security
-                        "Content-Type": "application/json"
-                    },
-                })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success) {
-                        alert(result.message); // Show success message
-                        location.reload(); // Reload page to update cart
-                    } else {
-                        alert(result.message); // Show error message if deletion failed
-                    }
-                })
-                .catch(error => {
-                    alert("An error occurred while deleting the item. Please try again.");
-                    console.error("Error:", error);
-                });
-            }
-        });
+            // Sending a DELETE request
+            fetch(url, {
+                method: "DELETE", // Ensure the HTTP method is DELETE
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}", // CSRF token for security
+                    "Content-Type": "application/json"
+                },
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert(result.message); // Show success message
+                    location.reload(); // Reload page to update cart
+                } else {
+                    alert(result.message); // Show error message if deletion failed
+                }
+            })
+            .catch(error => {
+                alert("An error occurred while deleting the item. Please try again.");
+                console.error("Error:", error);
+            });
+        }
     });
+});
+
 
     // Clear all items from the cart
     document.querySelector('.link-secondary').addEventListener('click', function (e) {

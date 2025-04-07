@@ -215,37 +215,41 @@
                 }
 
                 fetch("{{ route('cart.add') }}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                        },
-                        body: JSON.stringify({
-                            productId,
-                            userId,
-                            colorId,
-                            size,
-                            quantity
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        button.disabled = false;
-                        button.textContent = originalText;
-                        button.classList.remove("loading");
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+    },
+    body: JSON.stringify({
+        productId,
+        userId,
+        colorId,
+        size,
+        quantity
+    })
+})
+.then(response => response.json())
+.then(data => {
+    button.disabled = false;
+    button.textContent = originalText;
+    button.classList.remove("loading");
 
-                        if (data.success) {
-                            alert("Item added to cart!");
-                        } else {
-                            alert("Failed to add item to cart.");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                        button.disabled = false;
-                        button.textContent = originalText;
-                        button.classList.remove("loading");
-                    });
+    if (data.success) {
+        alert("Item added to cart!");
+        if (data.redirect_url) {  // Use `data.redirect_url` here
+            window.location.href = data.redirect_url;
+        }
+    } else {
+        alert("Failed to add item to cart.");
+    }
+})
+.catch(error => {
+    console.error("Error:", error);
+    button.disabled = false;
+    button.textContent = originalText;
+    button.classList.remove("loading");
+});
+
             });
 
             document.querySelector(".customization-btn").addEventListener("click", function() {

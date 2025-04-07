@@ -14,7 +14,7 @@
 
 <script>
     $(document).ready(function() {
-        $('#select2Order').select2({
+        $('#country').select2({
             placeholder: 'Select Country',
             width: '100%' // ensure full width styling
         });
@@ -154,7 +154,8 @@
 
                                 <div data-mdb-input-init class="form-outline mb-4">
                                     <label class="form-label" for="country">Country *</label>
-                                    <select id="select2Order" name="country" class="select2 form-select" required>
+                                    <select id="country" name="country" class="select2 form-select" required>
+
                                         @foreach ($countries as $code => $name)
                                             <option value="{{ $code }}">{{ $name }}</option>
                                         @endforeach
@@ -358,13 +359,14 @@
             let discountId = null;
         
             document.addEventListener('DOMContentLoaded', function () {
-                
+        
                 // Function to update tax and total amounts
                 function updateTaxAndTotal(subtotal, appliedDiscount = 0) {
                     let TPStaxElement = document.querySelector('.tps-cart-tax');
                     let TVQtaxElement = document.querySelector('.tvq-cart-tax');
                     let totalElement = document.querySelector('.cart-total');
         
+                    // Get tax percentages from the server-side variables
                     let TPStaxPercentage = parseFloat(TPStaxElement.getAttribute('tps-data-tax')) || 0;
                     let TVQtaxPercentage = parseFloat(TVQtaxElement.getAttribute('tvq-data-tax')) || 0;
         
@@ -372,7 +374,8 @@
                     if (discountedTotal < 0) discountedTotal = 0; // Prevent negative totals
         
                     // Update userCountry dynamically
-                    let userCountry = document.getElementById('country').value;
+                    let userCountry = $('#country').val();
+
         
                     // If the country is Canada, apply TPS and TVQ taxes
                     let TPStaxAmount = userCountry === "CA" ? (discountedTotal * TPStaxPercentage) / 100 : 0;
@@ -447,7 +450,7 @@
                         let TPStaxElement = document.querySelector('.tps-cart-tax');
                         let TPStaxAmount = parseFloat(TPStaxElement.innerText.replace(/[^0-9.]/g, '')) || 0;
                         let TPStaxNumber = TPStaxElement.getAttribute('tps-data-taxno'); // Extract TPS Tax Number
-                        let TPStaxPercentage = TPStaxElement.getAttribute('tps-data-percentage'); // Extract TPS Tax Number
+                        let TPStaxPercentage = TPStaxElement.getAttribute('tps-data-percentage'); // Extract TPS Tax Percentage
         
                         let TVQtaxElement = document.querySelector('.tvq-cart-tax');
                         let TVQtaxAmount = parseFloat(TVQtaxElement.innerText.replace(/[^0-9.]/g, '')) || 0;
@@ -472,7 +475,6 @@
                             lastname: document.getElementById('lastname').value,
                             companyname: document.getElementById('companyname').value,
                             country: document.getElementById('country').value,
-                            // state: document.getElementById('state').value,
                             address: document.getElementById('address').value,
                             email: document.getElementById('email').value,
                             phone: document.getElementById('phone').value,
@@ -570,14 +572,18 @@
                 }
         
                 // Event listener for country change
-                countrySelect.addEventListener('change', function () {
-                    updateTaxRowsVisibility();
-                });
+                
+                $('#country').on('change', function () {
+    console.log("Selected country code:", $(this).val());
+    updateTaxRowsVisibility();
+});
+
         
                 // Initial check for Canada tax rows visibility
                 updateTaxRowsVisibility();
                 document.getElementById('checkoutButton').addEventListener('click', proceedToCheckout);
             });
         </script>
+        
 
     @endsection

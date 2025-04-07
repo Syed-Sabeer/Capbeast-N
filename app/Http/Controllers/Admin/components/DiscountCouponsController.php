@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\InternalStatus;
 use App\Models\Product;
 use App\Models\DiscountCoupon;
-use App\Models\ProductPrinting;
+
 use Monarobase\CountryList\CountryList;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -28,9 +28,7 @@ class DiscountCouponsController extends Controller
             if ($request->type == 1) {
                 $items = Product::select('id', 'title')->get();
             }
-            //  elseif ($request->type == 3) {
-            //     $items = ProductPrinting::select('id', 'title')->get();
-            // } 
+             
             else {
                 return response()->json([], 400);
             }
@@ -96,9 +94,7 @@ class DiscountCouponsController extends Controller
                 if ($request->discount_type == 1) {
                     $discountCoupon->discountable_type = Product::class;
                 }
-                //  elseif ($request->discount_type == 3) {
-                //     $discountCoupon->discountable_type = ProductPrinting::class;
-                // }
+             
                 $discountCoupon->discountable_id = null; // Ensure ID is null
                 $discountCoupon->save(); // Save for global use
             } else {
@@ -109,12 +105,7 @@ class DiscountCouponsController extends Controller
                     $discountCoupon->discountable_id = $product->id;
                     $product->discountCoupons()->save($discountCoupon);
                 } 
-                // elseif ($request->discount_type == 3) {
-                //     $printing = ProductPrinting::findOrFail($request->item_id);
-                //     $discountCoupon->discountable_type = ProductPrinting::class;
-                //     $discountCoupon->discountable_id = $printing->id;
-                //     $printing->discountCoupons()->save($discountCoupon);
-                // }
+                
             }
             
 
