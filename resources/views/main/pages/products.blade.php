@@ -28,27 +28,36 @@
                         <button class="categoryarrow categoryarrow-left" onclick="scrollSlider(-200)">&#10094;</button>
                         <div class="category-slider" id="categorySlider">
                             @if($filterType === 'brand')
-                            @foreach ($brands as $brand)
-                            <a href="{{ url('products/brand/' . Str::slug($brand->title)) }}" class="brand-link">
-                                <div class="category-card {{ request()->segment(2) == 'brand' && request()->segment(3) == Str::slug($brand->title) ? 'active' : '' }}">
-                                    <img src="{{ asset(  'storage/' . ($brand->image ?? 'default-brand.jpg')) }}" alt="{{ $brand->title }}">
-                                    <p>{{ $brand->title }}</p>
-                                </div>
-                            </a>
-                            {{-- 'storage/' . ($color->front_image ?? 'ProductImages/default.jpg')) }}" width="50"> --}}
-                        @endforeach
-                        
-                            @else
-                            @foreach ($categories as $category)
-                            <a href="{{ url('products/category/' . Str::slug($category->title)) }}" class="category-link">
-                                <div class="category-card {{ request()->segment(2) == 'category' && request()->segment(3) == Str::slug($category->title) ? 'active' : '' }}">
-                                    <img src="{{ asset('storage/' . ($category->image ?? 'default-category.jpg')) }}" alt="{{ $category->title }}">
-                                    <p>{{ $category->title }}</p>
-                                </div>
-                            </a>
-                        @endforeach
-                        
-                            @endif
+    @foreach ($brands as $brand)
+        <a href="{{ url('products/brand/' . Str::slug($brand->title)) }}" class="brand-link">
+            <div class="category-card {{ request()->segment(2) == 'brand' && request()->segment(3) == Str::slug($brand->title) ? 'active' : '' }}">
+                <img src="{{ asset('storage/' . ($brand->image ?? 'default-brand.jpg')) }}" alt="{{ $brand->title }}">
+                <p>{{ $brand->title }}</p>
+            </div>
+        </a>
+    @endforeach
+
+@elseif($filterType === 'mlb')
+    @foreach ($mlbs as $mlb)
+        <a href="{{ url('products/mlb/' . Str::slug($mlb->title)) }}" class="mlb-link">
+            <div class="category-card {{ request()->segment(2) == 'mlb' && request()->segment(3) == Str::slug($mlb->title) ? 'active' : '' }}">
+                <img src="{{ asset('storage/' . ($mlb->image ?? 'default-mlb.jpg')) }}" alt="{{ $mlb->title }}">
+                <p>{{ $mlb->title }}</p>
+            </div>
+        </a>
+    @endforeach
+
+@else
+    @foreach ($categories as $category)
+        <a href="{{ url('products/category/' . Str::slug($category->title)) }}" class="category-link">
+            <div class="category-card {{ request()->segment(2) == 'category' && request()->segment(3) == Str::slug($category->title) ? 'active' : '' }}">
+                <img src="{{ asset('storage/' . ($category->image ?? 'default-category.jpg')) }}" alt="{{ $category->title }}">
+                <p>{{ $category->title }}</p>
+            </div>
+        </a>
+    @endforeach
+@endif
+        
                         </div>
                         <button class="categoryarrow categoryarrow-right" onclick="scrollSlider(200)">&#10095;</button>
                     </div>
