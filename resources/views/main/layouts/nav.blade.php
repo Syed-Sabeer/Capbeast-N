@@ -214,7 +214,7 @@
                         
                 
                         <li class="nav-item">
-                            <a class="nav-link" href="contact-us.html" data-key="t-contact">Contact</a>
+                            <a class="nav-link" href="{{ route('contact') }}" data-key="t-contact">Contact</a>
                         </li>
                     </ul>
                 </div>

@@ -33,12 +33,12 @@
                     </div>
 
                     <div class="accordion accordion-border-box" id="genques-accordion">
-                        <div class="accordion-item">
+                        {{-- <div class="accordion-item">
                             <h2 class="accordion-header" id="genques-headingOne">
                                 <button class="accordion-button" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#genques-collapseOne" aria-expanded="true"
                                     aria-controls="genques-collapseOne">
-                                    Can I place my order online?
+                                    Do you have any minimum order quantities?
                                 </button>
                             </h2>
                             <div id="genques-collapseOne" class="accordion-collapse collapse show"
@@ -56,64 +56,21 @@
                                     </ul>
                                 </div>
                             </div>
-                        </div>
-                        {{-- <div class="accordion-item">
-                            <h2 class="accordion-header" id="genques-headingTwo">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#genques-collapseTwo" aria-expanded="false"
-                                    aria-controls="genques-collapseTwo">
-                                    Can I place my order oIs someone available to help me with
-                                    my order?nline?
-                                </button>
-                            </h2>
-                            <div id="genques-collapseTwo" class="accordion-collapse collapse"
-                                aria-labelledby="genques-headingTwo" data-bs-parent="#genques-accordion">
-                                <div class="accordion-body">
-                                    <p>
-                                        Of course! You can Live Chat with one of our employees
-                                        or call Customer Service at (855)-205-3213 or phone us
-                                        at (226) 204-9018 to obtain help with your order.
-                                    </p>
-                                </div>
-                            </div>
                         </div> --}}
-                        {{-- <div class="accordion-item">
-                            <h2 class="accordion-header" id="genques-headingThree">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#genques-collapseThree" aria-expanded="false"
-                                    aria-controls="genques-collapseThree">
-                                    I want a custom table cover, is your price the lowest of
-                                    all?
-                                </button>
-                            </h2>
-                            <div id="genques-collapseThree" class="accordion-collapse collapse"
-                                aria-labelledby="genques-headingThree" data-bs-parent="#genques-accordion">
-                                <div class="accordion-body">
-                                    <p>
-                                        Our prices are always the lowest in the market for
-                                        custom. We can assure you that there will be no company
-                                        in the market that will be able to provide a lower price
-                                        and faster turnaround than our company.
-                                    </p>
-                                </div>
-                            </div>
-                        </div> --}}
+                        
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="genques-headingFour">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#genques-collapseFour" aria-expanded="false"
                                     aria-controls="genques-collapseFour">
-                                    What does production time mean?
+                                    Do you have any minimum order quantities?
                                 </button>
                             </h2>
                             <div id="genques-collapseFour" class="accordion-collapse collapse"
                                 aria-labelledby="genques-headingFour" data-bs-parent="#genques-accordion">
                                 <div class="accordion-body">
                                     <p>
-                                        Production time refers to the period it takes to make
-                                        your table cover order in our production facility. The
-                                        time is based on business days, Monday through Friday,
-                                        excluding holidays.
+                                        No we don’t have any minimums, you can order as many or as few hats as you’d like. We do however offer bulk discounts so the more you purchase the more you can save.
                                     </p>
                                 </div>
                             </div>
@@ -123,14 +80,14 @@
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#genques-collapseFive" aria-expanded="false"
                                     aria-controls="genques-collapseFive">
-                                    What happens if there is a mistake with my order?
+                                    Can I use my own hats?
                                 </button>
                             </h2>
                             <div id="genques-collapseFive" class="accordion-collapse collapse"
                                 aria-labelledby="genques-headingFive" data-bs-parent="#genques-accordion">
                                 <div class="accordion-body">
                                     <p>
-                                        Before production, we will send you a proof. Once the proof is approved by the customer, there will be no refunds for custom design unless the design is shown to be different from what was approved. We advise customers to check the proof thoroughly.
+                                        Due to the professional nature of our service we will only customize and embroider hats that are purchased on our website.
                                     </p>
                                 </div>
                             </div>
@@ -140,16 +97,14 @@
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#genques-collapseSix" aria-expanded="false"
                                     aria-controls="genques-collapseSix">
-                                    Will I see a proof before my order goes into production?
+                                    How much does shipping cost?
                                 </button>
                             </h2>
                             <div id="genques-collapseSix" class="accordion-collapse collapse"
                                 aria-labelledby="genques-headingSix" data-bs-parent="#genques-accordion">
                                 <div class="accordion-body">
                                     <p>
-                                        Yes! Unless it is an exact reorder, you always see an
-                                        e-proof of your item which must be approved by you
-                                        before we proceed!
+                                        Shipping fees depend on the size of your order and your shipping destination. We advise that you create a dry run of your order and enter your shipping location. Our system will calculate the exact shipping cost for you so you can make a quick decision.
                                     </p>
                                 </div>
                             </div>
@@ -159,15 +114,14 @@
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#genques-collapseSeven" aria-expanded="false"
                                     aria-controls="genques-collapseSeven">
-                                    Do you keep my art on file?
+                                    Do you ship internationally?
                                 </button>
                             </h2>
                             <div id="genques-collapseSeven" class="accordion-collapse collapse"
                                 aria-labelledby="genques-headingSeven" data-bs-parent="#genques-accordion">
                                 <div class="accordion-body">
                                     <p>
-                                        Yes! We keep your artwork on file to make reordering and
-                                        using your art on other products simple and easy!
+                                        Absolutely. We ship orders all over the world on a daily basis.
                                     </p>
                                 </div>
                             </div>
@@ -177,16 +131,14 @@
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#genques-collapseEight" aria-expanded="false"
                                     aria-controls="genques-collapseEight">
-                                    Where do I send my artwork?
+                                    How long does my order take to ship?
                                 </button>
                             </h2>
                             <div id="genques-collapseEight" class="accordion-collapse collapse"
                                 aria-labelledby="genques-headingEight" data-bs-parent="#genques-accordion">
                                 <div class="accordion-body">
                                     <p>
-                                        Simply upload it on our website and attach it to your
-                                        order and we’ll take it from there. You can also send it
-                                        to sales@monkeybeanies.com .
+                                        Each order is personally customized and made for you. That means the total time from us to you can be 4-6 weeks. We'll keep you updated as your order goes through the different stages of production.
                                     </p>
                                 </div>
                             </div>
@@ -196,19 +148,14 @@
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#genques-collapseNine" aria-expanded="false"
                                     aria-controls="genques-collapseNine">
-                                    What image file types can I upload?
+                                    What is a digitizing fee?
                                 </button>
                             </h2>
                             <div id="genques-collapseNine" class="accordion-collapse collapse"
                                 aria-labelledby="genques-headingNine" data-bs-parent="#genques-accordion">
                                 <div class="accordion-body">
                                     <p>
-                                        We highly recommend you send a vector-based file in EPS,
-                                        AI or PDF format. If you have a raster-based image such
-                                        as PSD, PNG or JPG, please send it in the actual size it
-                                        will be imprinted on your table cover. We suggest you
-                                        send the highest resolution file you have available. The
-                                        highest resolution files work best.
+                                        Before your logo can be embroidered, our artists must digitally prepare it. This process is called ‘digitizing’. After we have digitized your logo once, we keep it on file so you are not charged again.
                                     </p>
                                 </div>
                             </div>
@@ -218,21 +165,14 @@
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#genques-collapseTen" aria-expanded="false"
                                     aria-controls="genques-collapseTen">
-                                    Is it OK to use copyrighted or licensed material for my
-                                    table cover?
+                                    How many colors can you embroider in a logo?
                                 </button>
                             </h2>
                             <div id="genques-collapseTen" class="accordion-collapse collapse"
                                 aria-labelledby="genques-headingTen" data-bs-parent="#genques-accordion">
                                 <div class="accordion-body">
                                     <p>
-                                        We do not knowingly reproduce copyrighted material and
-                                        will not accept liability for such infringement when
-                                        reproducing orders. You are solely responsible for
-                                        ensuring the artwork you submit does not infringe on
-                                        property rights by obtaining proper permission for the
-                                        reproduction of logos, trademarks and copyrighted
-                                        material.
+                                        We can stitch up to 8 colors for your logo.
                                     </p>
                                 </div>
                             </div>
@@ -242,16 +182,15 @@
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#genques-collapseEleven" aria-expanded="false"
                                     aria-controls="genques-collapseEleven">
-                                    Can I use multiple artwork designs for my table cover
-                                    order?
+                                    How big can my logo be embroidered?
                                 </button>
                             </h2>
                             <div id="genques-collapseEleven" class="accordion-collapse collapse"
                                 aria-labelledby="genques-headingEleven" data-bs-parent="#genques-accordion">
                                 <div class="accordion-body">
                                     <p>
-                                        Yes absolutely! Feel free to upload as many as you’d
-                                        like or you can also email us your designs.
+                                        This is dependent on the size of your hat. On larger hats the maximum size that we can stitch a logo is 4 inches wide and 2.25 inches high.
+                                        
                                     </p>
                                 </div>
                             </div>
@@ -261,17 +200,69 @@
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#genques-collapseTwelve" aria-expanded="false"
                                     aria-controls="genques-collapseTwelve">
-                                    What are PromoBucks?
+                                    Do you provide sample orders?
                                 </button>
                             </h2>
                             <div id="genques-collapseTwelve" class="accordion-collapse collapse"
                                 aria-labelledby="genques-headingTwelve" data-bs-parent="#genques-accordion">
                                 <div class="accordion-body">
                                     <p>
-                                        PromoBucks are credits that you can apply to your next
-                                        purchase. Think of them as our thank you for choosing
-                                        us. These credits reduce your pre-tax total, making your
-                                        future orders even more affordable.
+                                        Yes. We have no minimum order quantities so you can order one hat as a sample.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="genques-headingTwelve">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#genques-collapseTwelve" aria-expanded="false"
+                                    aria-controls="genques-collapseTwelve">
+                                    Do you offer bulk discounts?
+                                </button>
+                            </h2>
+                            <div id="genques-collapseTwelve" class="accordion-collapse collapse"
+                                aria-labelledby="genques-headingTwelve" data-bs-parent="#genques-accordion">
+                                <div class="accordion-body">
+                                    <p>
+                                        Of course! The more you buy, the more you save. See the chart in our hat designer for further details on discount percentages.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="genques-headingTwelve">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#genques-collapseTwelve" aria-expanded="false"
+                                    aria-controls="genques-collapseTwelve">
+                                    What forms of payment do you accept?
+                                </button>
+                            </h2>
+                            <div id="genques-collapseTwelve" class="accordion-collapse collapse"
+                                aria-labelledby="genques-headingTwelve" data-bs-parent="#genques-accordion">
+                                <div class="accordion-body">
+                                    <p>
+                                        CapBeast accepts all major brands of payment including Visa, MasterCard, PayPal and American Express.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="genques-headingTwelve">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#genques-collapseTwelve" aria-expanded="false"
+                                    aria-controls="genques-collapseTwelve">
+                                    How do I know what size garment to choose?
+                                </button>
+                            </h2>
+                            <div id="genques-collapseTwelve" class="accordion-collapse collapse"
+                                aria-labelledby="genques-headingTwelve" data-bs-parent="#genques-accordion">
+                                <div class="accordion-body">
+                                    <p>
+                                        We have sizing charts for you to reference for all corresponding products. Message our customer service for more details.
                                     </p>
                                 </div>
                             </div>

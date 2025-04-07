@@ -23,11 +23,15 @@
             <div class="row align-items-center">
                 <div class="col-lg-6">
                     <h1 class="fw-bold mb-3">👋 About Us</h1>
-                    <p class="fs-16 text-muted mb-5 mb-lg-3">Monkey Beanies is a division of WebOrka Inc. Our commitment to maintain consistent quality for our customers has always been a priority. Just like a cozy slipper, a beanie needs to provide comfort to keep you warm during the frigid winters of North America.
+                    <p class="fs-16 text-muted mb-5 mb-lg-3">At CapBeast we’re all about making custom hats. We help you make your ideas come to life, one stitch at a time.
 
-                        To ensure we meet these standards, we have chosen to produce our own beanies, hand-knitted in Montreal. This allows us to guarantee ample supply, durability, comfort, and rigorous quality control.
+                        Our custom hat maker enables you to design a hat with your own logo or text with the click of a button. Our vast catalog makes it possible for you to customize hats from your favorite brands like brands New Era, Flexfit, ‘47 Brand, Champion, Richardson, Adidas, Nike and many more.
                         
-                        Become a part of our journey and support our locally made products.
+                        We offer many styles of headwear including Snapbacks, Fitted hats, Flat brim, Dad hats, Baseball hats, Athletic hats, Golf hats and fitted hats.
+                        
+                        All of the caps are custom embroidered by our team on the latest digital production equipment, so you know that you will be getting the best quality product possible.
+                        
+                        CapBeast ships worldwide and we have no minimum order quantities. We also offer bulk discounts on larger orders, so the more hats you order, the more you save.
                         <br>
                         MADE BY CANADIANS FOR THE WORLD</p>
                 </div>
@@ -57,14 +61,14 @@
 
 
 
-    <section class="section">
+    {{-- <section class="section">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6">
                     <div>
                         <img src="{{ asset('assetsMain/images/ecommerce/img-5.jpg')}}" alt="" class="img-fluid rounded">
                     </div>
-                </div>
+                </div> --}}
                 {{-- <div class="col-lg-6">
                     <div class="mt-4 mt-lg-0">
                         <p class="text-uppercase fw-medium text-muted">Best Products Sales</p>
@@ -77,9 +81,9 @@
                                 class="bi bi-arrow-right ms-2"></i></a>
                     </div>
                 </div> --}}
-            </div>
+            {{-- </div>
         </div>
-    </section>
+    </section> --}}
 
 
 
