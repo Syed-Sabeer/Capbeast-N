@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product; 
 use App\Models\Category; 
 use App\Models\Brand; 
+use App\Models\Mlb; 
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -15,6 +16,7 @@ class ProductController extends Controller
         $query = Product::with('categories')->where('visibility', 1);
         $categories = Category::all(); 
         $brands = Brand::all();
+        $mlbs = Mlb::all();
     
         if ($filterType && $slug) {
             if ($filterType === 'category') {
@@ -29,14 +31,16 @@ class ProductController extends Controller
                 if ($brand) {
                     $query->where('brand_id', $brand->id);
                 }
+            } elseif ($filterType === 'mlb') {
+                $mlb = Mlb::where('title', str_replace('-', ' ', $slug))->first();
+                if ($mlb) {
+                    $query->where('mlb_id', $mlb->id);
+                }
             }
         }
-    
+
         $products = $query->get();
-    
-        return view('main.pages.products', compact('products', 'categories', 'brands', 'filterType', 'slug'));
+
+        return view('main.pages.products', compact('products', 'categories', 'brands', 'mlbs', 'filterType', 'slug'));
     }
-    
-
-
 }

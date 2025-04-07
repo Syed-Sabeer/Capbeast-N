@@ -1,5 +1,27 @@
 @extends('main.layouts.master')
 
+
+
+
+<!-- Include jQuery CDN -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include Select2 CSS from CDN -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+<!-- Include Select2 JS from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#select2Order').select2({
+            placeholder: 'Select Country',
+            width: '100%' // ensure full width styling
+        });
+    });
+</script>
+
+</script>
 @section('main-container')
     @component('main.components.breadcrumb', [
         'pageTitle' => 'Checkout',
@@ -125,14 +147,20 @@
                                     <input type="text" id="address" name="address" class="form-control" required />
                                 </div>
 
+                  
+                                                   
+                                
+
+
                                 <div data-mdb-input-init class="form-outline mb-4">
                                     <label class="form-label" for="country">Country *</label>
-                                    <select id="country" name="country" class="form-select" required>
-                                        <option value="" disabled selected>Select Country</option>
-
+                                    <select id="select2Order" name="country" class="select2 form-select" required>
+                                        @foreach ($countries as $code => $name)
+                                            <option value="{{ $code }}">{{ $name }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
-                                                    
+                                
 
                                 <!-- Email input -->
                                 <div data-mdb-input-init class="form-outline mb-4">

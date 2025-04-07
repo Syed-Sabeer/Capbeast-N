@@ -29,6 +29,11 @@ class Product extends Model
     {
         return $this->hasOne(ProductSEO::class, 'product_id');
     }
+    public function orderItems()
+{
+    return $this->hasMany(OrderItem::class, 'product_id');
+}
+
 
     public function productBrand()
     {

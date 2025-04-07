@@ -169,56 +169,49 @@
                                 </div>
                             </div>
                         </li>
-                        
-                        
-
+                       
                         
                         <li class="nav-item dropdown dropdown-hover dropdown-mega-full">
-                            <a class="nav-link dropdown-toggle" data-key="t-catalog" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="{{ url('products/category') }}" role="button">
                                 MLB
                             </a>
                             <div class="dropdown-menu p-0">
                                 <div class="row g-0 g-lg-4">
                                     <div class="col-lg-2 d-none d-lg-block">
-                                        <div class="card rounded-start rounded-0 border-0 h-100 mb-0 overflow-hidden" style="background-image: url('../assetsMain/images/ecommerce/img-1.jpg');background-size: cover;">
+                                        <div class="card rounded-start rounded-0 border-0 h-100 mb-0 overflow-hidden" style="background-image: url('../assetsMain/images/ecommerce/img-1.jpg'); background-size: cover;">
                                             <div class="bg-overlay bg-light bg-opacity-25"></div>
-                                            <div class="card-body d-flex align-items-center justify-content-center">
-                                                <div class="text-center">
-                                                    <a href="product-grid-sidebar-banner.html" class="btn btn-secondary btn-hover"><i class="ph-storefront align-middle me-1"></i> <span data-key="t-shop-now">Shop Now</span></a>
-                                                </div>
+                                            <div class="card-body d-flex flex-column align-items-start justify-content-start">
+                                                <img src="{{ asset('assetsMain/images/fixed/nav_cap.png') }}" alt="" width="150" height="150">
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-2">
-                                        <ul class="dropdown-menu-list list-unstyled mb-0 py-3">
-                                            
-                                            <li class="nav-item">
-                                                <a href="product-grid-sidebar-banner.html" class="nav-link" data-key="t-clothing">Clothing</a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a href="product-grid-right.html" class="nav-link" data-key="t-watches">Watches</a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a href="product-list-left.html" class="nav-link" data-key="t-bags-Luggage">Bags & Luggage</a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a href="product-grid-right.html" class="nav-link" data-key="t-footwear">Footwear</a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a href="product-list.html" class="nav-link" data-key="t-innerwear">Innerwear</a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a href="product-list-right.html" class="nav-link" data-key="t-other-accessories">Other Accessories</a>
-                                            </li>
-
-                                            
-                                        </ul>
-                                    </div>
-                                    
-                                  
+                        
+                                    @php
+                                        $mlbs = App\Models\Mlb::all();
+                                        $chunks = $mlbs->chunk(6);
+                                    @endphp
+                        
+                                    @foreach($chunks as $chunk)
+                                        <div class="col-lg-2">
+                                            <ul class="dropdown-menu-list list-unstyled mb-0 py-3">
+                                                @foreach($chunk as $mlb)
+                                                    <li class="nav-item">
+                                                        <a href="{{ url('products/mlb/' . Str::slug($mlb->title)) }}" class="nav-link">
+                                                            {{ $mlb->title }}
+                                                        </a>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @endforeach
                                 </div>
                             </div>
                         </li>
+                       
+                        
+
+                        
+                        
                 
                         <li class="nav-item">
                             <a class="nav-link" href="contact-us.html" data-key="t-contact">Contact</a>

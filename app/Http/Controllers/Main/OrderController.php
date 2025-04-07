@@ -6,8 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Cart;
-use PragmaRX\Countries\Package\Countries;
-use App\Models\CartArtwork;
+use Monarobase\CountryList\CountryList;
 use App\Mail\OrderPlacedMail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Order;
@@ -236,6 +235,7 @@ class OrderController extends Controller
     public function index()
     {
         $userId = auth()->id();
+        $countries = (new CountryList())->getList('en');
 
         $cart = Cart::with(['product', 'color'])
             ->where('user_id', $userId)
@@ -248,7 +248,7 @@ class OrderController extends Controller
             return redirect()->route('cart')->with('error', 'Your cart is empty. Please add items before proceeding to checkout.');
         }
 
-        return view('main.pages.checkout', compact('cart','TPStaxPercentage','TVQtaxPercentage'));
+        return view('main.pages.checkout', compact('cart','TPStaxPercentage','TVQtaxPercentage','countries'));
     }
 
     public function getCountries()
@@ -369,69 +369,75 @@ class OrderController extends Controller
     }
 
     public function applyDiscount(Request $request)
-{
-    $request->validate([
-        'coupon_code' => 'required|string',
-    ]);
-
-    $user = Auth::user();
-    $coupon = DiscountCoupon::where('code', $request->coupon_code)->first();
-
-    if (!$coupon) {
-        return response()->json(['success' => false, 'message' => 'Invalid coupon code.'], 400);
-    }
-
-    // Check coupon visibility
-    if ($coupon->visibility != 1) {
-        return response()->json(['success' => false, 'message' => 'Coupon is not available.'], 400);
-    }
-   
-    // Validate expiration date
-    $currentDate = now();
-    if ($coupon->is_expiry && ($currentDate < $coupon->duration_from || $currentDate > $coupon->duration_to)) {
-        return response()->json(['success' => false, 'message' => 'Coupon has expired.'], 400);
-    }
-
-    // Validate usage count
-    $usageCount = Order::where('discount_id', $coupon->id)->count();
-    if ($coupon->is_expiry && $coupon->count !== null && $usageCount >= $coupon->count) {
-        return response()->json(['success' => false, 'message' => 'Coupon usage limit reached.'], 400);
-    }
-
-    $cartItems = Cart::where('user_id', auth()->id())->get();
-    $maxDiscountAmount = 0;
-
-    foreach ($cartItems as $item) {
-        $currentDiscount = 0;
-
-        if ($coupon->is_all == 1) {
-            if ($item->product_id != null) {
-                $currentDiscount = ($item->product_price * $coupon->percentage / 100) * $item->quantity;
-            } 
-        } else {
-            if ($item->product_id == $coupon->discountable_id) {
-                $currentDiscount = ($item->product_price * $coupon->percentage / 100) * $item->quantity;
-            } elseif ($item->printing_id == $coupon->discountable_id) {
-                $currentDiscount = ($item->printing_price * $coupon->percentage / 100) * $item->quantity;
+    {
+        $request->validate([
+            'coupon_code' => 'required|string',
+        ]);
+    
+        $user = Auth::user();
+        $coupon = DiscountCoupon::where('code', $request->coupon_code)->first();
+    
+        if (!$coupon) {
+            return response()->json(['success' => false, 'message' => 'Invalid coupon code.'], 400);
+        }
+    
+        // Check coupon visibility
+        if ($coupon->visibility != 1) {
+            return response()->json(['success' => false, 'message' => 'Coupon is not available.'], 400);
+        }
+    
+        // Validate expiration date
+        $currentDate = now();
+        if ($coupon->is_expiry && ($currentDate < $coupon->duration_from || $currentDate > $coupon->duration_to)) {
+            return response()->json(['success' => false, 'message' => 'Coupon has expired.'], 400);
+        }
+    
+        // Validate usage count
+        $usageCount = Order::where('discount_id', $coupon->id)->count();
+        if ($coupon->is_expiry && $coupon->count !== null && $usageCount >= $coupon->count) {
+            return response()->json(['success' => false, 'message' => 'Coupon usage limit reached.'], 400);
+        }
+    
+        // Log coupon and cart info for debugging
+        Log::debug("Coupon ID: {$coupon->id}, is_all: {$coupon->is_all}, discountable_id: {$coupon->discountable_id}");
+        $cartItems = Cart::where('user_id', auth()->id())->get();
+        Log::debug("Cart items count: " . $cartItems->count());
+    
+        $maxDiscountAmount = 0;
+    
+        foreach ($cartItems as $item) {
+            $currentDiscount = 0;
+            Log::debug("Cart item product_id: {$item->product_id}, product_price: {$item->product->selling_price}, quantity: {$item->quantity}, coupon discountable_id: {$coupon->discountable_id}");
+    
+            if ($coupon->is_all == 1) {
+                // Apply the discount for all products, even if product_id is null
+                $currentDiscount = ($item->product->selling_price * $coupon->percentage / 100) * $item->quantity;
+            } else {
+                // Apply discount only for specific product
+                if ($item->product_id == $coupon->discountable_id) {
+                    $currentDiscount = ($item->product->selling_price * $coupon->percentage / 100) * $item->quantity;
+                }
+            }
+    
+            Log::debug("Current discount for item (product_id {$item->product_id}): {$currentDiscount}");
+    
+            if ($currentDiscount > $maxDiscountAmount) {
+                $maxDiscountAmount = $currentDiscount;
             }
         }
-
-        if ($currentDiscount > $maxDiscountAmount) {
-            $maxDiscountAmount = $currentDiscount;
+    
+        if ($maxDiscountAmount > 0) {
+            return response()->json([
+                'success' => true,
+                'discount' => $maxDiscountAmount,
+                'discountId' => $coupon->id,
+                'message' => 'Discount applied successfully.',
+            ]);
         }
+    
+        return response()->json(['success' => false, 'message' => 'Coupon not applicable for selected products.'], 400);
     }
-
-    if ($maxDiscountAmount > 0) {
-        return response()->json([
-            'success' => true,
-            'discount' => $maxDiscountAmount,
-            'discountId' => $coupon->id,
-            'message' => 'Discount applied successfully.',
-        ]);
-    }
-
-    return response()->json(['success' => false, 'message' => 'Coupon not applicable for selected products.'], 400);
-}
+    
     
     
 }
