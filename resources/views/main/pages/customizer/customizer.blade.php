@@ -323,7 +323,7 @@
         .font-size-value {
             position: absolute;
             top: -25px;
-            left: 10%;
+            left: 25%;
             transform: translateX(-50%);
             background: #007bff;
             color: white;
@@ -569,6 +569,15 @@
         input[type="range"]:disabled::-moz-range-thumb {
             cursor: not-allowed;
         }
+
+        .price-active {
+            font-weight: bold;
+            color: #3a86ff;
+        }
+
+        #total-price {
+            color: #fff !important;
+        }
     </style>
     <section class="section">
         <div class="container-fluid">
@@ -594,7 +603,7 @@
                 <!-- Dynamic Options Sidebar -->
                 <div class="col-md-3 sidebar-option p-4">
                     <!-- Upload Panel -->
-                    <div class="option-panel active" id="upload-panel">
+                    <div class="option-panel active" id="upload-panel" style="margin-bottom: 100px !important;">
                         <h4 class="mb-4">Upload Your Design</h4>
                         <div class="upload-area border rounded p-4 text-center mb-4"
                             style="background-color: #f8f9fa; border-style: dashed !important;">
@@ -607,7 +616,7 @@
                     </div>
 
                     <!-- Text Panel -->
-                    <div class="option-panel" id="text-panel">
+                    <div class="option-panel" id="text-panel" style="margin-bottom: 100px !important;">
                         <h4 class="mb-4">Add Text</h4>
                         <div class="mb-3">
                             <label class="form-label">Your Text</label>
@@ -678,8 +687,8 @@
 
                             <label class="form-label">Font Size</label>
                             <div class="slider-container">
-                                <span class="font-size-value" id="fontSizeValue">10px</span>
-                                <input type="range" class="win10-thumb" min="5" max="100" value="10"
+                                <span class="font-size-value" id="fontSizeValue">25px</span>
+                                <input type="range" class="win10-thumb" min="5" max="100" value="25"
                                     id="fontSizeRange" />
                                 <!-- <input type="range" class="form-range" min="5" max="100" value="10" id="fontSizeRange"> -->
                             </div>
@@ -688,7 +697,8 @@
                             <div class="color-options mb-3">
                                 @if (isset($textColors) && count($textColors) > 0)
                                     @foreach ($textColors as $index => $color)
-                                        <div title="{{ $color->color_name }}" class="color-option {{ $index === 0 ? 'active' : '' }}"
+                                        <div title="{{ $color->color_name }}"
+                                            class="color-option {{ $index === 0 ? 'active' : '' }}"
                                             style="background-image: url({{ asset($color->color_image) }});"></div>
                                     @endforeach
                                 @endif
@@ -712,16 +722,23 @@
                     </div>
 
                     <!-- Design Panel -->
-                    <div class="option-panel" id="design-panel">
+                    <div class="option-panel" id="design-panel" style="margin-bottom: 100px !important;">
                         <h4 class="mb-4">Add Design Elements</h4>
                         <div class="input-group mb-3">
-                            <input type="text" class="form-control" placeholder="Search designs...">
+                            <input type="text" class="form-control" id="design-search"
+                                placeholder="Search designs...">
                             <button class="btn btn-outline-secondary" type="button">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
 
-                        <div class="design-grid">
+                        <div id="designs-container">
+                            @include('main.pages.customizer.designs', [
+                                'customizerDesigns' => $customizerDesigns,
+                            ])
+                        </div>
+
+                        {{-- <div class="design-grid">
                           @if (isset($customizerDesigns) && count($customizerDesigns) > 0)
                             @foreach ($customizerDesigns as $design)
                               <div class="design-thumbnail" style="background-image: url({{asset($design->image)}})">
@@ -737,7 +754,7 @@
                             <button class="btn btn-outline-secondary">
                                 Next <i class="fas fa-chevron-right"></i>
                             </button>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
 
@@ -746,13 +763,15 @@
                     <div class="hat-preview mx-auto">
                         <div class="design-area" id="hat-view">
                             <!-- This will be updated with the selected view -->
-                            <img src="{{ asset($userCustomization->front_image) }}" alt="Front View" class="img-fluid" id="current-view">
+                            <img src="{{ asset($userCustomization->front_image) }}" alt="Front View" class="img-fluid"
+                                id="current-view">
                         </div>
                     </div>
                     <div class="mt-4 p-3 bg-light rounded">
                         <div class="d-flex justify-content-around text-center view-selector">
                             <div class="px-3 view-option" data-view="front">
-                                <img height="50px" src="{{ asset($userCustomization->front_image) }}" alt="Front View" class="active">
+                                <img height="50px" src="{{ asset($userCustomization->front_image) }}" alt="Front View"
+                                    class="active">
                                 <p class="small mb-0 active">Front-${{ $customizerPrice->front_price }}</p>
                             </div>
                             <div class="px-3 view-option" data-view="left">
@@ -771,16 +790,36 @@
                     </div>
                     <div class="option-bar mt-4 d-flex justify-content-between align-items-center p-3">
                         <div>
-                            <span>Color: <strong>Black</strong></span>
-                            <span class="mx-3">|</span>
-                            <span>Size: <strong>One Size</strong></span>
+                            <span>Product:
+                                <strong>
+                                    @if (isset($product))
+                                        {{ $product->title }}
+                                    @else
+                                        No Product
+                                    @endif
+                                </strong>
+                            </span>
+                            <br>
+                            {{-- <span class="mx-3">|</span> --}}
+                            <span>Color:
+                                <strong>
+                                    @if (isset($productColor) && isset($productColor->color_name_1))
+                                        {{ $productColor->color_name_1 }}
+                                    @elseif(isset($productColor) && isset($productColor->color_name_2))
+                                        {{ $productColor->color_name_2 }}
+                                    @else
+                                        No Color
+                                    @endif
+                                </strong>
+                            </span>
                         </div>
-                        <button class="btn btn-primary">
-                            <i class="fas fa-shopping-cart me-2"></i>ADD TO CART - $29.99
+                        <button class="btn btn-primary add-to-cart-btn">
+                            <i class="fas fa-shopping-cart me-2"></i>ADD TO CART - $<span
+                                id="total-price">{{ isset($product) ? $product->selling_price : '0.00' }}</span>
                         </button>
                     </div>
 
-                    <div class="mt-4 p-3 bg-light rounded">
+                    <div class="mt-4 p-3 bg-light rounded" style="margin-bottom: 100px !important;">
                         <h5 class="mb-3">Design Tips</h5>
                         <div class="d-flex justify-content-around text-center">
                             <div class="px-3">
@@ -805,13 +844,55 @@
     <!-- jQuery CDN (latest version) -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
+        //design paginate
+        $(document).on('click', '.paginate-btn', function(e) {
+            e.preventDefault();
+            var url = $(this).data('url');
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function(data) {
+                    $('#designs-container').html(data);
+                },
+                error: function() {
+                    alert('Error loading designs. Please try again.');
+                }
+            });
+        });
+
+        //design search
+        let searchTimeout = null;
+
+        $('#design-search').on('input', function() {
+            clearTimeout(searchTimeout);
+
+            const searchQuery = $(this).val();
+
+            searchTimeout = setTimeout(() => {
+                $.ajax({
+                    url: '{{ route('customizer.index', $userCustomization->id) }}', // Use your route
+                    type: 'GET',
+                    data: {
+                        search: searchQuery
+                    },
+                    success: function(data) {
+                        $('#designs-container').html(data);
+                    },
+                    error: function() {
+                        alert('Error loading search results.');
+                    }
+                });
+            }, 400); // Debounce delay
+        });
+
         // Global state variables
         let designState = {
             currentView: 'front',
             views: {
                 front: {
                     elements: [],
-                    background: "{{asset($userCustomization->front_image)}}",
+                    background: "{{ asset($userCustomization->front_image) }}",
                     zoom: 1,
                     pan: {
                         x: 0,
@@ -820,7 +901,7 @@
                 },
                 left: {
                     elements: [],
-                    background: "{{asset($userCustomization->left_image)}}",
+                    background: "{{ asset($userCustomization->left_image) }}",
                     zoom: 1,
                     pan: {
                         x: 0,
@@ -829,7 +910,7 @@
                 },
                 right: {
                     elements: [],
-                    background: "{{asset($userCustomization->right_image)}}",
+                    background: "{{ asset($userCustomization->right_image) }}",
                     zoom: 1,
                     pan: {
                         x: 0,
@@ -838,7 +919,7 @@
                 },
                 back: {
                     elements: [],
-                    background: "{{asset($userCustomization->back_image)}}",
+                    background: "{{ asset($userCustomization->back_image) }}",
                     zoom: 1,
                     pan: {
                         x: 0,
@@ -847,6 +928,44 @@
                 }
             },
         };
+
+        // Add this at the beginning of your script, with other global state variables
+        let priceState = {
+            basePrice: {{ isset($product) ? $product->selling_price : 0 }},
+            views: {
+                front: {
+                    price: {{ $customizerPrice->front_price }},
+                    hasDesign: false
+                },
+                left: {
+                    price: {{ $customizerPrice->left_price }},
+                    hasDesign: false
+                },
+                right: {
+                    price: {{ $customizerPrice->right_price }},
+                    hasDesign: false
+                },
+                back: {
+                    price: {{ $customizerPrice->back_price }},
+                    hasDesign: false
+                }
+            }
+        };
+
+        // Add this function to calculate and update the total price
+        function updateTotalPrice() {
+            let total = priceState.basePrice;
+
+            // Add prices for views that have designs
+            for (const view in priceState.views) {
+                if (priceState.views[view].hasDesign) {
+                    total += priceState.views[view].price;
+                }
+            }
+
+            // Update the displayed price
+            $('#total-price').text(total.toFixed(2));
+        }
 
         let currentTextElement = null;
         let selectedElement = null;
@@ -860,6 +979,7 @@
         });
 
         $(document).ready(function() {
+            updateTotalPrice();
             // Create download button in the UI
             const downloadBtn = $('<button>')
                 .addClass('download-btn')
@@ -1292,6 +1412,168 @@
                     previewContent.find('div').text('Error generating preview. Please try again.');
                 }
             }
+
+            // Add to Cart button click handler
+            $('.add-to-cart-btn').on('click', async function(e) {
+                e.preventDefault();
+                const originalView = designState.currentView;
+                const previews = {};
+
+                // Collect views that have designs
+                const viewsToCapture = Object.keys(priceState.views).filter(view => priceState.views[
+                    view].hasDesign);
+
+                for (const view of viewsToCapture) {
+                    // Switch to the view
+                    $(`.view-option[data-view="${view}"]`).trigger('click');
+
+                    // Wait for the current-view image to load
+                    await new Promise(resolve => {
+                        const img = $('#current-view')[0];
+                        if (img.complete) resolve();
+                        else {
+                            img.onload = resolve;
+                            img.onerror = resolve;
+                        }
+                    });
+
+                    // Generate preview image
+                    const dataUrl = await generatePreview();
+                    previews[view] = dataUrl;
+                }
+
+                // Switch back to original view
+                $(`.view-option[data-view="${originalView}"]`).trigger('click');
+                console.log('Views', previews);
+                // Send data to server
+                $.ajax({
+                    url: '{{ route('customizer.update', $userCustomization->id) }}', // Replace with your route
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        product_id: {{ $product->id ?? 0 }},
+                        total_price: $('#total-price').text(),
+                        previews: previews
+                    },
+                    success: function(response) {
+                        alert('Item added to cart successfully!');
+                    },
+                    error: function(xhr) {
+                        alert('Error adding item to cart. Please try again.');
+                    }
+                });
+            });
+            // Helper function to generate preview image for current view
+            async function generatePreview() {
+                const hatImg = document.getElementById('current-view');
+                await new Promise(resolve => {
+                    if (hatImg.complete) resolve();
+                    else {
+                        hatImg.onload = resolve;
+                        hatImg.onerror = resolve;
+                    }
+                });
+
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = hatImg.naturalWidth || hatImg.width;
+                canvas.height = hatImg.naturalHeight || hatImg.height;
+                ctx.drawImage(hatImg, 0, 0);
+
+                const boundary = $('.design-boundary')[0];
+                const boundaryRect = boundary.getBoundingClientRect();
+                const hatRect = hatImg.getBoundingClientRect();
+
+                const scaleX = canvas.width / hatRect.width;
+                const scaleY = canvas.height / hatRect.height;
+
+                async function loadImage(url) {
+                    return new Promise((resolve) => {
+                        const img = new Image();
+                        img.crossOrigin = 'Anonymous';
+                        img.onload = () => resolve(img);
+                        img.onerror = () => resolve(null);
+                        img.src = url;
+                    });
+                }
+
+                const elements = $('.design-content').children();
+
+                for (let i = 0; i < elements.length; i++) {
+                    const element = elements[i];
+                    const $element = $(element);
+                    const elementRect = element.getBoundingClientRect();
+
+                    const x = (elementRect.left - hatRect.left) * scaleX;
+                    const y = (elementRect.top - hatRect.top) * scaleY;
+                    const width = elementRect.width * scaleX;
+                    const height = elementRect.height * scaleY;
+
+                    const transform = $element.css('transform');
+                    let angle = 0;
+                    if (transform && transform !== 'none') {
+                        const values = transform.split('(')[1].split(')')[0].split(',');
+                        angle = Math.round(Math.atan2(values[1], values[0]) * (180 / Math.PI));
+                    }
+
+                    if ($element.hasClass('editable-image')) {
+                        const imgElement = element.querySelector('img');
+                        if (imgElement) {
+                            const img = await loadImage(imgElement.src);
+                            if (img) {
+                                ctx.save();
+                                ctx.translate(x + width / 2, y + height / 2);
+                                ctx.rotate(angle * Math.PI / 180);
+                                ctx.drawImage(img, -width / 2, -height / 2, width, height);
+                                ctx.restore();
+                            }
+                        }
+                    } else if ($element.hasClass('text-design')) {
+                        const text = element.textContent;
+                        const styles = window.getComputedStyle(element);
+
+                        const fontSize = parseFloat(styles.fontSize) * scaleY;
+                        const fontFamily = styles.fontFamily;
+                        const fontWeight = styles.fontWeight;
+                        const fontStyle = styles.fontStyle;
+                        const textDecoration = styles.textDecoration;
+
+                        let fontString = '';
+                        if (fontStyle === 'italic') fontString += 'italic ';
+                        if (fontWeight === 'bold' || parseInt(fontWeight) > 400) fontString += 'bold ';
+                        fontString += `${fontSize}px ${fontFamily}`;
+                        ctx.font = fontString;
+
+                        const bgImage = styles.backgroundImage;
+                        if (bgImage && bgImage !== 'none') {
+                            const imageUrl = bgImage.replace('url("', '').replace('")', '');
+                            const colorImg = await loadImage(imageUrl);
+                            ctx.fillStyle = colorImg ? ctx.createPattern(colorImg, 'repeat') : '#000000';
+                        } else {
+                            ctx.fillStyle = '#000000';
+                        }
+
+                        ctx.save();
+                        ctx.translate(x, y + fontSize);
+                        ctx.rotate(angle * Math.PI / 180);
+
+                        if (textDecoration.includes('underline')) {
+                            const metrics = ctx.measureText(text);
+                            ctx.strokeStyle = ctx.fillStyle;
+                            ctx.lineWidth = fontSize * 0.1;
+                            ctx.beginPath();
+                            ctx.moveTo(0, fontSize * 0.1);
+                            ctx.lineTo(metrics.width, fontSize * 0.1);
+                            ctx.stroke();
+                        }
+
+                        ctx.fillText(text, 0, 0);
+                        ctx.restore();
+                    }
+                }
+
+                return canvas.toDataURL('image/png');
+            }
             // DOM elements
             const designArea = $('#hat-view');
             const currentView = $('#current-view');
@@ -1400,6 +1682,11 @@
                     currentTextElement = null;
                     $('#text-panel input[type="text"]').val('');
                 }
+
+                // Update price display (no need to recalculate, just show the view price)
+                // This is optional - you can remove if you prefer to only show the total
+                $('.view-option p').removeClass('price-active');
+                $(this).find('p').addClass('price-active');
             });
 
             // Save current view state
@@ -1580,7 +1867,8 @@
 
             // Design thumbnail selection
             // Fix for design thumbnail boundary constraints
-            $('.design-thumbnail').on('click', function() {
+            $('#designs-container').on('click', '.design-thumbnail', function() {
+                console.log('clicked');
                 const bgImage = $(this).css('background-image');
                 const imageUrl = bgImage.match(/url\(["']?(.*?)["']?\)/)[1];
 
@@ -1628,14 +1916,14 @@
 
             // Add these CSS fixes
             $('<style>').text(`
-  .design-content {
-      overflow: hidden !important;
-      transform: translateX(-50%);
-  }
-  .editable-image {
-      transform-origin: center center;
-  }
-`).appendTo('head');
+              .design-content {
+                  overflow: hidden !important;
+                  transform: translateX(-50%);
+              }
+              .editable-image {
+                  transform-origin: center center;
+              }
+            `).appendTo('head');
 
             // Helper functions for element creation
             function createResizeHandles() {
@@ -1916,6 +2204,13 @@
             // Save state function
             function saveState() {
                 saveCurrentViewState();
+
+                // Check which views have designs
+                for (const view in designState.views) {
+                    priceState.views[view].hasDesign = designState.views[view].elements.length > 0;
+                }
+
+                updateTotalPrice();
             }
 
             // Initialize the design area

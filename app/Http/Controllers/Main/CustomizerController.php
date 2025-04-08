@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomizerDesign;
 use App\Models\CustomizerPrice;
+use App\Models\DesignCategory;
 use App\Models\Product;
 use App\Models\ProductColor;
 use App\Models\TextColor;
@@ -17,9 +19,27 @@ class CustomizerController extends Controller
   {
     try {
       $userCustomization = UserCustomization::findOrFail($id);
+      if ($userCustomization->price != null) {
+        return redirect()->route('cart')->with('error', 'This Customization is already in cart.');
+      }
+      $productColor = ProductColor::findOrfail($userCustomization->product_color_id);
+      $product = Product::findOrFail($userCustomization->product_id);
       $textColors = TextColor::all();
       $customizerPrice = CustomizerPrice::firstOrFail();
-      return view('main.pages.customizer', compact('userCustomization', 'textColors', 'customizerPrice'));
+      $designCategories = DesignCategory::all();
+      // $customizerDesigns = CustomizerDesign::paginate(6);
+      $query = CustomizerDesign::query()->where('status', '1');
+
+        if (request()->has('search')) {
+            $searchTerm = request()->input('search');
+            $query->where('name', 'like', '%' . $searchTerm . '%');
+        }
+
+        $customizerDesigns = $query->paginate(6)->withQueryString();
+      if (request()->ajax()) {
+        return view('main.pages.customizer.designs', compact('customizerDesigns'))->render();
+      }
+      return view('main.pages.customizer.customizer', compact('userCustomization', 'textColors', 'customizerPrice', 'customizerDesigns', 'productColor', 'product'));
     } catch (\Throwable $th) {
       //throw $th;
       return response()->json(['error' => $th->getMessage()], 500);
@@ -33,6 +53,9 @@ class CustomizerController extends Controller
       $request->validate([
         'productId' => 'required|exists:products,id',
         'colorId' => 'required|exists:product_color,id',
+        'userId' => 'required|exists:users,id',
+        'quantity' => 'required|integer|min:1',
+        'size' => 'nullable|string',
       ]);
 
       // Retrieve the product and product color
@@ -41,7 +64,7 @@ class CustomizerController extends Controller
 
       // Check if a customization already exists for this user and color
       $userCustomization = UserCustomization::where('user_id', auth()->id())
-        ->where('product_color_id', $request->colorId)
+        ->where('product_color_id', $request->colorId)->where('price', null)
         ->first();
 
       // If no customization exists, create a new one
@@ -104,6 +127,78 @@ class CustomizerController extends Controller
       // Handle any other exceptions
       return response()->json([
         'message' => 'An error occurred while processing your request',
+        'success' => false,
+        'error' => $e->getMessage(),
+      ], 500);
+    }
+  }
+
+  public function update(Request $request, $id)
+  {
+    try {
+      $request->validate([
+        'product_id' => 'required|exists:products,id',
+        'total_price' => 'required|string|max:255',
+        'previews' => 'nullable|array',
+      ]);
+
+      $userCustomization = UserCustomization::findOrFail($id);
+      $userCustomization->price = $request->total_price;
+
+      $previews = $request->input('previews', []); // Get the previews array
+
+      // Loop through views and save if present
+      $viewMap = [
+        'front' => 'front_image',
+        'back' => 'back_image',
+        'left' => 'left_image',
+        'right' => 'right_image',
+      ];
+
+      foreach ($viewMap as $view => $column) {
+        if (!empty($previews[$view])) {
+          $imageData = $previews[$view];
+
+          if (preg_match('/^data:image\/(\w+);base64,/', $imageData, $type)) {
+            $image = substr($imageData, strpos($imageData, ',') + 1);
+            $image = base64_decode($image);
+
+            $imageExtension = strtolower($type[1]); // e.g., png, jpeg
+            $fileName = uniqid($view . '_') . '.' . $imageExtension;
+            $filePath = 'storage/customizations/' . $fileName;
+
+            // Ensure directory exists
+            $destination = public_path('storage/customizations');
+            if (!is_dir($destination)) {
+              mkdir($destination, 0755, true);
+            }
+
+            // Save the image
+            file_put_contents(public_path($filePath), $image);
+
+            // Save path to DB
+            $userCustomization->$column = $filePath;
+          }
+        }
+      }
+
+      $userCustomization->save();
+
+      return response()->json([
+        'message' => 'Customizer updated successfully.',
+        'success' => true,
+        'data' => $userCustomization,
+        'redirect_url' => route('customizer.index', $userCustomization->id),
+      ]);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+      return response()->json([
+        'message' => 'Validation failed',
+        'success' => false,
+        'errors' => $e->errors(),
+      ], 422);
+    } catch (\Exception $e) {
+      return response()->json([
+        'message' => 'Error occurred',
         'success' => false,
         'error' => $e->getMessage(),
       ], 500);
