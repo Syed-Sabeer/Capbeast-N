@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let defaultColor = colorOptions[0]; // Select first color by default
         defaultColor.classList.add("active");
         mainImage.src = defaultColor.getAttribute("data-image");
-        addToCartBtn.setAttribute("data-color-id", defaultColor.getAttribute("data-color-id"));
+        // addToCartBtn.setAttribute("data-color-id", defaultColor.getAttribute("data-color-id"));
     }
 
     colorOptions.forEach(option => {
@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
             mainImage.src = this.getAttribute("data-image");
 
             // Update the color ID in the Add to Cart button
-            addToCartBtn.setAttribute("data-color-id", this.getAttribute("data-color-id"));
+            // addToCartBtn.setAttribute("data-color-id", this.getAttribute("data-color-id"));
         });
     });
 });

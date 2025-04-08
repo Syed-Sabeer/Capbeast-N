@@ -177,82 +177,82 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
-            document.querySelector(".add-to-cart-btn").addEventListener("click", function() {
-                const button = this;
-                const originalText = button.textContent;
+            // document.querySelector(".add-to-cart-btn").addEventListener("click", function() {
+            //     const button = this;
+            //     const originalText = button.textContent;
 
-                // Show loading state
-                button.disabled = true;
-                button.textContent = "Processing...";
-                button.classList.add("loading"); // Optional: Add a loading class for CSS styling
+            //     // Show loading state
+            //     button.disabled = true;
+            //     button.textContent = "Processing...";
+            //     button.classList.add("loading"); // Optional: Add a loading class for CSS styling
 
-                const isAuthenticated = "{{ Auth::check() }}" === "1"; // Ensure proper boolean conversion
-                let productId = this.getAttribute("data-product-id");
-                let colorId = document.querySelector(".color-option.active")?.getAttribute(
-                    "data-color-id") || this.getAttribute("data-color-id");
-                let size = document.querySelector(".size-option.active")?.innerText || "";
-                let quantity = document.querySelector(".product-quantity1")?.value || 1;
+            //     const isAuthenticated = "{{ Auth::check() }}" === "1"; // Ensure proper boolean conversion
+            //     let productId = this.getAttribute("data-product-id");
+            //     let colorId = document.querySelector(".color-option.active")?.getAttribute(
+            //         "data-color-id") || this.getAttribute("data-color-id");
+            //     let size = document.querySelector(".size-option.active")?.innerText || "";
+            //     let quantity = document.querySelector(".product-quantity1")?.value || 1;
 
-                let userId = this.getAttribute("data-user-id");
+            //     let userId = this.getAttribute("data-user-id");
 
-                if (!isAuthenticated) {
-                    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-                    let newItem = {
-                        productId,
-                        colorId,
-                        size,
-                        quantity
-                    };
+            //     if (!isAuthenticated) {
+            //         let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            //         let newItem = {
+            //             productId,
+            //             colorId,
+            //             size,
+            //             quantity
+            //         };
 
-                    cart.push(newItem);
-                    localStorage.setItem("cart", JSON.stringify(cart));
-                    document.cookie =
-                        `cart=${encodeURIComponent(JSON.stringify(cart))}; path=/; max-age=3600; SameSite=Lax`;
+            //         cart.push(newItem);
+            //         localStorage.setItem("cart", JSON.stringify(cart));
+            //         document.cookie =
+            //             `cart=${encodeURIComponent(JSON.stringify(cart))}; path=/; max-age=3600; SameSite=Lax`;
 
-                    setTimeout(() => {
-                        window.location.href = "{{ route('user.login') }}";
-                    }, 1000); // Redirect faster
+            //         setTimeout(() => {
+            //             window.location.href = "{{ route('user.login') }}";
+            //         }, 1000); // Redirect faster
 
-                    return;
-                }
+            //         return;
+            //     }
 
-                fetch("{{ route('cart.add') }}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                        },
-                        body: JSON.stringify({
-                            productId,
-                            userId,
-                            colorId,
-                            size,
-                            quantity
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        button.disabled = false;
-                        button.textContent = originalText;
-                        button.classList.remove("loading");
+            //     fetch("{{ route('cart.add') }}", {
+            //             method: "POST",
+            //             headers: {
+            //                 "Content-Type": "application/json",
+            //                 "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            //             },
+            //             body: JSON.stringify({
+            //                 productId,
+            //                 userId,
+            //                 colorId,
+            //                 size,
+            //                 quantity
+            //             })
+            //         })
+            //         .then(response => response.json())
+            //         .then(data => {
+            //             button.disabled = false;
+            //             button.textContent = originalText;
+            //             button.classList.remove("loading");
 
-                        if (data.success) {
-                            alert("Item added to cart!");
-                            if (data.redirect_url) { // Use `data.redirect_url` here
-                                window.location.href = data.redirect_url;
-                            }
-                        } else {
-                            alert("Failed to add item to cart.");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                        button.disabled = false;
-                        button.textContent = originalText;
-                        button.classList.remove("loading");
-                    });
+            //             if (data.success) {
+            //                 alert("Item added to cart!");
+            //                 if (data.redirect_url) { // Use `data.redirect_url` here
+            //                     window.location.href = data.redirect_url;
+            //                 }
+            //             } else {
+            //                 alert("Failed to add item to cart.");
+            //             }
+            //         })
+            //         .catch(error => {
+            //             console.error("Error:", error);
+            //             button.disabled = false;
+            //             button.textContent = originalText;
+            //             button.classList.remove("loading");
+            //         });
 
-            });
+            // });
 
             document.querySelector(".customization-btn").addEventListener("click", function() {
                 const button = this;
