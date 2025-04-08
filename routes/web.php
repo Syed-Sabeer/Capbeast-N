@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Main\TOSDController;
+use App\Http\Controllers\Main\TOSDController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
@@ -10,6 +11,7 @@ use App\Http\Controllers\Main\ProductDetailController;
 use App\Http\Controllers\Main\ProductController;
 use App\Http\Controllers\Main\AboutController;
 use App\Http\Controllers\Main\HomeController;
+
 
 use App\Http\Controllers\Main\ContactController;
 use App\Http\Controllers\Main\AuthController;
@@ -45,7 +47,6 @@ use App\Http\Controllers\Admin\components\DiscountCouponsController;
 use App\Http\Controllers\Main\DeliveryInfoController;
 use App\Http\Controllers\Main\PrivacyPolicyController;
 use App\Http\Controllers\Main\ReturnController;
-use App\Http\Controllers\Main\ShippingController;
 
 Route::get('/', function () {
   return redirect()->route('home');
@@ -126,6 +127,10 @@ Route::post('/shipping/discount', [ShippingController::class, 'applyShippingDisc
 
 
   Route::get('/about', [AboutController::class, 'index'])->name('about');
+  Route::get('/privacy-policy', [PrivacyPolicyController::class, 'index'])->name('privacypolicy');
+  Route::get('/return', [ReturnController::class, 'index'])->name('return');
+  Route::get('/terms-of-Sale-and-Delivery', [TOSDController::class, 'index'])->name(name: 'tosd');
+  Route::get('/delivery-info', [DeliveryInfoController::class, 'index'])->name('deliveryinfo');
   Route::get('/privacy-policy', [PrivacyPolicyController::class, 'index'])->name('privacypolicy');
   Route::get('/return', [ReturnController::class, 'index'])->name('return');
   Route::get('/terms-of-Sale-and-Delivery', [TOSDController::class, 'index'])->name(name: 'tosd');
