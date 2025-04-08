@@ -66,7 +66,7 @@ Route::middleware(['web'])->group(function () {
 
     Route::get('/customizer/{id}', [CustomizerController::class, 'index'])->name('customizer.index');
     Route::post('/customizer/add', [CustomizerController::class, 'add'])->name('customizer.add');
-    Route::post('/customizer/update', [CustomizerController::class, 'update'])->name('customizer.update');
+    Route::post('/customizer/update/{id}', [CustomizerController::class, 'update'])->name('customizer.update');
 
     Route::get('/countries', [OrderController::class, 'getCountries'])->name('countries.index');
     Route::get('/countries/{code}/states', [OrderController::class, 'getStates'])->name('countries.states');
