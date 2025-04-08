@@ -56,7 +56,7 @@ return [
     */
 
   'url' => env('APP_URL', 'http://localhost'),
-  'asset_url' => env('ASSET_URL', 'http://localhost/Capbeast/public'),
+  'asset_url' => env('ASSET_URL', 'http://localhost/Capbeast-N/public'),
   // 'asset_url' => env('ASSET_URL'),
 
   /*
