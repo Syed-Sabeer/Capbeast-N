@@ -47,6 +47,7 @@ use App\Http\Controllers\Admin\components\DiscountCouponsController;
 use App\Http\Controllers\Main\DeliveryInfoController;
 use App\Http\Controllers\Main\PrivacyPolicyController;
 use App\Http\Controllers\Main\ReturnController;
+use App\Http\Controllers\Main\ShippingController;
 
 Route::get('/', function () {
   return redirect()->route('home');
