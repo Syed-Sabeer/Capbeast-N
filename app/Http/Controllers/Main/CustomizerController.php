@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomizerPrice;
 use App\Models\Product;
 use App\Models\ProductColor;
 use App\Models\TextColor;
 use App\Models\UserCustomization;
+use Auth;
 use Illuminate\Http\Request;
 
 class CustomizerController extends Controller
@@ -16,7 +18,8 @@ class CustomizerController extends Controller
     try {
       $userCustomization = UserCustomization::findOrFail($id);
       $textColors = TextColor::all();
-      return view('main.pages.customizer', compact('userCustomization','textColors'));
+      $customizerPrice = CustomizerPrice::firstOrFail();
+      return view('main.pages.customizer', compact('userCustomization', 'textColors', 'customizerPrice'));
     } catch (\Throwable $th) {
       //throw $th;
       return response()->json(['error' => $th->getMessage()], 500);
