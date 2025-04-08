@@ -8,6 +8,7 @@ use App\Models\CartArtwork;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class CartController extends Controller
 {
@@ -17,7 +18,7 @@ class CartController extends Controller
     $userId = auth()->id();
 
 
-    $carts = Cart::with(['product', 'color'])
+    $carts = Cart::with(['product', 'color', 'userCustomization'])
       ->where('user_id', $userId)
       ->get();
 
@@ -64,15 +65,56 @@ class CartController extends Controller
       return response()->json(['success' => false, 'message' => 'Failed to add item to cart.'], 500);
     }
   }
+  // public function remove($itemId)
+  // {
+  //   try {
+  //     $cartItem = Cart::findOrFail($itemId);
+  //     $cartItem->delete();
+
+  //     return response()->json(['success' => true, 'message' => 'Item removed from cart!']);
+  //   } catch (\Exception $e) {
+  //     return response()->json(['success' => false, 'message' => 'Failed to remove item from cart.'], 500);
+  //   }
+  // }
+
   public function remove($itemId)
   {
     try {
-      $cartItem = Cart::findOrFail($itemId);
+      $cartItem = Cart::with('userCustomization.customizerUploads')->findOrFail($itemId);
+
+      if ($cartItem->userCustomization) {
+        $customization = $cartItem->userCustomization;
+
+        // Delete front, back, left, right images if they exist
+        $imageFields = ['front_image', 'back_image', 'left_image', 'right_image'];
+        foreach ($imageFields as $field) {
+          if (!empty($customization->$field)) {
+            Storage::disk('public')->delete($customization->$field);
+          }
+        }
+
+        // Delete all uploaded images related to customization
+        foreach ($customization->customizerUploads as $upload) {
+          if (!empty($upload->image)) {
+            Storage::disk('public')->delete($upload->image);
+          }
+          $upload->delete(); // Delete DB record
+        }
+
+        // Delete customization record
+        $customization->delete();
+      }
+
+      // Delete cart item
       $cartItem->delete();
 
       return response()->json(['success' => true, 'message' => 'Item removed from cart!']);
     } catch (\Exception $e) {
-      return response()->json(['success' => false, 'message' => 'Failed to remove item from cart.'], 500);
+      return response()->json([
+        'success' => false,
+        'message' => 'Failed to remove item from cart.',
+        'error' => $e->getMessage()
+      ], 500);
     }
   }
 

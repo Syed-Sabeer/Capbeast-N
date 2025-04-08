@@ -176,7 +176,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-
+          localStorage.removeItem('cart');
             // document.querySelector(".add-to-cart-btn").addEventListener("click", function() {
             //     const button = this;
             //     const originalText = button.textContent;

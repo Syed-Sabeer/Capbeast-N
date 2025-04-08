@@ -578,6 +578,34 @@
         #total-price {
             color: #fff !important;
         }
+
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: block;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .loader-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
     <section class="section">
         <div class="container-fluid">
@@ -737,24 +765,6 @@
                                 'customizerDesigns' => $customizerDesigns,
                             ])
                         </div>
-
-                        {{-- <div class="design-grid">
-                          @if (isset($customizerDesigns) && count($customizerDesigns) > 0)
-                            @foreach ($customizerDesigns as $design)
-                              <div class="design-thumbnail" style="background-image: url({{asset($design->image)}})">
-                              </div>
-                            @endforeach
-                          @endif
-                        </div>
-
-                        <div class="d-flex justify-content-between mt-3">
-                            <button class="btn btn-outline-secondary">
-                                <i class="fas fa-chevron-left"></i> Previous
-                            </button>
-                            <button class="btn btn-outline-secondary">
-                                Next <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div> --}}
                     </div>
                 </div>
 
@@ -789,7 +799,7 @@
                         </div>
                     </div>
                     <div class="option-bar mt-4 d-flex justify-content-between align-items-center p-3">
-                        <div>
+                        <div style="width: 50%">
                             <span>Product:
                                 <strong>
                                     @if (isset($product))
@@ -813,8 +823,8 @@
                                 </strong>
                             </span>
                         </div>
-                        <button class="btn btn-primary add-to-cart-btn">
-                            <i class="fas fa-shopping-cart me-2"></i>ADD TO CART - $<span
+                        <button class="btn btn-primary add-to-cart-btn" style="width: 50%">
+                            <i class="fas fa-shopping-cart me-2"></i>ADD TO CART <br> $<span
                                 id="total-price">{{ isset($product) ? $product->selling_price : '0.00' }}</span>
                         </button>
                     </div>
@@ -839,7 +849,10 @@
                 </div>
             </div>
         </div>
-    </section>
+      </section>
+      <div id="loader">
+          <div class="loader-spinner"></div>
+      </div>
 
     <!-- jQuery CDN (latest version) -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -848,14 +861,16 @@
         $(document).on('click', '.paginate-btn', function(e) {
             e.preventDefault();
             var url = $(this).data('url');
-
+            $('#loader').show();
             $.ajax({
                 url: url,
                 type: 'GET',
                 success: function(data) {
+                    $('#loader').hide();
                     $('#designs-container').html(data);
                 },
                 error: function() {
+                    $('#loader').hide();
                     alert('Error loading designs. Please try again.');
                 }
             });
@@ -870,6 +885,7 @@
             const searchQuery = $(this).val();
 
             searchTimeout = setTimeout(() => {
+                $('#loader').show();
                 $.ajax({
                     url: '{{ route('customizer.index', $userCustomization->id) }}', // Use your route
                     type: 'GET',
@@ -877,9 +893,11 @@
                         search: searchQuery
                     },
                     success: function(data) {
+                        $('#loader').hide();
                         $('#designs-container').html(data);
                     },
                     error: function() {
+                        $('#loader').hide();
                         alert('Error loading search results.');
                     }
                 });
@@ -979,6 +997,7 @@
         });
 
         $(document).ready(function() {
+            $('#loader').hide();
             updateTotalPrice();
             // Create download button in the UI
             const downloadBtn = $('<button>')
@@ -1416,6 +1435,7 @@
             // Add to Cart button click handler
             $('.add-to-cart-btn').on('click', async function(e) {
                 e.preventDefault();
+                $('#loader').show();
                 const originalView = designState.currentView;
                 const previews = {};
 
@@ -1456,9 +1476,16 @@
                         previews: previews
                     },
                     success: function(response) {
-                        alert('Item added to cart successfully!');
+                      if (response.redirect_url) {
+                          // Redirect to the customizer index page
+                          window.location.href = response.redirect_url;
+                          $('#loader').hide();
+                        } else {
+                            alert("Failed to add item to cart.");
+                        }
                     },
                     error: function(xhr) {
+                      $('#loader').hide();
                         alert('Error adding item to cart. Please try again.');
                     }
                 });
@@ -1658,7 +1685,6 @@
 
                 // Only proceed if switching to a different view
                 if (view === designState.currentView) return;
-
                 // Save current state before switching
                 saveCurrentViewState();
 
@@ -1832,35 +1858,92 @@
             }
 
             // Image upload handling
+            // $('.upload-area button').on('click', function() {
+            //     const input = $('<input>').attr({
+            //         type: 'file',
+            //         accept: 'image/*'
+            //     }).on('change', function(e) {
+            //         const file = e.target.files[0];
+            //         const reader = new FileReader();
+            //         reader.onload = function(event) {
+            //             const img = $('<div>').addClass('editable-image');
+            //             const imgContent = $('<img>').attr({
+            //                 src: event.target.result,
+            //                 draggable: false
+            //             });
+
+            //             createResizeHandles().forEach(handle => img.append(handle));
+            //             img.append(createDeleteButton());
+            //             img.append(createRotateHandle());
+            //             img.append(imgContent);
+            //             designContent.append(img);
+
+            //             img.css({
+            //                 left: '50%',
+            //                 top: '50%'
+            //             });
+            //             setupImageEditing(img[0]);
+            //             selectElement(img[0]);
+            //             saveState();
+            //         };
+            //         reader.readAsDataURL(file);
+            //     });
+            //     input.click();
+            // });
+
             $('.upload-area button').on('click', function() {
                 const input = $('<input>').attr({
                     type: 'file',
                     accept: 'image/*'
                 }).on('change', function(e) {
+                    $('#loader').show();
                     const file = e.target.files[0];
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const img = $('<div>').addClass('editable-image');
-                        const imgContent = $('<img>').attr({
-                            src: event.target.result,
-                            draggable: false
-                        });
+                    const formData = new FormData();
+                    formData.append('image', file);
+                    formData.append('user_customization_id', '{{ $userCustomization->id }}');
+                    formData.append('_token', '{{ csrf_token() }}');
 
-                        createResizeHandles().forEach(handle => img.append(handle));
-                        img.append(createDeleteButton());
-                        img.append(createRotateHandle());
-                        img.append(imgContent);
-                        designContent.append(img);
+                    $.ajax({
+                        url: '{{ route('customizer.upload-image') }}',
+                        method: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            $('#loader').hide();
+                            // Create image element using the server's image URL
+                            const imgDiv = $('<div>').addClass('editable-image')
+                              .attr('data-image-id', response.image_id).css({
+                                position: 'absolute',
+                                left: '50%',
+                                top: '50%',
+                                // transform: 'translate(-50%, -50%)'
+                            });
 
-                        img.css({
-                            left: '50%',
-                            top: '50%'
-                        });
-                        setupImageEditing(img[0]);
-                        selectElement(img[0]);
-                        saveState();
-                    };
-                    reader.readAsDataURL(file);
+                            const imgContent = $('<img>').attr('src', response
+                                .image_url).css({
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'contain'
+                            });
+
+                            // Add resize handles and controls
+                            createResizeHandles().forEach(handle => imgDiv.append(
+                                handle));
+                            imgDiv.append(createDeleteButton());
+                            imgDiv.append(createRotateHandle());
+                            imgDiv.append(imgContent);
+
+                            designContent.append(imgDiv);
+                            setupImageEditing(imgDiv[0]);
+                            selectElement(imgDiv[0]);
+                            saveState();
+                        },
+                        error: function(xhr) {
+                          $('#loader').hide();
+                            alert('Error uploading image. Please try again.');
+                        }
+                    });
                 });
                 input.click();
             });
@@ -1868,7 +1951,6 @@
             // Design thumbnail selection
             // Fix for design thumbnail boundary constraints
             $('#designs-container').on('click', '.design-thumbnail', function() {
-                console.log('clicked');
                 const bgImage = $(this).css('background-image');
                 const imageUrl = bgImage.match(/url\(["']?(.*?)["']?\)/)[1];
 
@@ -1989,9 +2071,35 @@
                     e.preventDefault();
                 });
 
+                // Modify the delete button click handler
                 $element.find('.delete-btn').on('click', function(e) {
-                    $element.remove();
-                    saveState();
+                    const imageId = $element.data('image-id');
+
+                    if (imageId) {
+                        if (confirm('Are you sure you want to delete this image permanently?')) {
+                            $('#loader').show();
+                            $.ajax({
+                                url: "{{ route('customizer.delete-image', '') }}/" + imageId,
+                                method: 'GET',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                success: () => {
+                                    $('#loader').hide();
+                                    $element.remove();
+                                    saveState();
+                                },
+                                error: () => {
+                                  $('#loader').hide();
+                                  alert('Failed to delete image from server');
+                                }
+                            });
+                        }
+                    } else {
+                        $element.remove();
+                        saveState();
+                    }
+
                     e.stopPropagation();
                 });
 

@@ -49,30 +49,30 @@ class OrderController extends Controller
     {
         $payer = new Payer();
         $payer->setPaymentMethod('paypal');
-    
+
         $amount = new Amount();
-        $amount->setTotal((float)$totalPrice); 
-    
-       
+        $amount->setTotal((float)$totalPrice);
+
+
         $currency = 'USD';
-        
+
         $amount->setCurrency($currency);
 
-        // $amount->setCurrency('CAD'); 
-    
+        // $amount->setCurrency('CAD');
+
         $transaction = new Transaction();
         $transaction->setAmount($amount);
-    
+
         $redirectUrls = new RedirectUrls();
         $redirectUrls->setReturnUrl(URL::route('status'))
                      ->setCancelUrl(URL::route('status'));
-    
+
         $payment = new Payment();
         $payment->setIntent('sale')
                 ->setPayer($payer)
                 ->setTransactions([$transaction])
                 ->setRedirectUrls($redirectUrls);
-    
+
         try {
             $payment->create($this->_api_context);
             Log::info("PayPal Payment Created: " . json_encode($payment));
@@ -81,32 +81,32 @@ class OrderController extends Controller
             Session::put('error', 'Connection timeout');
             return Redirect::route('checkout');
         }
-    
+
         foreach ($payment->getLinks() as $link) {
             if ($link->getRel() == 'approval_url') {
                 $redirect_url = $link->getHref();
                 break;
             }
         }
-    
+
         // Store payment ID for later use
         Session::put('paypal_payment_id', $payment->getId());
-    
+
         return $redirect_url;
     }
-    
+
 
 
     public function GetPaymentStatus(Request $request)
     {
         $paymentId = $request->query('paymentId');
         $payerId = $request->query('PayerID');
-    
+
         if (empty($payerId) || empty($paymentId)) {
             Session::put('error', 'Payment failed');
             return redirect()->route('checkout');
         }
-    
+
         try {
             // Retrieve total price and discount details from session
             $totalPrice = session('checkout_details')['total_price'] ?? 0;
@@ -120,21 +120,21 @@ class OrderController extends Controller
             $TPStaxPercentage = session('checkout_details')['tps_tax_percentage'] ?? 0;
             $TVQtaxPercentage = session('checkout_details')['tvq_tax_percentage'] ?? 0;
             $discount = session('checkout_details')['discount'] ?? null;
-    
+
             $payment = Payment::get($paymentId, $this->_api_context);
             $execution = new PaymentExecution();
             $execution->setPayerId($payerId);
             $result = $payment->execute($execution, $this->_api_context);
-    
+
             if ($result->state == 'approved') {
                 // Retrieve session data
                 $checkoutDetails = session('checkout_details');
                 if (!$checkoutDetails) {
                     return redirect()->route('checkout')->with('error', 'Session expired.');
                 }
-    
+
                 DB::beginTransaction();
-    
+
                 // Create Order
                 $order = Order::create([
                     'order_id' => $this->generateOrderId(),
@@ -145,10 +145,10 @@ class OrderController extends Controller
                     'discount_price' => $discountAmount,
                     'status' => 0,
                 ]);
-    
+
                 $country = session('checkout_details')['country'] ?? null;
                 if (($TPStaxAmount > 0 || $TVQtaxAmount > 0) && $country === 'CA') {
-               
+
 
                     OrderTaxDetails::create([
                         'order_id' => $order->id,
@@ -159,10 +159,10 @@ class OrderController extends Controller
                         'tvq_tax_percentage' => $TVQtaxPercentage,
                         'tvq_tax_price' => $TVQtaxAmount,
                     ]);
-                    
+
                 }
-                
-    
+
+
                 // Create Shipping Details
                 OrderShippingDetail::create([
                     'order_id' => $order->id,
@@ -175,7 +175,7 @@ class OrderController extends Controller
                     'phone' => $checkoutDetails['phone'],
                     'additional_info' => $checkoutDetails['additional_info'],
                 ]);
-    
+
                 // Insert Order Items
                 foreach ($checkoutDetails['cart_items'] as $item) {
                     $orderItem = OrderItem::create([
@@ -186,16 +186,16 @@ class OrderController extends Controller
                         'quantity' => $item->quantity,
                         'product_price' => $item->product->selling_price,
                     ]);
-    
-                 
+
+
                 }
-    
+
                 // Clear Cart
                 Cart::where('user_id', auth()->id())->delete();
-    
+
                 DB::commit();
                 session()->forget('checkout_details');
-    
+
                    // Send Emails
             Mail::to(auth()->user()->email)->send(new OrderPlacedMail($order, false));
             Mail::to('info@capbeast.com')->send(new OrderPlacedMail($order, true));
@@ -203,7 +203,7 @@ class OrderController extends Controller
 
                 return redirect()->route('main.pages.success', ['orderId' => $order->id]);
             }
-    
+
             return redirect()->route('checkout')->with('error', 'Payment failed.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -211,7 +211,7 @@ class OrderController extends Controller
             return redirect()->route('checkout')->with('error', 'Payment failed.');
         }
     }
-    
+
 
     public function orderSuccess(Request $request)
     {
@@ -229,7 +229,7 @@ class OrderController extends Controller
     {
         $userId = auth()->id();
 
-        
+
 
         $orderhistory = Order::where('user_id', $userId)->get();
 
@@ -241,7 +241,7 @@ class OrderController extends Controller
         $userId = auth()->id();
         $countries = (new CountryList())->getList('en');
 
-        $cart = Cart::with(['product', 'color'])
+        $cart = Cart::with(['product', 'color', 'userCustomization'])
             ->where('user_id', $userId)
             ->get();
 
@@ -261,19 +261,19 @@ class OrderController extends Controller
             $countries = Cache::remember('country_list', now()->addDays(1), function () {
                 $response = Http::timeout(120) // Increase the timeout value
                     ->get('https://restcountries.com/v3.1/all?fields=name,cca2');
-    
+
                 if (!$response->successful()) {
                     throw new \Exception('API request failed');
                 }
-    
+
                 return collect($response->json())->pluck('name.common', 'cca2')->sort();
             });
-    
+
             // Check if the countries data was returned correctly
             if (is_array($countries) && isset($countries['error'])) {
                 return response()->json(['error' => $countries['error']], 500);
             }
-    
+
             return response()->json($countries);
         } catch (\Exception $e) {
             Log::error('Error fetching countries: ' . $e->getMessage());
@@ -283,7 +283,7 @@ class OrderController extends Controller
     public function add(Request $request)
     {
         $userId = auth()->id();
-        
+
         try {
             $request->validate([
                 'firstname' => 'required|string|max:255',
@@ -296,12 +296,12 @@ class OrderController extends Controller
                 'additional_info' => 'nullable|string|max:500',
                 'paymentMethod' => 'required|string'
             ]);
-    
+
             $cartItems = Cart::where('user_id', $userId)->with(['product', 'color', 'printing'])->get();
             if ($cartItems->isEmpty()) {
                 return response()->json(['success' => false, 'message' => 'Cart is empty.'], 400);
             }
-    
+
             // Get final total from request
             $totalPrice = (float) $request->input('finalTotal');
             $discountAmount = (float) $request->input('DiscountAmount') ?? 0;
@@ -314,7 +314,7 @@ class OrderController extends Controller
             $TPStaxNumber = (float) $request->input('TPStaxNumber') ?? 0;
             $TVQtaxNumber = (float) $request->input('TVQtaxNumber') ?? 0;
 
-            
+
             // Save session data
             session([
                 'checkout_details' => [
@@ -339,29 +339,29 @@ class OrderController extends Controller
                     'tvq_tax_no' => $TVQtaxNumber,
                 ]
             ]);
-    
+
             // Initiate PayPal Payment
             if ($request->paymentMethod === 'paypal') {
                 $paymentResponse = $this->PostPaymentWithPaypal($totalPrice);
-    
+
                 if (!$paymentResponse) {
                     return response()->json(['success' => false, 'message' => 'PayPal payment initiation failed.'], 500);
                 }
-    
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Redirecting to PayPal...',
                     'paypalUrl' => $paymentResponse
                 ]);
             }
-    
+
             return response()->json(['success' => false, 'message' => 'Payment method not supported.']);
         } catch (\Exception $e) {
             Log::error('Checkout failed: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Checkout failed. Please try again later.'], 500);
         }
     }
-    
+
 
     private function generateOrderId()
     {
@@ -377,42 +377,42 @@ class OrderController extends Controller
         $request->validate([
             'coupon_code' => 'required|string',
         ]);
-    
+
         $user = Auth::user();
         $coupon = DiscountCoupon::where('code', $request->coupon_code)->first();
-    
+
         if (!$coupon) {
             return response()->json(['success' => false, 'message' => 'Invalid coupon code.'], 400);
         }
-    
+
         // Check coupon visibility
         if ($coupon->visibility != 1) {
             return response()->json(['success' => false, 'message' => 'Coupon is not available.'], 400);
         }
-    
+
         // Validate expiration date
         $currentDate = now();
         if ($coupon->is_expiry && ($currentDate < $coupon->duration_from || $currentDate > $coupon->duration_to)) {
             return response()->json(['success' => false, 'message' => 'Coupon has expired.'], 400);
         }
-    
+
         // Validate usage count
         $usageCount = Order::where('discount_id', $coupon->id)->count();
         if ($coupon->is_expiry && $coupon->count !== null && $usageCount >= $coupon->count) {
             return response()->json(['success' => false, 'message' => 'Coupon usage limit reached.'], 400);
         }
-    
+
         // Log coupon and cart info for debugging
         Log::debug("Coupon ID: {$coupon->id}, is_all: {$coupon->is_all}, discountable_id: {$coupon->discountable_id}");
         $cartItems = Cart::where('user_id', auth()->id())->get();
         Log::debug("Cart items count: " . $cartItems->count());
-    
+
         $maxDiscountAmount = 0;
-    
+
         foreach ($cartItems as $item) {
             $currentDiscount = 0;
             Log::debug("Cart item product_id: {$item->product_id}, product_price: {$item->product->selling_price}, quantity: {$item->quantity}, coupon discountable_id: {$coupon->discountable_id}");
-    
+
             if ($coupon->is_all == 1) {
                 // Apply the discount for all products, even if product_id is null
                 $currentDiscount = ($item->product->selling_price * $coupon->percentage / 100) * $item->quantity;
@@ -422,14 +422,14 @@ class OrderController extends Controller
                     $currentDiscount = ($item->product->selling_price * $coupon->percentage / 100) * $item->quantity;
                 }
             }
-    
+
             Log::debug("Current discount for item (product_id {$item->product_id}): {$currentDiscount}");
-    
+
             if ($currentDiscount > $maxDiscountAmount) {
                 $maxDiscountAmount = $currentDiscount;
             }
         }
-    
+
         if ($maxDiscountAmount > 0) {
             return response()->json([
                 'success' => true,
@@ -438,10 +438,10 @@ class OrderController extends Controller
                 'message' => 'Discount applied successfully.',
             ]);
         }
-    
+
         return response()->json(['success' => false, 'message' => 'Coupon not applicable for selected products.'], 400);
     }
-    
-    
-    
+
+
+
 }

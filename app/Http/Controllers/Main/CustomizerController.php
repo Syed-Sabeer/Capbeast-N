@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cart;
 use App\Models\CustomizerDesign;
 use App\Models\CustomizerPrice;
+use App\Models\CustomizerUpload;
 use App\Models\DesignCategory;
 use App\Models\Product;
 use App\Models\ProductColor;
@@ -12,6 +14,7 @@ use App\Models\TextColor;
 use App\Models\UserCustomization;
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CustomizerController extends Controller
 {
@@ -19,8 +22,8 @@ class CustomizerController extends Controller
   {
     try {
       $userCustomization = UserCustomization::findOrFail($id);
-      if ($userCustomization->price != null) {
-        return redirect()->route('cart')->with('error', 'This Customization is already in cart.');
+      if ($userCustomization->cart_id != null) {
+        return redirect()->route('cart')->with('error', 'This Customization is already added cart.');
       }
       $productColor = ProductColor::findOrfail($userCustomization->product_color_id);
       $product = Product::findOrFail($userCustomization->product_id);
@@ -64,7 +67,7 @@ class CustomizerController extends Controller
 
       // Check if a customization already exists for this user and color
       $userCustomization = UserCustomization::where('user_id', auth()->id())
-        ->where('product_color_id', $request->colorId)->where('price', null)
+        ->where('product_color_id', $request->colorId)->where('cart_id', null)
         ->first();
 
       // If no customization exists, create a new one
@@ -73,6 +76,8 @@ class CustomizerController extends Controller
         $userCustomization->user_id = auth()->id();
         $userCustomization->product_color_id = $request->colorId;
         $userCustomization->product_id = $product->id;
+        $userCustomization->quantity = $request->quantity;
+        $userCustomization->size = $request->size;
 
         // Image fields from product_color table
         $imageFields = ['front_image', 'back_image', 'left_image', 'right_image'];
@@ -142,8 +147,10 @@ class CustomizerController extends Controller
         'previews' => 'nullable|array',
       ]);
 
+      $product = Product::findOrFail($request->product_id);
+      $design_price = $request->total_price - $product->selling_price;
       $userCustomization = UserCustomization::findOrFail($id);
-      $userCustomization->price = $request->total_price;
+      $userCustomization->price = $design_price;
 
       $previews = $request->input('previews', []); // Get the previews array
 
@@ -182,13 +189,22 @@ class CustomizerController extends Controller
         }
       }
 
+      $cartItem = Cart::create([
+        'user_id' => $userCustomization->user_id,
+        'product_id' => $userCustomization->product_id,
+        'color_id' => $userCustomization->product_color_id,
+        'quantity' => $userCustomization->quantity,
+        'size' => $userCustomization->size,
+      ]);
+
+      $userCustomization->cart_id = $cartItem->id;
       $userCustomization->save();
 
       return response()->json([
         'message' => 'Customizer updated successfully.',
         'success' => true,
         'data' => $userCustomization,
-        'redirect_url' => route('customizer.index', $userCustomization->id),
+        'redirect_url' => route('cart'),
       ]);
     } catch (\Illuminate\Validation\ValidationException $e) {
       return response()->json([
@@ -203,5 +219,33 @@ class CustomizerController extends Controller
         'error' => $e->getMessage(),
       ], 500);
     }
+  }
+
+  public function uploadImage(Request $request)
+  {
+      $request->validate(['image' => 'required|image']);
+
+      $imagePath = $request->file('image')->store('customizerUploads', 'public');
+
+      $image = CustomizerUpload::create([
+        'user_customization_id' => $request->user_customization_id,
+        'image' => $imagePath,
+      ]);
+
+      return response()->json([
+        'image_url' => asset("storage/{$imagePath}"),
+        'image_id' => $image->id
+      ]);
+  }
+
+  // In CustomizerController.php
+  public function deleteImage($id)
+  {
+    $image = CustomizerUpload::findOrFail($id);
+    // Delete file from storage
+    Storage::disk('public')->delete($image->image);
+    // Delete record from database
+    $image->delete();
+    return response()->json(['success' => true]);
   }
 }

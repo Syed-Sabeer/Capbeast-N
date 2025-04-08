@@ -51,7 +51,8 @@
                                         <tr>
                                             <th scope="col">Product</th>
                                             <th scope="col">Quantity</th>
-                                            <th scope="col">Price</th>
+                                            <th scope="col">Item Price</th>
+                                            <th scope="col">Cust. Price</th>
                                             <th scope="col">Total</th>
                                         </tr>
                                     </thead>
@@ -62,7 +63,8 @@
 
                                         @foreach ($cart as $item)
                                             @php
-                                                $itemTotal = $item->product->selling_price * $item->quantity;
+                                                // $itemTotal = $item->product->selling_price * $item->quantity;
+                                                $itemTotal = ($item->product->selling_price * $item->quantity) + ($item->userCustomization->price * $item->quantity);
                                                 $subtotal += $itemTotal;
                                             @endphp
 
@@ -71,13 +73,20 @@
                                                     <div class="d-flex align-items-center gap-2">
                                                         <div class="avatar-sm flex-shrink-0">
                                                             <div class="avatar-title  rounded-3">
+                                                              @if ($item->userCustomization)
+                                                                <img src="{{ asset(
+                                                                        ($item->userCustomization->front_image ??
+                                                                            ($item->userCustomization->right_image ??
+                                                                                ($item->userCustomization->left_image ?? ($item->userCustomization->back_image ?? 'ProductImages/default.jpg')))),
+                                                                ) }}" alt="" class="avatar-lg ">
+                                                              @else
                                                                 <img src="{{ asset(
                                                                     'storage/' .
                                                                         ($item->color->front_image ??
                                                                             ($item->color->right_image ??
                                                                                 ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg')))),
-                                                                ) }}"
-                                                                    alt="" class="avatar-xs">
+                                                                ) }}" alt="" class="avatar-lg ">
+                                                              @endif
                                                             </div>
                                                         </div>
                                                         <div class="flex-grow-1">
@@ -94,7 +103,10 @@
                                                     ${{ $item->product->selling_price }}
                                                 </td>
                                                 <td class="text-end">
-                                                    ${{ $item->product->selling_price * $item->quantity }}
+                                                    ${{ $item->userCustomization->price }}
+                                                </td>
+                                                <td class="text-end">
+                                                    ${{ ($item->product->selling_price * $item->quantity) + ($item->userCustomization->price * $item->quantity) }}
                                                 </td>
                                             </tr>
                                         @endforeach
