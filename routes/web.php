@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Main\TOSDController;
-use App\Http\Controllers\Main\TOSDController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
