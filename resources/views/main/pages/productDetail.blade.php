@@ -18,23 +18,25 @@
             height: 2rem;
             width: 2rem;
         }
-        .customization-btn{
-          background-color: white;
-          color: #000;
-          border: 1px solid #000;
-          margin-top: 10px;
-          padding: 10px;
-          border-radius: 5px;
-          width: 100%;
+
+        .customization-btn {
+            background-color: white;
+            color: #000;
+            border: 1px solid #000;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            width: 100%;
         }
-        .customization-btn:hover{
-          background-color: #000;
-          color: #fff;
-          border: 1px solid #000;
-          margin-top: 10px;
-          padding: 10px;
-          border-radius: 5px;
-          width: 100%;
+
+        .customization-btn:hover {
+            background-color: #000;
+            color: #fff;
+            border: 1px solid #000;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            width: 100%;
         }
     </style>
 
@@ -122,11 +124,11 @@
                             <button type="button" class="plus">+</button>
                         </div>
 
-                        <button class="btn btn-primary fs-14 add-to-cart-btn" data-product-id="{{ $product->id }}"
+                        {{-- <button class="btn btn-primary fs-14 add-to-cart-btn" data-product-id="{{ $product->id }}"
                             data-color-id="{{ $product->productColors->first()->id ?? '' }}"
                             data-user-id="{{ auth()->id() }}" data-size="">
                             Add To Cart
-                        </button>
+                        </button> --}}
                         <button class="btn btn-primary fs-14 customization-btn" data-product-id="{{ $product->id }}"
                             data-color-id="{{ $product->productColors->first()->id ?? '' }}"
                             data-user-id="{{ auth()->id() }}" data-size="">
@@ -215,40 +217,40 @@
                 }
 
                 fetch("{{ route('cart.add') }}", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-    },
-    body: JSON.stringify({
-        productId,
-        userId,
-        colorId,
-        size,
-        quantity
-    })
-})
-.then(response => response.json())
-.then(data => {
-    button.disabled = false;
-    button.textContent = originalText;
-    button.classList.remove("loading");
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify({
+                            productId,
+                            userId,
+                            colorId,
+                            size,
+                            quantity
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        button.disabled = false;
+                        button.textContent = originalText;
+                        button.classList.remove("loading");
 
-    if (data.success) {
-        alert("Item added to cart!");
-        if (data.redirect_url) {  // Use `data.redirect_url` here
-            window.location.href = data.redirect_url;
-        }
-    } else {
-        alert("Failed to add item to cart.");
-    }
-})
-.catch(error => {
-    console.error("Error:", error);
-    button.disabled = false;
-    button.textContent = originalText;
-    button.classList.remove("loading");
-});
+                        if (data.success) {
+                            alert("Item added to cart!");
+                            if (data.redirect_url) { // Use `data.redirect_url` here
+                                window.location.href = data.redirect_url;
+                            }
+                        } else {
+                            alert("Failed to add item to cart.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        button.disabled = false;
+                        button.textContent = originalText;
+                        button.classList.remove("loading");
+                    });
 
             });
 
@@ -271,18 +273,18 @@
                 let userId = this.getAttribute("data-user-id");
 
                 if (!isAuthenticated) {
-                    // let cart = JSON.parse(localStorage.getItem("cart")) || [];
-                    // let newItem = {
-                    //     productId,
-                    //     colorId,
-                    //     size,
-                    //     quantity
-                    // };
+                    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+                    let newItem = {
+                        productId,
+                        colorId,
+                        size,
+                        quantity
+                    };
 
-                    // cart.push(newItem);
-                    // localStorage.setItem("cart", JSON.stringify(cart));
-                    // document.cookie =
-                    //     `cart=${encodeURIComponent(JSON.stringify(cart))}; path=/; max-age=3600; SameSite=Lax`;
+                    cart.push(newItem);
+                    localStorage.setItem("cart", JSON.stringify(cart));
+                    document.cookie =
+                        `cart=${encodeURIComponent(JSON.stringify(cart))}; path=/; max-age=3600; SameSite=Lax`;
 
                     setTimeout(() => {
                         window.location.href = "{{ route('user.login') }}";
@@ -312,8 +314,8 @@
                         button.classList.remove("loading");
 
                         if (data.success) {
-                          // Redirect to the customizer index page
-                          window.location.href = data.redirect_url;
+                            // Redirect to the customizer index page
+                            window.location.href = data.redirect_url;
                         } else {
                             alert("Failed to add item to cart.");
                         }
