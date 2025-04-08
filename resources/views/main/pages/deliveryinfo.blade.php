@@ -8,8 +8,8 @@
         <div class="row justify-content-center">
             <div class="col-lg-6">  
                 <div class="text-center">
-                    <h1 class="text-white mb-2">Delivery Information</h1>
-                    <p class="text-white-75 mb-0">Last Updated 10 April, 2025</p>
+                    <h1 class="text-white mb-2">DELIVERY INFORMATION</h1>
+                    <p class="text-white-75 mb-0">This Delivery Information was published on April 10<sup>th</sup>, 2025.</p>
                 </div>
             </div>
         </div>
