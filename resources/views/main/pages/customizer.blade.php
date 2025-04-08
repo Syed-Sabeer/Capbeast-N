@@ -575,7 +575,6 @@
             <div class="row">
                 <!-- Left Sidebar - Design Tools -->
                 <div class="col-md-2 sidebar p-4">
-
                     <div class="tool-section">
                         <button class="w-100 active" data-panel="upload-panel">
                             <i class="fa-solid fa-file-arrow-up"></i>
@@ -608,7 +607,7 @@
                     </div>
 
                     <!-- Text Panel -->
-                    <div class="option-panel mb-5" id="text-panel">
+                    <div class="option-panel" id="text-panel">
                         <h4 class="mb-4">Add Text</h4>
                         <div class="mb-3">
                             <label class="form-label">Your Text</label>
@@ -622,11 +621,9 @@
                                 <option value="Helvetica, sans-serif" style="font-family: Helvetica, sans-serif;">Helvetica
                                 </option>
                                 <option value="'Times New Roman', serif" style="font-family: 'Times New Roman', serif;">
-                                    Times
-                                    New Roman</option>
+                                    Times New Roman</option>
                                 <option value="'Courier New', monospace" style="font-family: 'Courier New', monospace;">
-                                    Courier
-                                    New</option>
+                                    Courier New</option>
                                 <option value="Georgia, serif" style="font-family: Georgia, serif;">Georgia</option>
 
                                 <!-- Google Fonts -->
@@ -640,31 +637,30 @@
                                 <option value="'Berkshire Swash', cursive" style="font-family: 'Berkshire Swash', cursive;">
                                     Berkshire Swash</option>
                                 <option value="'Black Ops One', cursive" style="font-family: 'Black Ops One', cursive;">
-                                    Black
-                                    Ops One</option>
+                                    Black Ops One</option>
                                 <option value="'Cookie', cursive" style="font-family: 'Cookie', cursive;">Cookie</option>
                                 <option value="'Damion', cursive" style="font-family: 'Damion', cursive;">Damion</option>
-                                <option value="'Fondamento', cursive" style="font-family: 'Fondamento', cursive;">Fondamento
+                                <option value="'Fondamento', cursive" style="font-family: 'Fondamento', cursive;">
+                                    Fondamento
                                 </option>
                                 <option value="'IM Fell English', serif" style="font-family: 'IM Fell English', serif;">IM
-                                    FELL
-                                    English</option>
-                                <option value="'Indie Flower', cursive" style="font-family: 'Indie Flower', cursive;">Indie
+                                    FELL English</option>
+                                <option value="'Indie Flower', cursive" style="font-family: 'Indie Flower', cursive;">
+                                    Indie
                                     Flower</option>
                                 <option value="'Kaushan Script', cursive" style="font-family: 'Kaushan Script', cursive;">
                                     Kaushan Script</option>
                                 <option value="'Merienda', cursive" style="font-family: 'Merienda', cursive;">Merienda
                                 </option>
-                                <option value="'Old Standard TT', serif" style="font-family: 'Old Standard TT', serif;">Old
+                                <option value="'Old Standard TT', serif" style="font-family: 'Old Standard TT', serif;">
+                                    Old
                                     English</option>
                                 <option value="'Pacifico', cursive" style="font-family: 'Pacifico', cursive;">Pacifico
                                 </option>
                                 <option value="'Patrick Hand', cursive" style="font-family: 'Patrick Hand', cursive;">
-                                    Patrick
-                                    Hand</option>
+                                    Patrick Hand</option>
                                 <option value="'Permanent Marker', cursive"
-                                    style="font-family: 'Permanent Marker', cursive;">
-                                    Permanent Marker</option>
+                                    style="font-family: 'Permanent Marker', cursive;">Permanent Marker</option>
                                 <option value="'Rock Salt', cursive" style="font-family: 'Rock Salt', cursive;">Rock Salt
                                 </option>
                                 <option value="'Satisfy', cursive" style="font-family: 'Satisfy', cursive;">Script Tails
@@ -681,18 +677,18 @@
 
 
                             <label class="form-label">Font Size</label>
-                            <!-- <input type="range" class="form-range mb-3" min="8" max="72" value="24"> -->
                             <div class="slider-container">
-                                <!-- <label class="slider-label">Font Size</label> -->
                                 <span class="font-size-value" id="fontSizeValue">10px</span>
-                                <input type="range" class="form-range" min="5" max="100" value="10"
-                                    id="fontSizeRange">
+                                <input type="range" class="win10-thumb" min="5" max="100" value="10"
+                                    id="fontSizeRange" />
+                                <!-- <input type="range" class="form-range" min="5" max="100" value="10" id="fontSizeRange"> -->
                             </div>
+
                             <label class="form-label">Thread Color</label>
                             <div class="color-options mb-3">
                                 @if (isset($textColors) && count($textColors) > 0)
                                     @foreach ($textColors as $index => $color)
-                                        <div title="{{ $color->color_name }}" class="color-option"
+                                        <div title="{{ $color->color_name }}" class="color-option {{ $index === 0 ? 'active' : '' }}"
                                             style="background-image: url({{ asset($color->color_image) }});"></div>
                                     @endforeach
                                 @endif
@@ -726,23 +722,12 @@
                         </div>
 
                         <div class="design-grid">
-                            <div class="design-thumbnail" style="background-image: url('images/navbar.PNG')">
-                            </div>
-                            <div class="design-thumbnail"
-                                style="background-image: url('https://via.placeholder.com/150/ff5a5f/ffffff?text=Logo2')">
-                            </div>
-                            <div class="design-thumbnail"
-                                style="background-image: url('https://via.placeholder.com/150/2ec4b6/ffffff?text=Logo3')">
-                            </div>
-                            <div class="design-thumbnail"
-                                style="background-image: url('https://via.placeholder.com/150/8338ec/ffffff?text=Logo4')">
-                            </div>
-                            <div class="design-thumbnail"
-                                style="background-image: url('https://via.placeholder.com/150/ffbe0b/000000?text=Logo5')">
-                            </div>
-                            <div class="design-thumbnail"
-                                style="background-image: url('https://via.placeholder.com/150/fb5607/ffffff?text=Logo6')">
-                            </div>
+                          @if (isset($customizerDesigns) && count($customizerDesigns) > 0)
+                            @foreach ($customizerDesigns as $design)
+                              <div class="design-thumbnail" style="background-image: url({{asset($design->image)}})">
+                              </div>
+                            @endforeach
+                          @endif
                         </div>
 
                         <div class="d-flex justify-content-between mt-3">
@@ -757,19 +742,17 @@
                 </div>
 
                 <!-- Main Content - Hat Preview -->
-                <div class="col-md-5 main-content p-4">
+                <div class="col-md-7 main-content p-4">
                     <div class="hat-preview mx-auto">
                         <div class="design-area" id="hat-view">
                             <!-- This will be updated with the selected view -->
-                            <img src="{{ asset($userCustomization->front_image) }}" alt="Front View" class="img-fluid"
-                                id="current-view">
+                            <img src="{{ asset($userCustomization->front_image) }}" alt="Front View" class="img-fluid" id="current-view">
                         </div>
                     </div>
                     <div class="mt-4 p-3 bg-light rounded">
                         <div class="d-flex justify-content-around text-center view-selector">
                             <div class="px-3 view-option" data-view="front">
-                                <img height="50px" src="{{ asset($userCustomization->front_image) }}" alt="Front View"
-                                    class="active">
+                                <img height="50px" src="{{ asset($userCustomization->front_image) }}" alt="Front View" class="active">
                                 <p class="small mb-0 active">Front-${{ $customizerPrice->front_price }}</p>
                             </div>
                             <div class="px-3 view-option" data-view="left">
@@ -793,11 +776,11 @@
                             <span>Size: <strong>One Size</strong></span>
                         </div>
                         <button class="btn btn-primary">
-                            <i class="fas fa-shopping-cart me-2"></i>ADD TO CART
+                            <i class="fas fa-shopping-cart me-2"></i>ADD TO CART - $29.99
                         </button>
                     </div>
 
-                    <div class="mt-4 p-3 bg-light rounded" style="margin-bottom: 100px !important;">
+                    <div class="mt-4 p-3 bg-light rounded">
                         <h5 class="mb-3">Design Tips</h5>
                         <div class="d-flex justify-content-around text-center">
                             <div class="px-3">
@@ -815,66 +798,54 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Right Sidebar - Editing Tools -->
-                <div class="col-md-2 right-sidebar p-4">
-                    <button class="btn" id="pan-btn">
-                        <i class="fas fa-hand me-2"></i>PAN
-                    </button>
-                    <button class="btn" id="undo-btn">
-                        <i class="fas fa-undo me-2"></i>Undo
-                    </button>
-                    <button class="btn" id="redo-btn">
-                        <i class="fas fa-redo me-2"></i>Redo
-                    </button>
-                    <button class="btn" id="zoomIn-btn">
-                        <i class="fas fa-search-plus me-2"></i>Zoom In
-                    </button>
-                    <button class="btn" id="zoomOut-btn">
-                        <i class="fas fa-search-minus me-2"></i>Zoom Out
-                    </button>
-                    <button class="btn" id="lock-btn">
-                        <i class="fas fa-lock me-2"></i>Lock
-                    </button>
-                </div>
             </div>
         </div>
     </section>
 
     <!-- jQuery CDN (latest version) -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    {{-- <script>
-        // Add this at the top of your script
+    <script>
+        // Global state variables
         let designState = {
             currentView: 'front',
             views: {
                 front: {
-                    elements: [], // Stores all design elements for this view
+                    elements: [],
                     background: "{{asset($userCustomization->front_image)}}",
                     zoom: 1,
-                    pan: { x: 0, y: 0 }
+                    pan: {
+                        x: 0,
+                        y: 0
+                    }
                 },
                 left: {
                     elements: [],
                     background: "{{asset($userCustomization->left_image)}}",
                     zoom: 1,
-                    pan: { x: 0, y: 0 }
+                    pan: {
+                        x: 0,
+                        y: 0
+                    }
                 },
                 right: {
                     elements: [],
                     background: "{{asset($userCustomization->right_image)}}",
                     zoom: 1,
-                    pan: { x: 0, y: 0 }
+                    pan: {
+                        x: 0,
+                        y: 0
+                    }
                 },
                 back: {
                     elements: [],
                     background: "{{asset($userCustomization->back_image)}}",
                     zoom: 1,
-                    pan: { x: 0, y: 0 }
+                    pan: {
+                        x: 0,
+                        y: 0
+                    }
                 }
             },
-            color: 'black',
-            size: 'one-size'
         };
 
         let currentTextElement = null;
@@ -889,643 +860,277 @@
         });
 
         $(document).ready(function() {
-            // Panel switching functionality
-            $('.sidebar button').on('click', function() {
-                const panelId = $(this).data('panel');
+            // Create download button in the UI
+            const downloadBtn = $('<button>')
+                .addClass('download-btn')
+                .text('Download Design')
+                .css({
+                    'position': 'fixed',
+                    'bottom': '20px',
+                    'right': '20px',
+                    'padding': '10px 20px',
+                    'background': '#3a86ff',
+                    'color': 'white',
+                    'border': 'none',
+                    'border-radius': '5px',
+                    'cursor': 'pointer',
+                    'z-index': '1000'
+                })
+                .on('click', downloadDesign);
 
-                // Update active state in sidebar
-                $('.sidebar button').removeClass('active');
-                $(this).addClass('active');
+            $('body').append(downloadBtn);
 
-                // Show the corresponding panel
-                $('.option-panel').removeClass('active');
-                $('#' + panelId).addClass('active');
-            });
+            // Download function with support for color images
+            async function downloadDesign() {
+                // Create a canvas that matches the hat image size
+                const hatImg = document.getElementById('current-view');
 
-            // Color selection functionality
-            $('.color-option').on('click', function() {
-                const parent = $(this).closest('.color-options');
-                if (parent.length) {
-                    parent.find('.color-option').removeClass('active');
+                // Wait for the hat image to load
+                if (!hatImg.complete) {
+                    await new Promise(resolve => {
+                        hatImg.onload = resolve;
+                        hatImg.onerror = resolve;
+                    });
                 }
-                $(this).addClass('active');
 
-                // Update the color display in the option bar if it's the main color selector
-                if ($(this).closest('.sidebar .tool-section').length) {
-                    const colorName = $(this).attr('title') || $(this).text();
-                    $('.option-bar span strong').text(colorName);
+                const canvas = document.createElement('canvas');
+                canvas.width = hatImg.naturalWidth || hatImg.width;
+                canvas.height = hatImg.naturalHeight || hatImg.height;
+                const ctx = canvas.getContext('2d');
+
+                // Draw the base hat image
+                ctx.drawImage(hatImg, 0, 0, canvas.width, canvas.height);
+
+                // Get the design boundary position and size
+                const boundary = $('.design-boundary')[0];
+                const boundaryRect = boundary.getBoundingClientRect();
+                const hatRect = hatImg.getBoundingClientRect();
+
+                // Calculate scale factors
+                const scaleX = canvas.width / hatRect.width;
+                const scaleY = canvas.height / hatRect.height;
+
+                // Function to load an image
+                async function loadImage(url) {
+                    return new Promise((resolve) => {
+                        const img = new Image();
+                        img.crossOrigin = 'Anonymous';
+                        img.onload = () => resolve(img);
+                        img.onerror = () => resolve(null);
+                        img.src = url;
+                    });
                 }
-            });
 
-            // Text style selection
-            $('.text-style-option').on('click', function() {
-                $('.text-style-option').removeClass('active');
-                $(this).addClass('active');
-            });
+                // Draw each design element
+                const elements = $('.design-content').children();
 
-            // Layer visibility toggle
-            $('.layer-list .fa-eye, .layer-list .fa-eye-slash').on('click', function(e) {
-                e.stopPropagation();
-                if ($(this).hasClass('fa-eye')) {
-                    $(this).removeClass('fa-eye text-primary').addClass('fa-eye-slash text-muted');
-                } else {
-                    $(this).removeClass('fa-eye-slash text-muted').addClass('fa-eye text-primary');
-                }
-            });
+                for (let i = 0; i < elements.length; i++) {
+                    const element = elements[i];
+                    const $element = $(element);
+                    const elementRect = element.getBoundingClientRect();
 
-            // Design thumbnail selection
-            $('.design-thumbnail').on('click', function() {
-                $('.design-area').css('backgroundImage', $(this).css('backgroundImage'));
-            });
+                    // Calculate position relative to hat image
+                    const x = (elementRect.left - hatRect.left) * scaleX;
+                    const y = (elementRect.top - hatRect.top) * scaleY;
+                    const width = elementRect.width * scaleX;
+                    const height = elementRect.height * scaleY;
 
-            // Hat view selection functionality
-            // $('.view-option').on('click', function() {
-            //     const view = $(this).data('view');
-            //     const imgSrc = $(this).find('img').attr('src');
-
-            //     // Update active state
-            //     $('.view-option img, .view-option p').removeClass('active');
-            //     $(this).find('img, p').addClass('active');
-
-            //     // Update the main view
-            //     $('#current-view').attr('src', imgSrc);
-            // });
-
-            // New Code for state start here
-            // Update the view-option click handler
-            $('.view-option').on('click', function() {
-                const view = $(this).data('view');
-
-                // Save current view state before switching
-                saveCurrentViewState();
-
-                // Switch to new view
-                designState.currentView = view;
-                loadViewState(view);
-
-                // Update UI
-                $('.view-option img, .view-option p').removeClass('active');
-                $(this).find('img, p').addClass('active');
-                $('#current-view').attr('src', designState.views[view].background);
-
-                // Update design area
-                updateDesignArea(view);
-            });
-
-            function saveCurrentViewState() {
-                const view = designState.currentView;
-
-                // Save zoom and pan
-                designState.views[view].zoom = zoomLevel;
-                designState.views[view].pan = { ...panOffset };
-
-                // Save all elements
-                designState.views[view].elements = [];
-                $('.editable-image, .text-design').each(function() {
-                    const $el = $(this);
-                    const elementData = {
-                        type: $el.hasClass('text-design') ? 'text' : 'image',
-                        content: $el.hasClass('text-design') ? $el.text() : $el.find('img').attr('src'),
-                        position: {
-                            left: parseFloat($el.css('left')) || 0,
-                            top: parseFloat($el.css('top')) || 0
-                        },
-                        size: {
-                            width: parseFloat($el.css('width')) || $el.width(),
-                            height: parseFloat($el.css('height')) || $el.height()
-                        },
-                        rotation: parseFloat($el.css('transform').replace(/[^0-9\-.,]/g, '')) || 0,
-                        styles: {}
-                    };
-
-                    if (elementData.type === 'text') {
-                        elementData.styles = {
-                            fontFamily: $el.css('fontFamily'),
-                            fontSize: $el.css('fontSize'),
-                            color: $el.css('backgroundImage'),
-                            fontWeight: $el.css('fontWeight'),
-                            fontStyle: $el.css('fontStyle'),
-                            textDecoration: $el.css('textDecoration')
-                        };
+                    // Get rotation angle from transform
+                    const transform = $element.css('transform');
+                    let angle = 0;
+                    if (transform && transform !== 'none') {
+                        const values = transform.split('(')[1].split(')')[0].split(',');
+                        angle = Math.round(Math.atan2(values[1], values[0]) * (180 / Math.PI));
                     }
 
-                    designState.views[view].elements.push(elementData);
-                });
-            }
+                    if ($element.hasClass('editable-image')) {
+                        // Handle image elements
+                        const img = element.querySelector('img');
+                        if (img) {
+                            ctx.save();
+                            ctx.translate(x + width / 2, y + height / 2);
+                            ctx.rotate(angle * Math.PI / 180);
+                            ctx.drawImage(img, -width / 2, -height / 2, width, height);
+                            ctx.restore();
+                        }
+                    } else if ($element.hasClass('text-design')) {
+                        // Handle text elements
+                        const text = element.textContent;
+                        const styles = window.getComputedStyle(element);
 
-            function loadViewState(view) {
-                // Clear current design area
-                designContent.empty();
+                        // Extract text styles
+                        const fontSize = parseFloat(styles.fontSize) * scaleY;
+                        const fontFamily = styles.fontFamily;
+                        const fontWeight = styles.fontWeight;
+                        const fontStyle = styles.fontStyle;
+                        const textDecoration = styles.textDecoration;
 
-                // Set zoom and pan
-                zoomLevel = designState.views[view].zoom;
-                panOffset = { ...designState.views[view].pan };
-                updateTransform();
+                        // Create the font string
+                        let fontString = '';
+                        if (fontStyle === 'italic') fontString += 'italic ';
+                        if (fontWeight === 'bold' || parseInt(fontWeight) > 400) fontString += 'bold ';
+                        fontString += `${fontSize}px ${fontFamily}`;
+                        ctx.font = fontString;
 
-                // Load elements
-                designState.views[view].elements.forEach(element => {
-                    if (element.type === 'text') {
-                        createTextElement(element);
-                    } else {
-                        createImageElement(element);
-                    }
-                });
+                        // Handle text color - check for background image first
+                        const bgImage = styles.backgroundImage;
 
-                // Reset current text element
-                currentTextElement = null;
-            }
+                        if (bgImage && bgImage !== 'none') {
+                            // Extract the image URL
+                            const imageUrl = bgImage.replace('url("', '').replace('")', '');
 
-            function createTextElement(elementData) {
-                const textDiv = $('<div>').addClass('text-design')
-                    .text(elementData.content)
-                    .prop('contentEditable', true)
-                    .css({
-                        position: 'absolute',
-                        left: `${elementData.position.left}px`,
-                        top: `${elementData.position.top}px`,
-                        width: `${elementData.size.width}px`,
-                        height: `${elementData.size.height}px`,
-                        transform: `rotate(${elementData.rotation}deg)`,
-                        backgroundImage: elementData.styles.color,
-                        backgroundClip: 'text',
-                        color: 'transparent',
-                        fontFamily: elementData.styles.fontFamily,
-                        fontSize: elementData.styles.fontSize,
-                        fontWeight: elementData.styles.fontWeight,
-                        fontStyle: elementData.styles.fontStyle,
-                        textDecoration: elementData.styles.textDecoration
-                    });
+                            // Load the color image
+                            const colorImg = await loadImage(imageUrl);
 
-                designContent.append(textDiv);
-                setupTextEditing(textDiv[0]);
-                return textDiv;
-            }
-
-            function createImageElement(elementData) {
-                const imgDiv = $('<div>').addClass('editable-image')
-                    .css({
-                        position: 'absolute',
-                        left: `${elementData.position.left}px`,
-                        top: `${elementData.position.top}px`,
-                        width: `${elementData.size.width}px`,
-                        height: `${elementData.size.height}px`,
-                        transform: `rotate(${elementData.rotation}deg)`
-                    });
-
-                const imgContent = $('<img>').attr('src', elementData.content)
-                    .css({
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'contain'
-                    });
-
-                // Create controls
-                const resizeHandles = createResizeHandles();
-                resizeHandles.forEach(handle => imgDiv.append(handle));
-                imgDiv.append(createDeleteButton());
-                imgDiv.append(createRotateHandle());
-                imgDiv.append(imgContent);
-
-                designContent.append(imgDiv);
-                setupImageEditing(imgDiv[0]);
-                return imgDiv;
-            }
-
-            // Add this function to save the entire design
-            function saveDesignToServer() {
-                // First save the current view
-                saveCurrentViewState();
-
-                // Prepare data for server
-                const designData = {
-                    views: designState.views,
-                    color: designState.color,
-                    size: designState.size,
-                    product_id: "{{ $product->id ?? '' }}" // Add your product ID here
-                };
-
-                // Send to server
-                $.ajax({
-                    url: '/api/save-design',
-                    method: 'POST',
-                    data: JSON.stringify(designData),
-                    contentType: 'application/json',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            console.log('Design saved successfully');
-                            // Store design ID if needed
-                            if (response.design_id) {
-                                designState.designId = response.design_id;
+                            if (colorImg) {
+                                // Create pattern from the color image
+                                const pattern = ctx.createPattern(colorImg, 'repeat');
+                                ctx.fillStyle = pattern;
+                            } else {
+                                // Fallback to black if image fails to load
+                                ctx.fillStyle = '#000000';
                             }
+                        } else {
+                            // Fallback to black if no background
+                            ctx.fillStyle = '#000000';
                         }
-                    },
-                    error: function(error) {
-                        console.error('Error saving design:', error);
-                    }
-                });
-            }
 
-            // Update your existing saveState function to use this
-            function saveState() {
-                saveCurrentViewState();
-                // Optionally auto-save to server periodically
-                // saveDesignToServer();
-            }
-            // New Code for state end here
+                        // Draw text with rotation
+                        ctx.save();
+                        ctx.translate(x, y + fontSize); // Adjust for baseline
+                        ctx.rotate(angle * Math.PI / 180);
 
-            // Initialize with front view
-            $('.view-option[data-view="front"]').trigger('click');
-
-            // Right sidebar tools functionality
-            let zoomLevel = 1;
-            let isLocked = false;
-            let isPanning = false;
-            let panStart = {
-                x: 0,
-                y: 0
-            };
-            let panOffset = {
-                x: 0,
-                y: 0
-            };
-            const designArea = $('#hat-view');
-            const currentView = $('#current-view');
-            const undoStack = [];
-            const redoStack = [];
-
-            // Save current state to undo stack
-            function saveState() {
-                undoStack.push({
-                    src: currentView.attr('src'),
-                    transform: currentView.css('transform'),
-                    zoom: zoomLevel,
-                    offset: {
-                        ...panOffset
-                    }
-                });
-                redoStack.length = 0; // Clear redo stack when new action is performed
-            }
-
-            $('#pan-btn').on('click', function() {
-                isPanning = !isPanning;
-                $(this).toggleClass('active-btn', isPanning);
-                designArea.css('cursor', isPanning ? 'grab' : 'default');
-            });
-
-            designArea.on('mousedown', function(e) {
-                if (isPanning) {
-                    panStart = {
-                        x: e.clientX,
-                        y: e.clientY
-                    };
-                    designArea.css('cursor', 'grabbing');
-                }
-            });
-
-            designArea.on('mousemove', function(e) {
-                if (isPanning && panStart.x) {
-                    panOffset.x += e.clientX - panStart.x;
-                    panOffset.y += e.clientY - panStart.y;
-                    panStart = {
-                        x: e.clientX,
-                        y: e.clientY
-                    };
-                    updateTransform();
-                }
-            });
-
-            designArea.on('mouseup', function() {
-                if (isPanning) {
-                    designArea.css('cursor', 'grab');
-                    saveState();
-                }
-            });
-
-            // Undo
-            $('#undo-btn').on('click', function() {
-                if (undoStack.length > 0) {
-                    const state = undoStack.pop();
-                    redoStack.push({
-                        src: currentView.attr('src'),
-                        transform: currentView.css('transform'),
-                        zoom: zoomLevel,
-                        offset: {
-                            ...panOffset
+                        // Handle text decoration
+                        if (textDecoration.includes('underline')) {
+                            const metrics = ctx.measureText(text);
+                            ctx.strokeStyle = ctx.fillStyle;
+                            ctx.lineWidth = fontSize * 0.1;
+                            ctx.beginPath();
+                            ctx.moveTo(0, fontSize * 0.1);
+                            ctx.lineTo(metrics.width, fontSize * 0.1);
+                            ctx.stroke();
                         }
-                    });
-                    applyState(state);
-                }
-            });
 
-            // Redo
-            $('#redo-btn').on('click', function() {
-                if (redoStack.length > 0) {
-                    const state = redoStack.pop();
-                    undoStack.push({
-                        src: currentView.attr('src'),
-                        transform: currentView.css('transform'),
-                        zoom: zoomLevel,
-                        offset: {
-                            ...panOffset
-                        }
-                    });
-                    applyState(state);
-                }
-            });
-
-            // Zoom In
-            $('#zoomIn-btn').on('click', function() {
-                zoomLevel = Math.min(zoomLevel + 0.1, 3); // Max zoom 3x
-                updateTransform();
-                saveState();
-            });
-
-            // Zoom Out
-            $('#zoomOut-btn').on('click', function() {
-                zoomLevel = Math.max(zoomLevel - 0.1, 0.5); // Min zoom 0.5x
-                updateTransform();
-                saveState();
-            });
-
-            function updateTransform() {
-                currentView.css('transform', `scale(${zoomLevel}) translate(${panOffset.x}px, ${panOffset.y}px)`);
-            }
-
-            // Lock
-            $('#lock-btn').on('click', function() {
-                isLocked = !isLocked;
-                $(this).toggleClass('active-btn', isLocked);
-                currentView.css('pointer-events', isLocked ? 'none' : 'auto');
-            });
-
-            // Apply transform to image
-            function updateTransform() {
-                currentView.css('transform', `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoomLevel})`);
-            }
-
-            // Apply saved state
-            function applyState(state) {
-                currentView.attr('src', state.src);
-                currentView.css('transform', state.transform);
-                zoomLevel = state.zoom;
-                panOffset = {
-                    ...state.offset
-                };
-            }
-
-            // Add CSS to your styles
-            $('<style>').text(`
-              .design-boundary {
-                  position: absolute;
-                  border: 2px dashed #3a86ff;
-                  pointer-events: none;
-                  z-index: 10;
-              }
-
-              .design-content {
-                  position: absolute;
-                  overflow: hidden;
-                  z-index: 5;
-              }
-
-              #current-view {
-                  position: relative;
-                  width: 100%;
-                  height: auto;
-              }
-
-              .uploaded-design, .text-design {
-                  max-width: 100%;
-                  max-height: 100%;
-                  position: absolute;
-                  object-fit: contain;
-                  text-align: center;
-                  font-weight: bold;
-              }
-          `).appendTo('head');
-
-            // Boundary configurations for each view
-            const boundaryConfigs = {
-                'front': {
-                    top: '20%',
-                    left: '50%',
-                    width: '60%',
-                    height: '40%'
-                },
-                'back': {
-                    top: '20%',
-                    left: '50%',
-                    width: '60%',
-                    height: '40%'
-                },
-                'left': {
-                    top: '46%',
-                    left: '65%',
-                    width: '30%',
-                    height: '15%'
-                },
-                'right': {
-                    top: '46%',
-                    left: '35%',
-                    width: '30%',
-                    height: '15%'
-                }
-            };
-
-            // Add boundary box to the design area
-            const boundary = $('<div>').addClass('design-boundary').appendTo(designArea);
-
-            // Create container for design content
-            const designContent = $('<div>').addClass('design-content').appendTo(designArea);
-
-            // Function to update boundary and content positions based on view
-            function updateDesignArea(view) {
-                const config = boundaryConfigs[view] || boundaryConfigs.front;
-
-                // Update boundary
-                boundary.css({
-                    top: config.top,
-                    left: config.left,
-                    width: config.width,
-                    height: config.height,
-                    transform: 'translateX(-50%)'
-                });
-
-                // Update content area
-                designContent.css({
-                    top: config.top,
-                    left: config.left,
-                    width: config.width,
-                    height: config.height,
-                    transform: 'translateX(-50%)'
-                });
-
-                // Clear any existing designs when view changes
-                designContent.empty();
-                selectedElement = null;
-            }
-
-            // Initialize with front view
-            updateDesignArea('front');
-
-            // Update design area when view changes
-            $('.view-option').on('click', function() {
-                const view = $(this).data('view');
-                updateDesignArea(view);
-            });
-
-            // Enhanced Image Editor Functionality
-            let resizeHandleSize = 10;
-
-            // Handle image uploads with editing capabilities
-            $('.upload-area button').on('click', function() {
-                const input = $('<input>').attr({
-                    type: 'file',
-                    accept: 'image/*'
-                }).on('change', function(e) {
-                    const file = e.target.files[0];
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const img = $('<div>').addClass('editable-image');
-                        const imgContent = $('<img>').attr({
-                            src: event.target.result,
-                            draggable: false
-                        });
-
-                        // Create resize handles
-                        const resizeHandles = createResizeHandles();
-                        resizeHandles.forEach(handle => img.append(handle));
-
-                        // Create delete button
-                        const deleteBtn = createDeleteButton();
-                        img.append(deleteBtn);
-
-                        // Create rotate handle
-                        const rotateHandle = createRotateHandle();
-                        img.append(rotateHandle);
-
-                        img.append(imgContent);
-                        designContent.append(img);
-
-                        // Position in center of boundary
-                        img.css({
-                            left: '50%',
-                            top: '50%',
-                            // transform: 'translate(-50%, -50%)'
-                        });
-
-                        setupImageEditing(img[0]);
-                        selectElement(img[0]);
-                        saveState();
-                    };
-                    reader.readAsDataURL(file);
-                });
-                input.click();
-            });
-
-            // Handle design selection with editing capabilities
-            $('.design-thumbnail').on('click', function() {
-                const img = $('<div>').addClass('editable-image');
-                const imgContent = $('<img>').attr({
-                    src: $(this).css('backgroundImage').replace('url("', '').replace('")', ''),
-                    draggable: false
-                });
-
-                // Create resize handles
-                const resizeHandles = createResizeHandles();
-                resizeHandles.forEach(handle => img.append(handle));
-
-                // Create delete button
-                const deleteBtn = createDeleteButton();
-                img.append(deleteBtn);
-
-                // Create rotate handle
-                const rotateHandle = createRotateHandle();
-                img.append(rotateHandle);
-
-                img.append(imgContent);
-                designContent.append(img);
-
-                // Position in center of boundary
-                img.css({
-                    left: '50%',
-                    top: '50%',
-                    transform: 'translate(-50%, -50%)'
-                });
-
-                setupImageEditing(img[0]);
-                selectElement(img[0]);
-                saveState();
-            });
-
-            // Create resize handles
-            function createResizeHandles() {
-                const positions = ['nw', 'ne', 'sw', 'se'];
-                return positions.map(pos => {
-                    return $('<div>').addClass(`resize-handle resize-${pos}`);
-                });
-            }
-
-            // Create delete button
-            function createDeleteButton() {
-                return $('<div>').addClass('delete-btn').html('&times;');
-            }
-
-            // Create rotate handle
-            function createRotateHandle() {
-                return $('<div>').addClass('rotate-handle').html('↻');
-            }
-
-            // Setup all editing functionality for an image
-            function setupImageEditing(element) {
-                const $element = $(element);
-                const imgContent = $element.find('img')[0];
-                let startX, startY, startWidth, startHeight, startAngle;
-                let isDragging = false;
-                let isResizing = false;
-                let isRotating = false;
-                let resizeDirection = '';
-
-                // Make draggable
-                $element.on('mousedown', function(e) {
-                    if (e.target === element || e.target === imgContent) {
-                        isDragging = true;
-                        startX = e.clientX - element.getBoundingClientRect().left;
-                        startY = e.clientY - element.getBoundingClientRect().top;
-                        selectElement(element);
-                        e.preventDefault();
+                        ctx.fillText(text, 0, 0);
+                        ctx.restore();
                     }
+                }
+
+                // Convert canvas to image and trigger download
+                const link = document.createElement('a');
+                link.download = 'custom-cap-design.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+            // Create preview button
+            // Create preview button
+            const previewBtn = $('<button>')
+                .addClass('preview-btn')
+                .text('Preview Design')
+                .css({
+                    'position': 'fixed',
+                    'bottom': '70px', // Positioned above the download button
+                    'right': '20px',
+                    'padding': '10px 20px',
+                    'background': '#2ec4b6',
+                    'color': 'white',
+                    'border': 'none',
+                    'border-radius': '5px',
+                    'cursor': 'pointer',
+                    'z-index': '1000'
+                })
+                .on('click', previewDesign);
+
+            $('body').append(previewBtn);
+
+            // Create preview modal (hidden by default)
+            const previewModal = $('<div>')
+                .addClass('preview-modal')
+                .css({
+                    'position': 'fixed',
+                    'top': '0',
+                    'left': '0',
+                    'width': '100%',
+                    'height': '100%',
+                    'background': 'rgba(0,0,0,0.8)',
+                    'display': 'none',
+                    'z-index': '2000',
+                    'justify-content': 'center',
+                    'align-items': 'center'
                 });
 
-                // Handle resize handles
-                $element.find('.resize-handle').on('mousedown', function(e) {
-                    isResizing = true;
-                    resizeDirection = $(this).attr('class').split(' ')[1].split('-')[1];
-                    startWidth = parseInt($element.css('width')) || imgContent.offsetWidth;
-                    startHeight = parseInt($element.css('height')) || imgContent.offsetHeight;
-                    startX = e.clientX;
-                    startY = e.clientY;
-                    selectElement(element);
-                    e.stopPropagation();
-                    e.preventDefault();
+            const previewContent = $('<div>')
+                .addClass('preview-content')
+                .css({
+                    'background': 'white',
+                    'padding': '20px',
+                    'border-radius': '10px',
+                    'max-width': '90%',
+                    'max-height': '90%',
+                    'overflow': 'auto',
+                    'text-align': 'center',
+                    'position': 'relative' // Needed for absolute positioning of close button
                 });
 
-                // Handle rotate
-                $element.find('.rotate-handle').on('mousedown', function(e) {
-                    isRotating = true;
-                    const rect = element.getBoundingClientRect();
-                    const centerX = rect.left + rect.width / 2;
-                    const centerY = rect.top + rect.height / 2;
-                    startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
-                    const currentAngle = parseFloat($element.css('transform')?.replace(/[^0-9\-.,]/g, '') ||
-                        0);
-                    startAngle -= currentAngle;
-                    selectElement(element);
-                    e.stopPropagation();
-                    e.preventDefault();
+            // Add close button (X) in top-right corner
+            const modalCloseBtn = $('<button>')
+                .html('&times;')
+                .attr('title', 'Close')
+                .css({
+                    'position': 'absolute',
+                    'top': '10px',
+                    'right': '10px',
+                    'background': 'transparent',
+                    'border': 'none',
+                    'font-size': '24px',
+                    'cursor': 'pointer',
+                    'color': '#888',
+                    'width': '30px',
+                    'height': '30px',
+                    'padding': '0',
+                    'line-height': '30px'
+                })
+                .on('click', function() {
+                    previewModal.hide();
+                });
+
+            const previewImage = $('<img>')
+                .addClass('preview-image')
+                .css({
+                    'max-width': '100%',
+                    'max-height': '80vh'
+                });
+
+            const closeBtn = $('<button>')
+                .text('Close')
+                .css({
+                    'margin-top': '15px',
+                    'padding': '8px 20px',
+                    'background': '#ff5a5f',
+                    'color': 'white',
+                    'border': 'none',
+                    'border-radius': '5px',
+                    'cursor': 'pointer'
+                })
+                .on('click', function() {
+                    previewModal.hide();
+                });
+
+            const downloadFromPreviewBtn = $('<button>')
+                .text('Download This Design')
+                .css({
+                    'margin-top': '15px',
+                    'margin-left': '10px',
+                    'padding': '8px 20px',
+                    'background': '#3a86ff',
+                    'color': 'white',
+                    'border': 'none',
+                    'border-radius': '5px',
+                    'cursor': 'pointer'
+                })
+                .on('click', function() {
+                    downloadDesign();
+                    previewModal.hide();
                 });
 
             previewContent.append(
@@ -2701,31 +2306,41 @@
                 }
             });
 
-            // View switching functionality
+            // View switching functionality - modified
             $('.view-option').on('click', function() {
                 const view = $(this).data('view');
 
-                // Only save and load if switching to a different view
-                if (view !== designState.currentView) {
-                    saveCurrentViewState();
-                    designState.currentView = view;
-                    loadViewState(view);
-                }
+                // Only proceed if switching to a different view
+                if (view === designState.currentView) return;
 
+                // Save current state before switching
+                saveCurrentViewState();
+
+                // Update current view
+                designState.currentView = view;
+
+                // Update UI
                 $('.view-option img, .view-option p').removeClass('active');
                 $(this).find('img, p').addClass('active');
                 $('#current-view').attr('src', designState.views[view].background);
 
+                // Update design area boundaries
                 updateDesignArea(view);
+
+                // Load the new view's state
+                loadViewState(view);
+
+                // Disable text editing if no text in this view
+                const hasText = designState.views[view].elements.some(el => el.type === 'text');
+                if (!hasText) {
+                    currentTextElement = null;
+                    $('#text-panel input[type="text"]').val('');
+                }
             });
 
             // Save current view state
             function saveCurrentViewState() {
                 const view = designState.currentView;
-                designState.views[view].zoom = zoomLevel;
-                designState.views[view].pan = {
-                    ...panOffset
-                };
                 designState.views[view].elements = [];
 
                 // Capture both image and text elements
@@ -2761,26 +2376,28 @@
                 });
             }
 
-            // Load view state
+
             function loadViewState(view) {
-                console.log(designState.views[view].elements);
+                console.log('Loading view:', view);
+                console.log('Elements to load:', designState.views[view].elements);
+
+                // Clear current content
                 designContent.empty();
-                zoomLevel = designState.views[view].zoom;
-                panOffset = {
-                    ...designState.views[view].pan
-                };
-                updateTransform();
+                currentTextElement = null;
+                selectedElement = null;
 
                 // Recreate all elements for the view
                 designState.views[view].elements.forEach(element => {
+                    console.log('Creating element:', element);
                     if (element.type === 'text') {
-                        createTextElement(element);
+                        const textElement = createTextElement(element);
+                        // Set this as current text if it's for this view
+                        currentTextElement = textElement;
+                        $('#text-panel input[type="text"]').val(element.content);
                     } else {
                         createImageElement(element);
                     }
                 });
-
-                currentTextElement = null;
             }
 
             // Create text element
@@ -2792,8 +2409,8 @@
                         position: 'absolute',
                         left: `${elementData.position.left}px`,
                         top: `${elementData.position.top}px`,
-                        width: `${elementData.size.width}px`,
-                        height: `${elementData.size.height}px`,
+                        // width: `${elementData.size.width}px`,
+                        // height: `${elementData.size.height}px`,
                         transform: `rotate(${elementData.rotation}deg)`,
                         backgroundImage: elementData.styles.color,
                         backgroundClip: 'text',
@@ -2863,106 +2480,6 @@
                 selectedElement = null;
             }
 
-            // Toolbar functionality
-            $('#pan-btn').on('click', function() {
-                isPanning = !isPanning;
-                $(this).toggleClass('active-btn', isPanning);
-                designArea.css('cursor', isPanning ? 'grab' : 'default');
-            });
-
-            designArea.on('mousedown', function(e) {
-                if (isPanning) {
-                    panStart = {
-                        x: e.clientX,
-                        y: e.clientY
-                    };
-                    designArea.css('cursor', 'grabbing');
-                }
-            });
-
-            designArea.on('mousemove', function(e) {
-                if (isPanning && panStart.x) {
-                    panOffset.x += e.clientX - panStart.x;
-                    panOffset.y += e.clientY - panStart.y;
-                    panStart = {
-                        x: e.clientX,
-                        y: e.clientY
-                    };
-                    updateTransform();
-                }
-            });
-
-            designArea.on('mouseup', function() {
-                if (isPanning) {
-                    designArea.css('cursor', 'grab');
-                    saveState();
-                }
-            });
-
-            // Zoom functionality
-            $('#zoomIn-btn').on('click', function() {
-                zoomLevel = Math.min(zoomLevel + 0.1, 3);
-                updateTransform();
-                saveState();
-            });
-
-            $('#zoomOut-btn').on('click', function() {
-                zoomLevel = Math.max(zoomLevel - 0.1, 0.5);
-                updateTransform();
-                saveState();
-            });
-
-            function updateTransform() {
-                currentView.css('transform', `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoomLevel})`);
-            }
-
-            // Undo/Redo functionality
-            $('#undo-btn').on('click', function() {
-                if (undoStack.length > 0) {
-                    const state = undoStack.pop();
-                    redoStack.push({
-                        src: currentView.attr('src'),
-                        transform: currentView.css('transform'),
-                        zoom: zoomLevel,
-                        offset: {
-                            ...panOffset
-                        }
-                    });
-                    applyState(state);
-                }
-            });
-
-            $('#redo-btn').on('click', function() {
-                if (redoStack.length > 0) {
-                    const state = redoStack.pop();
-                    undoStack.push({
-                        src: currentView.attr('src'),
-                        transform: currentView.css('transform'),
-                        zoom: zoomLevel,
-                        offset: {
-                            ...panOffset
-                        }
-                    });
-                    applyState(state);
-                }
-            });
-
-            function applyState(state) {
-                currentView.attr('src', state.src);
-                currentView.css('transform', state.transform);
-                zoomLevel = state.zoom;
-                panOffset = {
-                    ...state.offset
-                };
-            }
-
-            // Lock functionality
-            $('#lock-btn').on('click', function() {
-                isLocked = !isLocked;
-                $(this).toggleClass('active-btn', isLocked);
-                currentView.css('pointer-events', isLocked ? 'none' : 'auto');
-            });
-
             // Image upload handling
             $('.upload-area button').on('click', function() {
                 const input = $('<input>').attr({
@@ -2998,28 +2515,63 @@
             });
 
             // Design thumbnail selection
+            // Fix for design thumbnail boundary constraints
             $('.design-thumbnail').on('click', function() {
-                const img = $('<div>').addClass('editable-image');
-                const imgContent = $('<img>').attr({
-                    src: $(this).css('backgroundImage').replace('url("', '').replace('")', ''),
-                    draggable: false
-                });
+                const bgImage = $(this).css('background-image');
+                const imageUrl = bgImage.match(/url\(["']?(.*?)["']?\)/)[1];
 
-                createResizeHandles().forEach(handle => img.append(handle));
-                img.append(createDeleteButton());
-                img.append(createRotateHandle());
-                img.append(imgContent);
-                designContent.append(img);
-
-                img.css({
-                    left: '50%',
+                // Create image element with proper boundary-relative positioning
+                const imgDiv = $('<div>').addClass('editable-image').css({
+                    position: 'absolute',
+                    width: '100px', // Initial size
+                    height: '100px',
+                    left: '50%', // Center within boundary
                     top: '50%',
-                    transform: 'translate(-50%, -50%)'
+                    // transform: 'translate(-50%, -50%)'
                 });
-                setupImageEditing(img[0]);
-                selectElement(img[0]);
+
+                // Create image content
+                const imgContent = $('<img>').attr('src', imageUrl).css({
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain'
+                });
+
+                // Add controls and append to content area
+                createResizeHandles().forEach(handle => imgDiv.append(handle));
+                imgDiv.append(createDeleteButton());
+                imgDiv.append(createRotateHandle());
+                imgDiv.append(imgContent);
+
+                // Add to design content area with boundary constraints
+                designContent.append(imgDiv);
+
+                // Immediately calculate correct boundaries
+                const contentRect = designContent[0].getBoundingClientRect();
+                const initialX = contentRect.width / 2;
+                const initialY = contentRect.height / 2;
+
+                // Set pixel-based positioning
+                imgDiv.css({
+                    left: initialX + 'px',
+                    top: initialY + 'px'
+                });
+
+                setupImageEditing(imgDiv[0]);
+                selectElement(imgDiv[0]);
                 saveState();
             });
+
+            // Add these CSS fixes
+            $('<style>').text(`
+  .design-content {
+      overflow: hidden !important;
+      transform: translateX(-50%);
+  }
+  .editable-image {
+      transform-origin: center center;
+  }
+`).appendTo('head');
 
             // Helper functions for element creation
             function createResizeHandles() {
@@ -3059,8 +2611,11 @@
                 $element.find('.resize-handle').on('mousedown', function(e) {
                     isResizing = true;
                     resizeDirection = $(this).attr('class').split(' ')[1].split('-')[1];
-                    startWidth = parseInt($element.css('width')) || imgContent.offsetWidth;
-                    startHeight = parseInt($element.css('height')) || imgContent.offsetHeight;
+                    const style = $element[0].style;
+                    startWidth = parseFloat(style.width) || imgContent.offsetWidth;
+                    startHeight = parseFloat(style.height) || imgContent.offsetHeight;
+                    startLeft = parseFloat(style.left) || 0;
+                    startTop = parseFloat(style.top) || 0;
                     startX = e.clientX;
                     startY = e.clientY;
                     selectElement(element);
@@ -3104,52 +2659,59 @@
                             top: `${newTop}px`
                         });
                     } else if (isResizing) {
-                        const widthChange = e.clientX - startX;
-                        const heightChange = e.clientY - startY;
-                        let newWidth = startWidth,
-                            newHeight = startHeight;
+                        const deltaX = e.clientX - startX;
+                        const deltaY = e.clientY - startY;
+                        let newWidth = startWidth;
+                        let newHeight = startHeight;
 
-                        if (resizeDirection.includes('e')) newWidth += widthChange;
-                        if (resizeDirection.includes('w')) newWidth -= widthChange;
-                        if (resizeDirection.includes('s')) newHeight += heightChange;
-                        if (resizeDirection.includes('n')) newHeight -= heightChange;
+                        // Calculate new dimensions based on resize direction
+                        if (resizeDirection.includes('e')) newWidth += deltaX;
+                        if (resizeDirection.includes('w')) newWidth -= deltaX;
+                        if (resizeDirection.includes('s')) newHeight += deltaY;
+                        if (resizeDirection.includes('n')) newHeight -= deltaY;
 
+                        // Maintain aspect ratio if shift key is pressed
                         if (e.shiftKey) {
-                            const aspectRatio = startWidth / startHeight;
-                            if (Math.abs(widthChange) > Math.abs(heightChange)) {
-                                newHeight = newWidth / aspectRatio;
+                            const aspect = startWidth / startHeight;
+                            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                                newHeight = newWidth / aspect;
                             } else {
-                                newWidth = newHeight * aspectRatio;
+                                newWidth = newHeight * aspect;
                             }
                         }
 
+                        // Apply minimum size constraints
                         newWidth = Math.max(newWidth, 30);
                         newHeight = Math.max(newHeight, 30);
 
-                        const currentLeft = parseFloat($element.css('left')) || 0;
-                        const currentTop = parseFloat($element.css('top')) || 0;
-                        const maxWidth = boundaryRect.width - currentLeft;
-                        const maxHeight = boundaryRect.height - currentTop;
-                        newWidth = Math.min(newWidth, maxWidth);
-                        newHeight = Math.min(newHeight, maxHeight);
+                        // Calculate new position based on initial values and size changes
+                        let newLeft = startLeft;
+                        let newTop = startTop;
 
+                        if (resizeDirection.includes('w')) {
+                            newLeft = startLeft + (startWidth - newWidth);
+                        }
+                        if (resizeDirection.includes('n')) {
+                            newTop = startTop + (startHeight - newHeight);
+                        }
+
+                        // Boundary constraints
+                        const boundaryRect = designContent[0].getBoundingClientRect();
+                        newLeft = Math.max(0, Math.min(newLeft, boundaryRect.width - newWidth));
+                        newTop = Math.max(0, Math.min(newTop, boundaryRect.height - newHeight));
+
+                        // Apply new dimensions and position
                         $element.css({
                             width: `${newWidth}px`,
-                            height: `${newHeight}px`
+                            height: `${newHeight}px`,
+                            left: `${newLeft}px`,
+                            top: `${newTop}px`
                         });
+
                         $(imgContent).css({
                             width: '100%',
                             height: '100%'
                         });
-
-                        if (resizeDirection.includes('w')) {
-                            const leftChange = startWidth - newWidth;
-                            $element.css('left', `${Math.max(currentLeft + leftChange, 0)}px`);
-                        }
-                        if (resizeDirection.includes('n')) {
-                            const topChange = startHeight - newHeight;
-                            $element.css('top', `${Math.max(currentTop + topChange, 0)}px`);
-                        }
                     } else if (isRotating) {
                         const rect = element.getBoundingClientRect();
                         const centerX = rect.left + rect.width / 2;
@@ -3175,15 +2737,23 @@
                 };
 
                 $element.on('mousedown', function(e) {
-                    if ($('#lock-btn').hasClass('active-btn')) return;
-                    isDragging = true;
-                    offset = {
-                        x: e.clientX - element.getBoundingClientRect().left,
-                        y: e.clientY - element.getBoundingClientRect().top
-                    };
-                    $element.css('cursor', 'grabbing');
-                    selectElement(element);
-                    e.preventDefault();
+                    // Only allow editing if this is the current view's text
+                    const textView = designState.views[designState.currentView].elements.find(el =>
+                        el.type === 'text' && el.content === $(this).text()
+                    );
+
+                    if (textView) {
+                        isDragging = true;
+                        offset = {
+                            x: e.clientX - element.getBoundingClientRect().left,
+                            y: e.clientY - element.getBoundingClientRect().top
+                        };
+                        $element.css('cursor', 'grabbing');
+                        selectElement(element);
+                        currentTextElement = $element;
+                        $('#text-panel input[type="text"]').val($element.text());
+                        e.preventDefault();
+                    }
                 });
 
                 $(document).on('mousemove', function(e) {
@@ -3204,29 +2774,60 @@
                     $element.css('cursor', 'grab');
                     saveState();
                 });
+
+                // Make text non-editable when not selected
+                $element.prop('contentEditable', false);
+
+                $element.on('dblclick', function() {
+                    if (currentTextElement === $element) {
+                        $element.prop('contentEditable', true).focus();
+                    }
+                });
+
+                $element.on('blur', function() {
+                    $element.prop('contentEditable', false);
+                    saveState();
+                });
             }
 
-            // Text input handling
+            // Text input handling - modified to be view-specific
             $('#text-panel input[type="text"]').on('input', function() {
                 const text = $(this).val();
-                if (!currentTextElement) {
-                    const activeColorOption = $('.color-option.active').css('backgroundImage');
-                    currentTextElement = $('<div>').addClass('text-design').text(text || 'Your Text')
-                        .prop('contentEditable', true)
-                        .css({
-                            position: 'absolute',
-                            left: '50%',
-                            top: '50%',
-                            backgroundImage: activeColorOption,
-                            backgroundClip: 'text',
-                            color: 'transparent',
-                            fontFamily: $('#text-panel select').val(),
-                            fontSize: $('#text-panel input[type="range"]').val() + 'px'
-                        });
-                    designContent.append(currentTextElement);
-                    setupTextEditing(currentTextElement[0]);
+                const currentView = designState.currentView;
+
+                // Check if there's already text in this view
+                const existingText = designState.views[currentView].elements.find(el => el.type === 'text');
+
+                if (existingText) {
+                    // Update existing text
+                    const textElement = $('.text-design').filter(function() {
+                        return $(this).parent().is(designContent);
+                    });
+                    if (textElement.length) {
+                        textElement.text(text || 'Your Text');
+                        existingText.content = text || 'Your Text';
+                    }
                 } else {
-                    currentTextElement.text(text || 'Your Text');
+                    // Create new text only if there isn't one in this view
+                    if (!currentTextElement) {
+                        const activeColorOption = $('.color-option.active').css('backgroundImage');
+                        currentTextElement = $('<div>').addClass('text-design').text(text || 'Your Text')
+                            .prop('contentEditable', true)
+                            .css({
+                                position: 'absolute',
+                                left: '50%',
+                                top: '50%',
+                                backgroundImage: activeColorOption,
+                                backgroundClip: 'text',
+                                color: 'transparent',
+                                fontFamily: $('#text-panel select').val(),
+                                fontSize: $('#text-panel input[type="range"]').val() + 'px'
+                            });
+                        designContent.append(currentTextElement);
+                        setupTextEditing(currentTextElement[0]);
+                    } else {
+                        currentTextElement.text(text || 'Your Text');
+                    }
                 }
                 saveState();
             });
@@ -3251,16 +2852,6 @@
             // Save state function
             function saveState() {
                 saveCurrentViewState();
-                undoStack.push({
-                    src: currentView.attr('src'),
-                    transform: currentView.css('transform'),
-                    zoom: zoomLevel,
-                    offset: {
-                        ...panOffset
-                    },
-                    content: designContent.html()
-                });
-                redoStack.length = 0;
             }
 
             // Initialize the design area
@@ -3269,89 +2860,89 @@
 
             // Add CSS styles
             $('<style>').text(`
-              .design-boundary {
-                  position: absolute;
-                  border: 2px dashed #3a86ff;
-                  pointer-events: none;
-                  z-index: 10;
-              }
-              .design-content {
-                  position: absolute;
-                  overflow: hidden;
-                  z-index: 5;
-              }
-              #current-view {
-                  position: relative;
-                  width: 100%;
-                  height: auto;
-              }
-              .editable-image, .text-design {
-                  position: absolute;
-                  cursor: move;
-                  transform-origin: center center;
-              }
-              .editable-image img {
-                  width: 100%;
-                  height: 100%;
-                  object-fit: contain;
-                  pointer-events: none;
-              }
-              .editable-image.selected, .text-design.selected {
-                  outline: 2px dashed #3a86ff;
-              }
-              .text-design {
-                  background-clip: text;
-                  color: transparent;
-              }
-              .resize-handle {
-                  position: absolute;
-                  width: 10px;
-                  height: 10px;
-                  background: #3a86ff;
-                  border-radius: 50%;
-                  z-index: 10;
-              }
-              .resize-nw { top: -5px; left: -5px; cursor: nwse-resize; }
-              .resize-ne { top: -5px; right: -5px; cursor: nesw-resize; }
-              .resize-sw { bottom: -5px; left: -5px; cursor: nesw-resize; }
-              .resize-se { bottom: -5px; right: -5px; cursor: nwse-resize; }
-              .delete-btn {
-                  position: absolute;
-                  top: -15px;
-                  right: -15px;
-                  width: 15px;
-                  height: 15px;
-                  background: #ff5a5f;
-                  color: white;
-                  border-radius: 50%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  font-size: 10px;
-                  cursor: pointer;
-                  z-index: 10;
-              }
-              .rotate-handle {
-                  position: absolute;
-                  top: -20px;
-                  left: 50%;
-                  transform: translateX(-50%);
-                  width: 15px;
-                  height: 15px;
-                  background: #2ec4b6;
-                  color: white;
-                  border-radius: 50%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  font-size: 10px;
-                  cursor: grab;
-                  z-index: 10;
-              }
-              .rotate-handle:active {
-                  cursor: grabbing;
-              }
-          `).appendTo('head');
+            .design-boundary {
+                position: absolute;
+                border: 2px dashed #3a86ff;
+                pointer-events: none;
+                z-index: 10;
+            }
+            .design-content {
+                position: absolute;
+                overflow: hidden;
+                z-index: 5;
+            }
+            #current-view {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+            .editable-image, .text-design {
+                position: absolute;
+                cursor: move;
+                transform-origin: center center;
+            }
+            .editable-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                pointer-events: none;
+            }
+            .editable-image.selected, .text-design.selected {
+                outline: 2px dashed #3a86ff;
+            }
+            .text-design {
+                background-clip: text;
+                color: transparent;
+            }
+            .resize-handle {
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                background: #3a86ff;
+                border-radius: 50%;
+                z-index: 10;
+            }
+            .resize-nw { top: -5px; left: -5px; cursor: nwse-resize; }
+            .resize-ne { top: -5px; right: -5px; cursor: nesw-resize; }
+            .resize-sw { bottom: -5px; left: -5px; cursor: nesw-resize; }
+            .resize-se { bottom: -5px; right: -5px; cursor: nwse-resize; }
+            .delete-btn {
+                position: absolute;
+                top: -15px;
+                right: -15px;
+                width: 15px;
+                height: 15px;
+                background: #ff5a5f;
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 10px;
+                cursor: pointer;
+                z-index: 10;
+            }
+            .rotate-handle {
+                position: absolute;
+                top: -20px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 15px;
+                height: 15px;
+                background: #2ec4b6;
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 10px;
+                cursor: grab;
+                z-index: 10;
+            }
+            .rotate-handle:active {
+                cursor: grabbing;
+            }
+        `).appendTo('head');
         });
     </script>
 @endsection

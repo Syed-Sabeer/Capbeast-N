@@ -217,24 +217,24 @@
                 }
 
                 fetch("{{ route('cart.add') }}", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-TOKEN": "{{ csrf_token() }}"
-    },
-    body: JSON.stringify({
-        productId,
-        userId,
-        colorId,
-        size,
-        quantity
-    })
-})
-.then(response => response.json())
-.then(data => {
-    button.disabled = false;
-    button.textContent = originalText;
-    button.classList.remove("loading");
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify({
+                            productId,
+                            userId,
+                            colorId,
+                            size,
+                            quantity
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        button.disabled = false;
+                        button.textContent = originalText;
+                        button.classList.remove("loading");
 
                         if (data.success) {
                             alert("Item added to cart!");
