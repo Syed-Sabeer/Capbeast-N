@@ -7,7 +7,6 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\OrderItem;
-
 use GuzzleHttp\Client;
 
 class HomeController extends Controller
@@ -22,6 +21,8 @@ class HomeController extends Controller
             ->take(8)
             ->with('productColors') // eager load for better performance
             ->get();
+
+            
     
         // Most ordered top 8 products
         $mostOrderedProducts = Product::where('visibility', true)
@@ -34,6 +35,7 @@ class HomeController extends Controller
             ->get();
     
         return view('main.pages.home', [
+            
             'recentProducts' => $recentProducts,
             'mostOrderedProducts' => $mostOrderedProducts,
         ]);

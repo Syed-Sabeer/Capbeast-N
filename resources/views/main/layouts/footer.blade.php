@@ -24,7 +24,7 @@
             </div>
             <div class="col-lg-8">
                 <div class="row ps-0 ps-lg-3">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="mt-lg-0 mt-4">
                             <h5 class="footer-title">Quick Link</h5>
                             <ul class="list-unstyled footer-link mt-3">
@@ -37,7 +37,20 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
+                        <div class="mt-lg-0 mt-4">
+                            <h5 class="footer-title">Info</h5>
+                            <ul class="list-unstyled footer-link mt-3">
+                                <li><a href="{{ route('privacypolicy') }}">Privacy & Policy</a></li>
+                                <li><a href="{{ route('deliveryinfo') }}">Delivery Information</a></li>
+                                <li><a href="{{ route('tosd') }}">Terms of Sale & Delivery</a></li>
+                                <li><a href="{{ route('return') }}">Returns</a></li>
+                                
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
                         <div class="mt-lg-0 mt-4">
                             <h5 class="footer-title">My Account</h5>
                             <ul class="list-unstyled footer-link mt-3 ">
@@ -51,7 +64,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="mt-lg-0 mt-4">
                             <h5 class="footer-title">Information</h5>
                             <ul class="list-unstyled footer-link mt-3">

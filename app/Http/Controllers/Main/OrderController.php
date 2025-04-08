@@ -197,8 +197,8 @@ class OrderController extends Controller
                 session()->forget('checkout_details');
     
                    // Send Emails
-            // Mail::to(auth()->user()->email)->send(new OrderPlacedMail($order, false));
-            // Mail::to('sales@monkeybeanies.com')->send(new OrderPlacedMail($order, true));
+            Mail::to(auth()->user()->email)->send(new OrderPlacedMail($order, false));
+            Mail::to('info@capbeast.com')->send(new OrderPlacedMail($order, true));
 
 
                 return redirect()->route('main.pages.success', ['orderId' => $order->id]);
