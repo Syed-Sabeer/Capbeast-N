@@ -24,6 +24,13 @@ return [
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],
+    
+    'stallion' => [
+        'base_url' => env('STALLION_API_BASE'), // Corrected base URL key
+        'token' => env('STALLION_API_KEY'),     // API Key from .env
+    ],
+
+
 
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),

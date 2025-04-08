@@ -71,9 +71,8 @@
                                 <li><a href="tel:18559326752"><i class="fa-solid fa-phone white-color">&nbsp; </i> +1
                                         (855)
                                         932-6752</a></li>
-                                <li><a href="mailto:support@capbeast.com"><i
-                                            class="white-color fa-solid fa-envelope">&nbsp;</i>
-                                    support@capbeast.com</a></li>
+                                <li><a href="mailto:support@capbeast.com" style="font-size: 13px"><i
+                                            class="white-color fa-solid fa-envelope">&nbsp;&nbsp;</i>support@capbeast.com</a></li>
                             </ul>
                         </div>
                     </div>
@@ -99,7 +98,7 @@
                                     alt height="30" /></a>
                         </li>
                         <li class="list-inline-item">
-                            <a href="#!"><img
+                            <a target="_blank" href="https://syed-sabeer.web.app/"><img
                                     src="{{ asset('assetsMain/images/ecommerce/payment/american-express.png') }}" alt
                                     height="30" /></a>
                         </li>

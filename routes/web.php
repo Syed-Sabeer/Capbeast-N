@@ -45,6 +45,7 @@ use App\Http\Controllers\Admin\components\DiscountCouponsController;
 use App\Http\Controllers\Main\DeliveryInfoController;
 use App\Http\Controllers\Main\PrivacyPolicyController;
 use App\Http\Controllers\Main\ReturnController;
+use App\Http\Controllers\Main\ShippingController;
 
 Route::get('/', function () {
   return redirect()->route('home');
@@ -67,6 +68,11 @@ Route::middleware(['web'])->group(function () {
 
     Route::get('/countries', [OrderController::class, 'getCountries'])->name('countries.index');
     Route::get('/countries/{code}/states', [OrderController::class, 'getStates'])->name('countries.states');
+
+    Route::post('/shipping/rate', [ShippingController::class, 'getShippingRate'])->name('shipping.rate');
+Route::get('/shipping/countries', [ShippingController::class, 'getCountries'])->name('shipping.countries');
+Route::post('/shipping/address/validate', [ShippingController::class, 'validateAddress'])->name('shipping.validate.address');
+Route::post('/shipping/discount', [ShippingController::class, 'applyShippingDiscount'])->name('shipping.discount');
 
 
 
