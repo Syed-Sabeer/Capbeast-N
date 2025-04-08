@@ -571,263 +571,274 @@
         }
     </style>
     <section class="section">
-      <div class="container-fluid">
-          <div class="row">
-              <!-- Left Sidebar - Design Tools -->
-              <div class="col-md-2 sidebar p-4">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Left Sidebar - Design Tools -->
+                <div class="col-md-2 sidebar p-4">
 
-                  <div class="tool-section">
-                      <button class="w-100 active" data-panel="upload-panel">
-                          <i class="fa-solid fa-file-arrow-up"></i>
-                          <span>Upload Image</span>
-                      </button>
-                      <button class="w-100" data-panel="design-panel">
-                          <i class="fa-solid fa-palette"></i>
-                          <span>Add Design</span>
-                      </button>
-                      <button class="w-100" data-panel="text-panel">
-                          <i class="fa-solid fa-text-height"></i>
-                          <span>Add Text</span>
-                      </button>
-                  </div>
-              </div>
+                    <div class="tool-section">
+                        <button class="w-100 active" data-panel="upload-panel">
+                            <i class="fa-solid fa-file-arrow-up"></i>
+                            <span>Upload Image</span>
+                        </button>
+                        <button class="w-100" data-panel="design-panel">
+                            <i class="fa-solid fa-palette"></i>
+                            <span>Add Design</span>
+                        </button>
+                        <button class="w-100" data-panel="text-panel">
+                            <i class="fa-solid fa-text-height"></i>
+                            <span>Add Text</span>
+                        </button>
+                    </div>
+                </div>
 
-              <!-- Dynamic Options Sidebar -->
-              <div class="col-md-3 sidebar-option p-4">
-                  <!-- Upload Panel -->
-                  <div class="option-panel active" id="upload-panel">
-                      <h4 class="mb-4">Upload Your Design</h4>
-                      <div class="upload-area border rounded p-4 text-center mb-4"
-                          style="background-color: #f8f9fa; border-style: dashed !important;">
-                          <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-muted"></i>
-                          <p>Drag & drop your image here</p>
-                          <p class="small text-muted">or</p>
-                          <button class="btn btn-primary">Browse Files</button>
-                          <p class="small text-muted mt-2">Supports: JPG, PNG, SVG (Max 5MB)</p>
-                      </div>
-                  </div>
+                <!-- Dynamic Options Sidebar -->
+                <div class="col-md-3 sidebar-option p-4">
+                    <!-- Upload Panel -->
+                    <div class="option-panel active" id="upload-panel">
+                        <h4 class="mb-4">Upload Your Design</h4>
+                        <div class="upload-area border rounded p-4 text-center mb-4"
+                            style="background-color: #f8f9fa; border-style: dashed !important;">
+                            <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-muted"></i>
+                            <p>Drag & drop your image here</p>
+                            <p class="small text-muted">or</p>
+                            <button class="btn btn-primary">Browse Files</button>
+                            <p class="small text-muted mt-2">Supports: JPG, PNG, SVG (Max 5MB)</p>
+                        </div>
+                    </div>
 
-                  <!-- Text Panel -->
-                  <div class="option-panel mb-5" id="text-panel">
-                      <h4 class="mb-4">Add Text</h4>
-                      <div class="mb-3">
-                          <label class="form-label">Your Text</label>
-                          <input type="text" class="form-control mb-3" placeholder="Enter your text here">
+                    <!-- Text Panel -->
+                    <div class="option-panel mb-5" id="text-panel">
+                        <h4 class="mb-4">Add Text</h4>
+                        <div class="mb-3">
+                            <label class="form-label">Your Text</label>
+                            <input type="text" class="form-control mb-3" placeholder="Enter your text here">
 
-                          <label class="form-label">Font Family</label>
-                          <!-- Updated dropdown -->
-                          <select class="form-select mb-3">
-                              <!-- Standard fonts -->
-                              <option value="Arial, sans-serif" style="font-family: Arial, sans-serif;">Arial</option>
-                              <option value="Helvetica, sans-serif" style="font-family: Helvetica, sans-serif;">Helvetica
-                              </option>
-                              <option value="'Times New Roman', serif" style="font-family: 'Times New Roman', serif;">Times
-                                  New Roman</option>
-                              <option value="'Courier New', monospace" style="font-family: 'Courier New', monospace;">Courier
-                                  New</option>
-                              <option value="Georgia, serif" style="font-family: Georgia, serif;">Georgia</option>
+                            <label class="form-label">Font Family</label>
+                            <!-- Updated dropdown -->
+                            <select class="form-select mb-3">
+                                <!-- Standard fonts -->
+                                <option value="Arial, sans-serif" style="font-family: Arial, sans-serif;">Arial</option>
+                                <option value="Helvetica, sans-serif" style="font-family: Helvetica, sans-serif;">Helvetica
+                                </option>
+                                <option value="'Times New Roman', serif" style="font-family: 'Times New Roman', serif;">
+                                    Times
+                                    New Roman</option>
+                                <option value="'Courier New', monospace" style="font-family: 'Courier New', monospace;">
+                                    Courier
+                                    New</option>
+                                <option value="Georgia, serif" style="font-family: Georgia, serif;">Georgia</option>
 
-                              <!-- Google Fonts -->
-                              <option value="'Adamina', serif" style="font-family: 'Adamina', serif;">Adamina</option>
-                              <option value="'Aladin', cursive" style="font-family: 'Aladin', cursive;">Aladin</option>
-                              <option value="'Amatic SC', cursive" style="font-family: 'Amatic SC', cursive;">Amatic SC
-                              </option>
-                              <option value="'Amiri', serif" style="font-family: 'Amiri', serif;">Amiri</option>
-                              <option value="'Arizonia', cursive" style="font-family: 'Arizonia', cursive;">Arizonia</option>
-                              <option value="'Berkshire Swash', cursive" style="font-family: 'Berkshire Swash', cursive;">
-                                  Berkshire Swash</option>
-                              <option value="'Black Ops One', cursive" style="font-family: 'Black Ops One', cursive;">Black
-                                  Ops One</option>
-                              <option value="'Cookie', cursive" style="font-family: 'Cookie', cursive;">Cookie</option>
-                              <option value="'Damion', cursive" style="font-family: 'Damion', cursive;">Damion</option>
-                              <option value="'Fondamento', cursive" style="font-family: 'Fondamento', cursive;">Fondamento
-                              </option>
-                              <option value="'IM Fell English', serif" style="font-family: 'IM Fell English', serif;">IM FELL
-                                  English</option>
-                              <option value="'Indie Flower', cursive" style="font-family: 'Indie Flower', cursive;">Indie
-                                  Flower</option>
-                              <option value="'Kaushan Script', cursive" style="font-family: 'Kaushan Script', cursive;">
-                                  Kaushan Script</option>
-                              <option value="'Merienda', cursive" style="font-family: 'Merienda', cursive;">Merienda</option>
-                              <option value="'Old Standard TT', serif" style="font-family: 'Old Standard TT', serif;">Old
-                                  English</option>
-                              <option value="'Pacifico', cursive" style="font-family: 'Pacifico', cursive;">Pacifico</option>
-                              <option value="'Patrick Hand', cursive" style="font-family: 'Patrick Hand', cursive;">Patrick
-                                  Hand</option>
-                              <option value="'Permanent Marker', cursive" style="font-family: 'Permanent Marker', cursive;">
-                                  Permanent Marker</option>
-                              <option value="'Rock Salt', cursive" style="font-family: 'Rock Salt', cursive;">Rock Salt
-                              </option>
-                              <option value="'Satisfy', cursive" style="font-family: 'Satisfy', cursive;">Script Tails
-                              </option>
-                              <option value="'Shadows Into Light', cursive"
-                                  style="font-family: 'Shadows Into Light', cursive;">Shout Out</option>
-                              <option value="'Special Elite', cursive" style="font-family: 'Special Elite', cursive;">
-                                  Distillery</option>
-                              <option value="'Tangerine', cursive" style="font-family: 'Tangerine', cursive;">Expression
-                              </option>
-                              <option value="'Yesteryear', cursive" style="font-family: 'Yesteryear', cursive;">Varsity
-                              </option>
-                          </select>
-
-
-                          <label class="form-label">Font Size</label>
-                          <!-- <input type="range" class="form-range mb-3" min="8" max="72" value="24"> -->
-                          <div class="slider-container">
-                              <!-- <label class="slider-label">Font Size</label> -->
-                              <span class="font-size-value" id="fontSizeValue">10px</span>
-                              <input type="range" class="form-range" min="5" max="100" value="10"
-                                  id="fontSizeRange">
-                          </div>
-                          <label class="form-label">Thread Color</label>
-                          <div class="color-options mb-3">
-                            @if (isset($textColors) && count($textColors) > 0)
-                              @foreach ($textColors as $index => $color)
-                                <div title="{{$color->color_name}}" class="color-option"
-                                  style="background-image: url({{asset($color->color_image)}});"></div>
-                              @endforeach
-                            @endif
-                          </div>
+                                <!-- Google Fonts -->
+                                <option value="'Adamina', serif" style="font-family: 'Adamina', serif;">Adamina</option>
+                                <option value="'Aladin', cursive" style="font-family: 'Aladin', cursive;">Aladin</option>
+                                <option value="'Amatic SC', cursive" style="font-family: 'Amatic SC', cursive;">Amatic SC
+                                </option>
+                                <option value="'Amiri', serif" style="font-family: 'Amiri', serif;">Amiri</option>
+                                <option value="'Arizonia', cursive" style="font-family: 'Arizonia', cursive;">Arizonia
+                                </option>
+                                <option value="'Berkshire Swash', cursive" style="font-family: 'Berkshire Swash', cursive;">
+                                    Berkshire Swash</option>
+                                <option value="'Black Ops One', cursive" style="font-family: 'Black Ops One', cursive;">
+                                    Black
+                                    Ops One</option>
+                                <option value="'Cookie', cursive" style="font-family: 'Cookie', cursive;">Cookie</option>
+                                <option value="'Damion', cursive" style="font-family: 'Damion', cursive;">Damion</option>
+                                <option value="'Fondamento', cursive" style="font-family: 'Fondamento', cursive;">Fondamento
+                                </option>
+                                <option value="'IM Fell English', serif" style="font-family: 'IM Fell English', serif;">IM
+                                    FELL
+                                    English</option>
+                                <option value="'Indie Flower', cursive" style="font-family: 'Indie Flower', cursive;">Indie
+                                    Flower</option>
+                                <option value="'Kaushan Script', cursive" style="font-family: 'Kaushan Script', cursive;">
+                                    Kaushan Script</option>
+                                <option value="'Merienda', cursive" style="font-family: 'Merienda', cursive;">Merienda
+                                </option>
+                                <option value="'Old Standard TT', serif" style="font-family: 'Old Standard TT', serif;">Old
+                                    English</option>
+                                <option value="'Pacifico', cursive" style="font-family: 'Pacifico', cursive;">Pacifico
+                                </option>
+                                <option value="'Patrick Hand', cursive" style="font-family: 'Patrick Hand', cursive;">
+                                    Patrick
+                                    Hand</option>
+                                <option value="'Permanent Marker', cursive"
+                                    style="font-family: 'Permanent Marker', cursive;">
+                                    Permanent Marker</option>
+                                <option value="'Rock Salt', cursive" style="font-family: 'Rock Salt', cursive;">Rock Salt
+                                </option>
+                                <option value="'Satisfy', cursive" style="font-family: 'Satisfy', cursive;">Script Tails
+                                </option>
+                                <option value="'Shadows Into Light', cursive"
+                                    style="font-family: 'Shadows Into Light', cursive;">Shout Out</option>
+                                <option value="'Special Elite', cursive" style="font-family: 'Special Elite', cursive;">
+                                    Distillery</option>
+                                <option value="'Tangerine', cursive" style="font-family: 'Tangerine', cursive;">Expression
+                                </option>
+                                <option value="'Yesteryear', cursive" style="font-family: 'Yesteryear', cursive;">Varsity
+                                </option>
+                            </select>
 
 
-                          <label class="form-label">Text Style</label>
-                          <div class="text-style-option active">
-                              <div style="font-weight: normal;">Normal</div>
-                          </div>
-                          <div class="text-style-option">
-                              <div style="font-weight: bold;">Bold</div>
-                          </div>
-                          <div class="text-style-option">
-                              <div style="font-style: italic;">Italic</div>
-                          </div>
-                          <div class="text-style-option">
-                              <div style="text-decoration: underline;">Underline</div>
-                          </div>
-                      </div>
-                  </div>
+                            <label class="form-label">Font Size</label>
+                            <!-- <input type="range" class="form-range mb-3" min="8" max="72" value="24"> -->
+                            <div class="slider-container">
+                                <!-- <label class="slider-label">Font Size</label> -->
+                                <span class="font-size-value" id="fontSizeValue">10px</span>
+                                <input type="range" class="form-range" min="5" max="100" value="10"
+                                    id="fontSizeRange">
+                            </div>
+                            <label class="form-label">Thread Color</label>
+                            <div class="color-options mb-3">
+                                @if (isset($textColors) && count($textColors) > 0)
+                                    @foreach ($textColors as $index => $color)
+                                        <div title="{{ $color->color_name }}" class="color-option"
+                                            style="background-image: url({{ asset($color->color_image) }});"></div>
+                                    @endforeach
+                                @endif
+                            </div>
 
-                  <!-- Design Panel -->
-                  <div class="option-panel" id="design-panel">
-                      <h4 class="mb-4">Add Design Elements</h4>
-                      <div class="input-group mb-3">
-                          <input type="text" class="form-control" placeholder="Search designs...">
-                          <button class="btn btn-outline-secondary" type="button">
-                              <i class="fas fa-search"></i>
-                          </button>
-                      </div>
 
-                      <div class="design-grid">
-                          <div class="design-thumbnail" style="background-image: url('images/navbar.PNG')">
-                          </div>
-                          <div class="design-thumbnail"
-                              style="background-image: url('https://via.placeholder.com/150/ff5a5f/ffffff?text=Logo2')">
-                          </div>
-                          <div class="design-thumbnail"
-                              style="background-image: url('https://via.placeholder.com/150/2ec4b6/ffffff?text=Logo3')">
-                          </div>
-                          <div class="design-thumbnail"
-                              style="background-image: url('https://via.placeholder.com/150/8338ec/ffffff?text=Logo4')">
-                          </div>
-                          <div class="design-thumbnail"
-                              style="background-image: url('https://via.placeholder.com/150/ffbe0b/000000?text=Logo5')">
-                          </div>
-                          <div class="design-thumbnail"
-                              style="background-image: url('https://via.placeholder.com/150/fb5607/ffffff?text=Logo6')">
-                          </div>
-                      </div>
+                            <label class="form-label">Text Style</label>
+                            <div class="text-style-option active">
+                                <div style="font-weight: normal;">Normal</div>
+                            </div>
+                            <div class="text-style-option">
+                                <div style="font-weight: bold;">Bold</div>
+                            </div>
+                            <div class="text-style-option">
+                                <div style="font-style: italic;">Italic</div>
+                            </div>
+                            <div class="text-style-option">
+                                <div style="text-decoration: underline;">Underline</div>
+                            </div>
+                        </div>
+                    </div>
 
-                      <div class="d-flex justify-content-between mt-3">
-                          <button class="btn btn-outline-secondary">
-                              <i class="fas fa-chevron-left"></i> Previous
-                          </button>
-                          <button class="btn btn-outline-secondary">
-                              Next <i class="fas fa-chevron-right"></i>
-                          </button>
-                      </div>
-                  </div>
-              </div>
+                    <!-- Design Panel -->
+                    <div class="option-panel" id="design-panel">
+                        <h4 class="mb-4">Add Design Elements</h4>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="Search designs...">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
 
-              <!-- Main Content - Hat Preview -->
-              <div class="col-md-5 main-content p-4">
-                  <div class="hat-preview mx-auto">
-                      <div class="design-area" id="hat-view">
-                          <!-- This will be updated with the selected view -->
-                          <img src="{{asset($userCustomization->front_image)}}" alt="Front View" class="img-fluid" id="current-view">
-                      </div>
-                  </div>
-                  <div class="mt-4 p-3 bg-light rounded">
-                      <div class="d-flex justify-content-around text-center view-selector">
-                          <div class="px-3 view-option" data-view="front">
-                              <img height="50px" src="{{asset($userCustomization->front_image)}}" alt="Front View" class="active">
-                              <p class="small mb-0 active">Front-$12.00</p>
-                          </div>
-                          <div class="px-3 view-option" data-view="left">
-                              <img height="50px" src="{{asset($userCustomization->left_image)}}" alt="Left View">
-                              <p class="small mb-0">Left-$12.00</p>
-                          </div>
-                          <div class="px-3 view-option" data-view="right">
-                              <img height="50px" src="{{asset($userCustomization->right_image)}}" alt="Right View">
-                              <p class="small mb-0">Right-$12.00</p>
-                          </div>
-                          <div class="px-3 view-option" data-view="back">
-                              <img height="50px" src="{{asset($userCustomization->back_image)}}" alt="Back View">
-                              <p class="small mb-0">Back-$12.00</p>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="option-bar mt-4 d-flex justify-content-between align-items-center p-3">
-                      <div>
-                          <span>Color: <strong>Black</strong></span>
-                          <span class="mx-3">|</span>
-                          <span>Size: <strong>One Size</strong></span>
-                      </div>
-                      <button class="btn btn-primary">
-                          <i class="fas fa-shopping-cart me-2"></i>ADD TO CART - $29.99
-                      </button>
-                  </div>
+                        <div class="design-grid">
+                            <div class="design-thumbnail" style="background-image: url('images/navbar.PNG')">
+                            </div>
+                            <div class="design-thumbnail"
+                                style="background-image: url('https://via.placeholder.com/150/ff5a5f/ffffff?text=Logo2')">
+                            </div>
+                            <div class="design-thumbnail"
+                                style="background-image: url('https://via.placeholder.com/150/2ec4b6/ffffff?text=Logo3')">
+                            </div>
+                            <div class="design-thumbnail"
+                                style="background-image: url('https://via.placeholder.com/150/8338ec/ffffff?text=Logo4')">
+                            </div>
+                            <div class="design-thumbnail"
+                                style="background-image: url('https://via.placeholder.com/150/ffbe0b/000000?text=Logo5')">
+                            </div>
+                            <div class="design-thumbnail"
+                                style="background-image: url('https://via.placeholder.com/150/fb5607/ffffff?text=Logo6')">
+                            </div>
+                        </div>
 
-                  <div class="mt-4 p-3 bg-light rounded" style="margin-bottom: 100px !important;">
-                      <h5 class="mb-3">Design Tips</h5>
-                      <div class="d-flex justify-content-around text-center">
-                          <div class="px-3">
-                              <i class="fas fa-ruler-combined text-primary mb-2"></i>
-                              <p class="small mb-0">Optimal design area is within the center 300px</p>
-                          </div>
-                          <div class="px-3">
-                              <i class="fas fa-image text-primary mb-2"></i>
-                              <p class="small mb-0">Use high-resolution images for best quality</p>
-                          </div>
-                          <div class="px-3">
-                              <i class="fas fa-paint-brush text-primary mb-2"></i>
-                              <p class="small mb-0">Contrasting colors work best for visibility</p>
-                          </div>
-                      </div>
-                  </div>
-              </div>
+                        <div class="d-flex justify-content-between mt-3">
+                            <button class="btn btn-outline-secondary">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </button>
+                            <button class="btn btn-outline-secondary">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-              <!-- Right Sidebar - Editing Tools -->
-              <div class="col-md-2 right-sidebar p-4">
-                  <button class="btn" id="pan-btn">
-                      <i class="fas fa-hand me-2"></i>PAN
-                  </button>
-                  <button class="btn" id="undo-btn">
-                      <i class="fas fa-undo me-2"></i>Undo
-                  </button>
-                  <button class="btn" id="redo-btn">
-                      <i class="fas fa-redo me-2"></i>Redo
-                  </button>
-                  <button class="btn" id="zoomIn-btn">
-                      <i class="fas fa-search-plus me-2"></i>Zoom In
-                  </button>
-                  <button class="btn" id="zoomOut-btn">
-                      <i class="fas fa-search-minus me-2"></i>Zoom Out
-                  </button>
-                  <button class="btn" id="lock-btn">
-                      <i class="fas fa-lock me-2"></i>Lock
-                  </button>
-              </div>
-          </div>
-      </div>
+                <!-- Main Content - Hat Preview -->
+                <div class="col-md-5 main-content p-4">
+                    <div class="hat-preview mx-auto">
+                        <div class="design-area" id="hat-view">
+                            <!-- This will be updated with the selected view -->
+                            <img src="{{ asset($userCustomization->front_image) }}" alt="Front View" class="img-fluid"
+                                id="current-view">
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <div class="d-flex justify-content-around text-center view-selector">
+                            <div class="px-3 view-option" data-view="front">
+                                <img height="50px" src="{{ asset($userCustomization->front_image) }}" alt="Front View"
+                                    class="active">
+                                <p class="small mb-0 active">Front-${{ $customizerPrice->front_price }}</p>
+                            </div>
+                            <div class="px-3 view-option" data-view="left">
+                                <img height="50px" src="{{ asset($userCustomization->left_image) }}" alt="Left View">
+                                <p class="small mb-0">Left-${{ $customizerPrice->back_price }}</p>
+                            </div>
+                            <div class="px-3 view-option" data-view="right">
+                                <img height="50px" src="{{ asset($userCustomization->right_image) }}" alt="Right View">
+                                <p class="small mb-0">Right-${{ $customizerPrice->right_price }}</p>
+                            </div>
+                            <div class="px-3 view-option" data-view="back">
+                                <img height="50px" src="{{ asset($userCustomization->back_image) }}" alt="Back View">
+                                <p class="small mb-0">Back-${{ $customizerPrice->left_price }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-bar mt-4 d-flex justify-content-between align-items-center p-3">
+                        <div>
+                            <span>Color: <strong>Black</strong></span>
+                            <span class="mx-3">|</span>
+                            <span>Size: <strong>One Size</strong></span>
+                        </div>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-shopping-cart me-2"></i>ADD TO CART
+                        </button>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-light rounded" style="margin-bottom: 100px !important;">
+                        <h5 class="mb-3">Design Tips</h5>
+                        <div class="d-flex justify-content-around text-center">
+                            <div class="px-3">
+                                <i class="fas fa-ruler-combined text-primary mb-2"></i>
+                                <p class="small mb-0">Optimal design area is within the center 300px</p>
+                            </div>
+                            <div class="px-3">
+                                <i class="fas fa-image text-primary mb-2"></i>
+                                <p class="small mb-0">Use high-resolution images for best quality</p>
+                            </div>
+                            <div class="px-3">
+                                <i class="fas fa-paint-brush text-primary mb-2"></i>
+                                <p class="small mb-0">Contrasting colors work best for visibility</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar - Editing Tools -->
+                <div class="col-md-2 right-sidebar p-4">
+                    <button class="btn" id="pan-btn">
+                        <i class="fas fa-hand me-2"></i>PAN
+                    </button>
+                    <button class="btn" id="undo-btn">
+                        <i class="fas fa-undo me-2"></i>Undo
+                    </button>
+                    <button class="btn" id="redo-btn">
+                        <i class="fas fa-redo me-2"></i>Redo
+                    </button>
+                    <button class="btn" id="zoomIn-btn">
+                        <i class="fas fa-search-plus me-2"></i>Zoom In
+                    </button>
+                    <button class="btn" id="zoomOut-btn">
+                        <i class="fas fa-search-minus me-2"></i>Zoom Out
+                    </button>
+                    <button class="btn" id="lock-btn">
+                        <i class="fas fa-lock me-2"></i>Lock
+                    </button>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- jQuery CDN (latest version) -->
@@ -2542,633 +2553,722 @@
         });
     </script> --}}
     <script>
-      // Global state variables
-      let designState = {
-          currentView: 'front',
-          views: {
-              front: {
-                  elements: [],
-                  background: "{{asset($userCustomization->front_image)}}",
-                  zoom: 1,
-                  pan: { x: 0, y: 0 }
-              },
-              left: {
-                  elements: [],
-                  background: "{{asset($userCustomization->left_image)}}",
-                  zoom: 1,
-                  pan: { x: 0, y: 0 }
-              },
-              right: {
-                  elements: [],
-                  background: "{{asset($userCustomization->right_image)}}",
-                  zoom: 1,
-                  pan: { x: 0, y: 0 }
-              },
-              back: {
-                  elements: [],
-                  background: "{{asset($userCustomization->back_image)}}",
-                  zoom: 1,
-                  pan: { x: 0, y: 0 }
-              }
-          },
-          color: 'black',
-          size: 'one-size'
-      };
-
-      let currentTextElement = null;
-      let selectedElement = null;
-      let zoomLevel = 1; // Moved to global scope
-      let panOffset = { x: 0, y: 0 }; // Moved to global scope
-      let isLocked = false;
-      let isPanning = false;
-      let panStart = { x: 0, y: 0 };
-
-      const rangeInput = document.getElementById("fontSizeRange");
-      const valueDisplay = document.getElementById("fontSizeValue");
-
-      rangeInput.addEventListener("input", function() {
-          valueDisplay.textContent = `${this.value}px`;
-          valueDisplay.style.left = `${(this.value - this.min) / (this.max - this.min) * 100}%`;
-      });
-
-      $(document).ready(function() {
-          // Initialize undo/redo stacks
-          const undoStack = [];
-          const redoStack = [];
-
-          // DOM elements
-          const designArea = $('#hat-view');
-          const currentView = $('#current-view');
-          const designContent = $('<div>').addClass('design-content').appendTo(designArea);
-          const boundary = $('<div>').addClass('design-boundary').appendTo(designArea);
-
-          // Boundary configurations
-          const boundaryConfigs = {
-              'front': { top: '20%', left: '50%', width: '60%', height: '40%' },
-              'back': { top: '20%', left: '50%', width: '60%', height: '40%' },
-              'left': { top: '46%', left: '65%', width: '30%', height: '15%' },
-              'right': { top: '46%', left: '35%', width: '30%', height: '15%' }
-          };
-
-          // Panel switching functionality
-          $('.sidebar button').on('click', function() {
-              const panelId = $(this).data('panel');
-              $('.sidebar button').removeClass('active');
-              $(this).addClass('active');
-              $('.option-panel').removeClass('active');
-              $('#' + panelId).addClass('active');
-          });
-
-          // Color selection
-          $('.color-option').on('click', function() {
-              const parent = $(this).closest('.color-options');
-              if (parent.length) parent.find('.color-option').removeClass('active');
-              $(this).addClass('active');
-
-              if ($(this).closest('.sidebar .tool-section').length) {
-                  const colorName = $(this).attr('title') || $(this).text();
-                  $('.option-bar span strong').text(colorName);
-              }
-
-              if (currentTextElement) {
-                  currentTextElement.css('backgroundImage', $(this).css('backgroundImage'));
-                  saveState();
-              }
-          });
-
-          // Text style selection
-          $('.text-style-option').on('click', function() {
-              $('.text-style-option').removeClass('active');
-              $(this).addClass('active');
-
-              if (currentTextElement) {
-                  const textStyle = $('.text-style-option.active div').css(['fontWeight', 'fontStyle', 'textDecoration']);
-                  currentTextElement.css({
-                      fontWeight: textStyle.fontWeight,
-                      fontStyle: textStyle.fontStyle,
-                      textDecoration: textStyle.textDecoration
-                  });
-                  saveState();
-              }
-          });
-
-          // View switching functionality
-          $('.view-option').on('click', function() {
-              const view = $(this).data('view');
-              saveCurrentViewState();
-
-              designState.currentView = view;
-              loadViewState(view);
-
-              $('.view-option img, .view-option p').removeClass('active');
-              $(this).find('img, p').addClass('active');
-              $('#current-view').attr('src', designState.views[view].background);
-
-              updateDesignArea(view);
-          });
-
-          // Save current view state
-          function saveCurrentViewState() {
-              const view = designState.currentView;
-              designState.views[view].zoom = zoomLevel;
-              designState.views[view].pan = { ...panOffset };
-              designState.views[view].elements = [];
-
-              $('.editable-image, .text-design').each(function() {
-                  const $el = $(this);
-                  const elementData = {
-                      type: $el.hasClass('text-design') ? 'text' : 'image',
-                      content: $el.hasClass('text-design') ? $el.text() : $el.find('img').attr('src'),
-                      position: {
-                          left: parseFloat($el.css('left')) || 0,
-                          top: parseFloat($el.css('top')) || 0
-                      },
-                      size: {
-                          width: parseFloat($el.css('width')) || $el.width(),
-                          height: parseFloat($el.css('height')) || $el.height()
-                      },
-                      rotation: parseFloat($el.css('transform').replace(/[^0-9\-.,]/g, '')) || 0,
-                      styles: {}
-                  };
-
-                  if (elementData.type === 'text') {
-                      elementData.styles = {
-                          fontFamily: $el.css('fontFamily'),
-                          fontSize: $el.css('fontSize'),
-                          color: $el.css('backgroundImage'),
-                          fontWeight: $el.css('fontWeight'),
-                          fontStyle: $el.css('fontStyle'),
-                          textDecoration: $el.css('textDecoration')
-                      };
-                  }
-
-                  designState.views[view].elements.push(elementData);
-              });
-          }
-
-          // Load view state
-          function loadViewState(view) {
-              designContent.empty();
-              zoomLevel = designState.views[view].zoom;
-              panOffset = { ...designState.views[view].pan };
-              updateTransform();
-
-              designState.views[view].elements.forEach(element => {
-                  if (element.type === 'text') {
-                      createTextElement(element);
-                  } else {
-                      createImageElement(element);
-                  }
-              });
-
-              currentTextElement = null;
-          }
-
-          // Create text element
-          function createTextElement(elementData) {
-              const textDiv = $('<div>').addClass('text-design')
-                  .text(elementData.content)
-                  .prop('contentEditable', true)
-                  .css({
-                      position: 'absolute',
-                      left: `${elementData.position.left}px`,
-                      top: `${elementData.position.top}px`,
-                      width: `${elementData.size.width}px`,
-                      height: `${elementData.size.height}px`,
-                      transform: `rotate(${elementData.rotation}deg)`,
-                      backgroundImage: elementData.styles.color,
-                      backgroundClip: 'text',
-                      color: 'transparent',
-                      fontFamily: elementData.styles.fontFamily,
-                      fontSize: elementData.styles.fontSize,
-                      fontWeight: elementData.styles.fontWeight,
-                      fontStyle: elementData.styles.fontStyle,
-                      textDecoration: elementData.styles.textDecoration
-                  });
-
-              designContent.append(textDiv);
-              setupTextEditing(textDiv[0]);
-              return textDiv;
-          }
-
-          // Create image element
-          function createImageElement(elementData) {
-              const imgDiv = $('<div>').addClass('editable-image')
-                  .css({
-                      position: 'absolute',
-                      left: `${elementData.position.left}px`,
-                      top: `${elementData.position.top}px`,
-                      width: `${elementData.size.width}px`,
-                      height: `${elementData.size.height}px`,
-                      transform: `rotate(${elementData.rotation}deg)`
-                  });
-
-              const imgContent = $('<img>').attr('src', elementData.content)
-                  .css({
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'contain'
-                  });
-
-              const resizeHandles = createResizeHandles();
-              resizeHandles.forEach(handle => imgDiv.append(handle));
-              imgDiv.append(createDeleteButton());
-              imgDiv.append(createRotateHandle());
-              imgDiv.append(imgContent);
-
-              designContent.append(imgDiv);
-              setupImageEditing(imgDiv[0]);
-              return imgDiv;
-          }
-
-          // Update design area based on view
-          function updateDesignArea(view) {
-              const config = boundaryConfigs[view] || boundaryConfigs.front;
-              boundary.css({
-                  top: config.top,
-                  left: config.left,
-                  width: config.width,
-                  height: config.height,
-                  transform: 'translateX(-50%)'
-              });
-
-              designContent.css({
-                  top: config.top,
-                  left: config.left,
-                  width: config.width,
-                  height: config.height,
-                  transform: 'translateX(-50%)'
-              });
-
-              designContent.empty();
-              selectedElement = null;
-          }
-
-          // Toolbar functionality
-          $('#pan-btn').on('click', function() {
-              isPanning = !isPanning;
-              $(this).toggleClass('active-btn', isPanning);
-              designArea.css('cursor', isPanning ? 'grab' : 'default');
-          });
-
-          designArea.on('mousedown', function(e) {
-              if (isPanning) {
-                  panStart = { x: e.clientX, y: e.clientY };
-                  designArea.css('cursor', 'grabbing');
-              }
-          });
-
-          designArea.on('mousemove', function(e) {
-              if (isPanning && panStart.x) {
-                  panOffset.x += e.clientX - panStart.x;
-                  panOffset.y += e.clientY - panStart.y;
-                  panStart = { x: e.clientX, y: e.clientY };
-                  updateTransform();
-              }
-          });
-
-          designArea.on('mouseup', function() {
-              if (isPanning) {
-                  designArea.css('cursor', 'grab');
-                  saveState();
-              }
-          });
-
-          // Zoom functionality
-          $('#zoomIn-btn').on('click', function() {
-              zoomLevel = Math.min(zoomLevel + 0.1, 3);
-              updateTransform();
-              saveState();
-          });
-
-          $('#zoomOut-btn').on('click', function() {
-              zoomLevel = Math.max(zoomLevel - 0.1, 0.5);
-              updateTransform();
-              saveState();
-          });
-
-          function updateTransform() {
-              currentView.css('transform', `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoomLevel})`);
-          }
-
-          // Undo/Redo functionality
-          $('#undo-btn').on('click', function() {
-              if (undoStack.length > 0) {
-                  const state = undoStack.pop();
-                  redoStack.push({
-                      src: currentView.attr('src'),
-                      transform: currentView.css('transform'),
-                      zoom: zoomLevel,
-                      offset: { ...panOffset }
-                  });
-                  applyState(state);
-              }
-          });
-
-          $('#redo-btn').on('click', function() {
-              if (redoStack.length > 0) {
-                  const state = redoStack.pop();
-                  undoStack.push({
-                      src: currentView.attr('src'),
-                      transform: currentView.css('transform'),
-                      zoom: zoomLevel,
-                      offset: { ...panOffset }
-                  });
-                  applyState(state);
-              }
-          });
-
-          function applyState(state) {
-              currentView.attr('src', state.src);
-              currentView.css('transform', state.transform);
-              zoomLevel = state.zoom;
-              panOffset = { ...state.offset };
-          }
-
-          // Lock functionality
-          $('#lock-btn').on('click', function() {
-              isLocked = !isLocked;
-              $(this).toggleClass('active-btn', isLocked);
-              currentView.css('pointer-events', isLocked ? 'none' : 'auto');
-          });
-
-          // Image upload handling
-          $('.upload-area button').on('click', function() {
-              const input = $('<input>').attr({ type: 'file', accept: 'image/*' }).on('change', function(e) {
-                  const file = e.target.files[0];
-                  const reader = new FileReader();
-                  reader.onload = function(event) {
-                      const img = $('<div>').addClass('editable-image');
-                      const imgContent = $('<img>').attr({ src: event.target.result, draggable: false });
-
-                      createResizeHandles().forEach(handle => img.append(handle));
-                      img.append(createDeleteButton());
-                      img.append(createRotateHandle());
-                      img.append(imgContent);
-                      designContent.append(img);
-
-                      img.css({ left: '50%', top: '50%' });
-                      setupImageEditing(img[0]);
-                      selectElement(img[0]);
-                      saveState();
-                  };
-                  reader.readAsDataURL(file);
-              });
-              input.click();
-          });
-
-          // Design thumbnail selection
-          $('.design-thumbnail').on('click', function() {
-              const img = $('<div>').addClass('editable-image');
-              const imgContent = $('<img>').attr({
-                  src: $(this).css('backgroundImage').replace('url("', '').replace('")', ''),
-                  draggable: false
-              });
-
-              createResizeHandles().forEach(handle => img.append(handle));
-              img.append(createDeleteButton());
-              img.append(createRotateHandle());
-              img.append(imgContent);
-              designContent.append(img);
-
-              img.css({ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' });
-              setupImageEditing(img[0]);
-              selectElement(img[0]);
-              saveState();
-          });
-
-          // Helper functions for element creation
-          function createResizeHandles() {
-              return ['nw', 'ne', 'sw', 'se'].map(pos =>
-                  $('<div>').addClass(`resize-handle resize-${pos}`)
-              );
-          }
-
-          function createDeleteButton() {
-              return $('<div>').addClass('delete-btn').html('&times;');
-          }
-
-          function createRotateHandle() {
-              return $('<div>').addClass('rotate-handle').html('↻');
-          }
-
-          // Element editing setup
-          function setupImageEditing(element) {
-              const $element = $(element);
-              const imgContent = $element.find('img')[0];
-              let startX, startY, startWidth, startHeight, startAngle;
-              let isDragging = false, isResizing = false, isRotating = false;
-              let resizeDirection = '';
-
-              $element.on('mousedown', function(e) {
-                  if (e.target === element || e.target === imgContent) {
-                      isDragging = true;
-                      startX = e.clientX - element.getBoundingClientRect().left;
-                      startY = e.clientY - element.getBoundingClientRect().top;
-                      selectElement(element);
-                      e.preventDefault();
-                  }
-              });
-
-              $element.find('.resize-handle').on('mousedown', function(e) {
-                  isResizing = true;
-                  resizeDirection = $(this).attr('class').split(' ')[1].split('-')[1];
-                  startWidth = parseInt($element.css('width')) || imgContent.offsetWidth;
-                  startHeight = parseInt($element.css('height')) || imgContent.offsetHeight;
-                  startX = e.clientX;
-                  startY = e.clientY;
-                  selectElement(element);
-                  e.stopPropagation();
-                  e.preventDefault();
-              });
-
-              $element.find('.rotate-handle').on('mousedown', function(e) {
-                  isRotating = true;
-                  const rect = element.getBoundingClientRect();
-                  const centerX = rect.left + rect.width / 2;
-                  const centerY = rect.top + rect.height / 2;
-                  startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
-                  const currentAngle = parseFloat($element.css('transform')?.replace(/[^0-9\-.,]/g, '') || 0);
-                  startAngle -= currentAngle;
-                  selectElement(element);
-                  e.stopPropagation();
-                  e.preventDefault();
-              });
-
-              $element.find('.delete-btn').on('click', function(e) {
-                  $element.remove();
-                  saveState();
-                  e.stopPropagation();
-              });
-
-              $(document).on('mousemove', function(e) {
-                  if (!selectedElement || selectedElement !== element) return;
-
-                  const boundaryRect = designContent[0].getBoundingClientRect();
-                  const elemRect = element.getBoundingClientRect();
-
-                  if (isDragging) {
-                      let newLeft = e.clientX - boundaryRect.left - startX;
-                      let newTop = e.clientY - boundaryRect.top - startY;
-                      newLeft = Math.max(0, Math.min(newLeft, boundaryRect.width - elemRect.width));
-                      newTop = Math.max(0, Math.min(newTop, boundaryRect.height - elemRect.height));
-                      $element.css({ left: `${newLeft}px`, top: `${newTop}px` });
-                  }
-                  else if (isResizing) {
-                      const widthChange = e.clientX - startX;
-                      const heightChange = e.clientY - startY;
-                      let newWidth = startWidth, newHeight = startHeight;
-
-                      if (resizeDirection.includes('e')) newWidth += widthChange;
-                      if (resizeDirection.includes('w')) newWidth -= widthChange;
-                      if (resizeDirection.includes('s')) newHeight += heightChange;
-                      if (resizeDirection.includes('n')) newHeight -= heightChange;
-
-                      if (e.shiftKey) {
-                          const aspectRatio = startWidth / startHeight;
-                          if (Math.abs(widthChange) > Math.abs(heightChange)) {
-                              newHeight = newWidth / aspectRatio;
-                          } else {
-                              newWidth = newHeight * aspectRatio;
-                          }
-                      }
-
-                      newWidth = Math.max(newWidth, 30);
-                      newHeight = Math.max(newHeight, 30);
-
-                      const currentLeft = parseFloat($element.css('left')) || 0;
-                      const currentTop = parseFloat($element.css('top')) || 0;
-                      const maxWidth = boundaryRect.width - currentLeft;
-                      const maxHeight = boundaryRect.height - currentTop;
-                      newWidth = Math.min(newWidth, maxWidth);
-                      newHeight = Math.min(newHeight, maxHeight);
-
-                      $element.css({ width: `${newWidth}px`, height: `${newHeight}px` });
-                      $(imgContent).css({ width: '100%', height: '100%' });
-
-                      if (resizeDirection.includes('w')) {
-                          const leftChange = startWidth - newWidth;
-                          $element.css('left', `${Math.max(currentLeft + leftChange, 0)}px`);
-                      }
-                      if (resizeDirection.includes('n')) {
-                          const topChange = startHeight - newHeight;
-                          $element.css('top', `${Math.max(currentTop + topChange, 0)}px`);
-                      }
-                  }
-                  else if (isRotating) {
-                      const rect = element.getBoundingClientRect();
-                      const centerX = rect.left + rect.width / 2;
-                      const centerY = rect.top + rect.height / 2;
-                      const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
-                      $element.css('transform', `rotate(${angle - startAngle}deg)`);
-                  }
-              });
-
-              $(document).on('mouseup', function() {
-                  if (isDragging || isResizing || isRotating) saveState();
-                  isDragging = isResizing = isRotating = false;
-              });
-          }
-
-          // Text editing setup
-          function setupTextEditing(element) {
-              const $element = $(element);
-              let isDragging = false;
-              let offset = { x: 0, y: 0 };
-
-              $element.on('mousedown', function(e) {
-                  if ($('#lock-btn').hasClass('active-btn')) return;
-                  isDragging = true;
-                  offset = {
-                      x: e.clientX - element.getBoundingClientRect().left,
-                      y: e.clientY - element.getBoundingClientRect().top
-                  };
-                  $element.css('cursor', 'grabbing');
-                  selectElement(element);
-                  e.preventDefault();
-              });
-
-              $(document).on('mousemove', function(e) {
-                  if (!isDragging) return;
-                  const boundaryRect = designContent[0].getBoundingClientRect();
-                  const newLeft = e.clientX - boundaryRect.left - offset.x;
-                  const newTop = e.clientY - boundaryRect.top - offset.y;
-                  const maxX = boundaryRect.width - element.offsetWidth;
-                  const maxY = boundaryRect.height - element.offsetHeight;
-                  $element.css({
-                      left: `${Math.min(Math.max(newLeft, 0), maxX)}px`,
-                      top: `${Math.min(Math.max(newTop, 0), maxY)}px`
-                  });
-              });
-
-              $(document).on('mouseup', function() {
-                  isDragging = false;
-                  $element.css('cursor', 'grab');
-                  saveState();
-              });
-          }
-
-          // Text input handling
-          $('#text-panel input[type="text"]').on('input', function() {
-              const text = $(this).val();
-              if (!currentTextElement) {
-                  const activeColorOption = $('.color-option.active').css('backgroundImage');
-                  currentTextElement = $('<div>').addClass('text-design').text(text || 'Your Text')
-                      .prop('contentEditable', true)
-                      .css({
-                          position: 'absolute',
-                          left: '50%',
-                          top: '50%',
-                          backgroundImage: activeColorOption,
-                          backgroundClip: 'text',
-                          color: 'transparent',
-                          fontFamily: $('#text-panel select').val(),
-                          fontSize: $('#text-panel input[type="range"]').val() + 'px'
-                      });
-                  designContent.append(currentTextElement);
-                  setupTextEditing(currentTextElement[0]);
-              } else {
-                  currentTextElement.text(text || 'Your Text');
-              }
-              saveState();
-          });
-
-          // Text styling updates
-          $('#text-panel select, #text-panel input[type="range"]').on('change', function() {
-              if (!currentTextElement) return;
-              currentTextElement.css({
-                  fontFamily: $('#text-panel select').val(),
-                  fontSize: $('#text-panel input[type="range"]').val() + 'px'
-              });
-              saveState();
-          });
-
-          // Element selection
-          function selectElement(element) {
-              if (selectedElement) $(selectedElement).removeClass('selected');
-              selectedElement = element;
-              if (element) $(element).addClass('selected');
-          }
-
-          // Save state function
-          function saveState() {
-              saveCurrentViewState();
-              undoStack.push({
-                  src: currentView.attr('src'),
-                  transform: currentView.css('transform'),
-                  zoom: zoomLevel,
-                  offset: { ...panOffset },
-                  content: designContent.html()
-              });
-              redoStack.length = 0;
-          }
-
-          // Initialize the design area
-          updateDesignArea('front');
-          $('.view-option[data-view="front"]').trigger('click');
-
-          // Add CSS styles
-          $('<style>').text(`
+        // Global state variables
+        let designState = {
+            currentView: 'front',
+            views: {
+                front: {
+                    elements: [],
+                    background: "{{ asset($userCustomization->front_image) }}",
+                    zoom: 1,
+                    pan: {
+                        x: 0,
+                        y: 0
+                    }
+                },
+                left: {
+                    elements: [],
+                    background: "{{ asset($userCustomization->left_image) }}",
+                    zoom: 1,
+                    pan: {
+                        x: 0,
+                        y: 0
+                    }
+                },
+                right: {
+                    elements: [],
+                    background: "{{ asset($userCustomization->right_image) }}",
+                    zoom: 1,
+                    pan: {
+                        x: 0,
+                        y: 0
+                    }
+                },
+                back: {
+                    elements: [],
+                    background: "{{ asset($userCustomization->back_image) }}",
+                    zoom: 1,
+                    pan: {
+                        x: 0,
+                        y: 0
+                    }
+                }
+            },
+        };
+
+        let currentTextElement = null;
+        let selectedElement = null;
+        let zoomLevel = 1; // Moved to global scope
+        let panOffset = {
+            x: 0,
+            y: 0
+        }; // Moved to global scope
+        let isLocked = false;
+        let isPanning = false;
+        let panStart = {
+            x: 0,
+            y: 0
+        };
+
+        const rangeInput = document.getElementById("fontSizeRange");
+        const valueDisplay = document.getElementById("fontSizeValue");
+
+        rangeInput.addEventListener("input", function() {
+            valueDisplay.textContent = `${this.value}px`;
+            valueDisplay.style.left = `${(this.value - this.min) / (this.max - this.min) * 100}%`;
+        });
+
+        $(document).ready(function() {
+            // Initialize undo/redo stacks
+            const undoStack = [];
+            const redoStack = [];
+
+            // DOM elements
+            const designArea = $('#hat-view');
+            const currentView = $('#current-view');
+            const designContent = $('<div>').addClass('design-content').appendTo(designArea);
+            const boundary = $('<div>').addClass('design-boundary').appendTo(designArea);
+
+            // Boundary configurations
+            const boundaryConfigs = {
+                'front': {
+                    top: '20%',
+                    left: '50%',
+                    width: '60%',
+                    height: '40%'
+                },
+                'back': {
+                    top: '20%',
+                    left: '50%',
+                    width: '60%',
+                    height: '40%'
+                },
+                'left': {
+                    top: '46%',
+                    left: '65%',
+                    width: '30%',
+                    height: '15%'
+                },
+                'right': {
+                    top: '46%',
+                    left: '35%',
+                    width: '30%',
+                    height: '15%'
+                }
+            };
+
+            // Panel switching functionality
+            $('.sidebar button').on('click', function() {
+                const panelId = $(this).data('panel');
+                $('.sidebar button').removeClass('active');
+                $(this).addClass('active');
+                $('.option-panel').removeClass('active');
+                $('#' + panelId).addClass('active');
+            });
+
+            // Color selection
+            $('.color-option').on('click', function() {
+                const parent = $(this).closest('.color-options');
+                if (parent.length) parent.find('.color-option').removeClass('active');
+                $(this).addClass('active');
+
+                if ($(this).closest('.sidebar .tool-section').length) {
+                    const colorName = $(this).attr('title') || $(this).text();
+                    $('.option-bar span strong').text(colorName);
+                }
+
+                if (currentTextElement) {
+                    currentTextElement.css('backgroundImage', $(this).css('backgroundImage'));
+                    saveState();
+                }
+            });
+
+            // Text style selection
+            $('.text-style-option').on('click', function() {
+                $('.text-style-option').removeClass('active');
+                $(this).addClass('active');
+
+                if (currentTextElement) {
+                    const textStyle = $('.text-style-option.active div').css(['fontWeight', 'fontStyle',
+                        'textDecoration'
+                    ]);
+                    currentTextElement.css({
+                        fontWeight: textStyle.fontWeight,
+                        fontStyle: textStyle.fontStyle,
+                        textDecoration: textStyle.textDecoration
+                    });
+                    saveState();
+                }
+            });
+
+            // View switching functionality
+            $('.view-option').on('click', function() {
+                const view = $(this).data('view');
+
+                // Only save and load if switching to a different view
+                if (view !== designState.currentView) {
+                    saveCurrentViewState();
+                    designState.currentView = view;
+                    loadViewState(view);
+                }
+
+                $('.view-option img, .view-option p').removeClass('active');
+                $(this).find('img, p').addClass('active');
+                $('#current-view').attr('src', designState.views[view].background);
+
+                updateDesignArea(view);
+            });
+
+            // Save current view state
+            function saveCurrentViewState() {
+                const view = designState.currentView;
+                designState.views[view].zoom = zoomLevel;
+                designState.views[view].pan = {
+                    ...panOffset
+                };
+                designState.views[view].elements = [];
+
+                // Capture both image and text elements
+                $('.editable-image, .text-design').each(function() {
+                    const $el = $(this);
+                    const elementData = {
+                        type: $el.hasClass('text-design') ? 'text' : 'image',
+                        content: $el.hasClass('text-design') ? $el.text() : $el.find('img').attr('src'),
+                        position: {
+                            left: parseFloat($el.css('left')) || 0,
+                            top: parseFloat($el.css('top')) || 0
+                        },
+                        size: {
+                            width: parseFloat($el.css('width')) || $el.width(),
+                            height: parseFloat($el.css('height')) || $el.height()
+                        },
+                        rotation: parseFloat($el.css('transform').replace(/[^0-9\-.,]/g, '')) || 0,
+                        styles: {}
+                    };
+
+                    if (elementData.type === 'text') {
+                        elementData.styles = {
+                            fontFamily: $el.css('fontFamily'),
+                            fontSize: $el.css('fontSize'),
+                            color: $el.css('backgroundImage'),
+                            fontWeight: $el.css('fontWeight'),
+                            fontStyle: $el.css('fontStyle'),
+                            textDecoration: $el.css('textDecoration')
+                        };
+                    }
+
+                    designState.views[view].elements.push(elementData);
+                });
+            }
+
+            // Load view state
+            function loadViewState(view) {
+                console.log(designState.views[view].elements);
+                designContent.empty();
+                zoomLevel = designState.views[view].zoom;
+                panOffset = {
+                    ...designState.views[view].pan
+                };
+                updateTransform();
+
+                // Recreate all elements for the view
+                designState.views[view].elements.forEach(element => {
+                    if (element.type === 'text') {
+                        createTextElement(element);
+                    } else {
+                        createImageElement(element);
+                    }
+                });
+
+                currentTextElement = null;
+            }
+
+            // Create text element
+            function createTextElement(elementData) {
+                const textDiv = $('<div>').addClass('text-design')
+                    .text(elementData.content)
+                    .prop('contentEditable', true)
+                    .css({
+                        position: 'absolute',
+                        left: `${elementData.position.left}px`,
+                        top: `${elementData.position.top}px`,
+                        width: `${elementData.size.width}px`,
+                        height: `${elementData.size.height}px`,
+                        transform: `rotate(${elementData.rotation}deg)`,
+                        backgroundImage: elementData.styles.color,
+                        backgroundClip: 'text',
+                        color: 'transparent',
+                        fontFamily: elementData.styles.fontFamily,
+                        fontSize: elementData.styles.fontSize,
+                        fontWeight: elementData.styles.fontWeight,
+                        fontStyle: elementData.styles.fontStyle,
+                        textDecoration: elementData.styles.textDecoration
+                    });
+
+                designContent.append(textDiv);
+                setupTextEditing(textDiv[0]);
+                return textDiv;
+            }
+
+            // Create image element
+            function createImageElement(elementData) {
+                const imgDiv = $('<div>').addClass('editable-image')
+                    .css({
+                        position: 'absolute',
+                        left: `${elementData.position.left}px`,
+                        top: `${elementData.position.top}px`,
+                        width: `${elementData.size.width}px`,
+                        height: `${elementData.size.height}px`,
+                        transform: `rotate(${elementData.rotation}deg)`
+                    });
+
+                const imgContent = $('<img>').attr('src', elementData.content)
+                    .css({
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain'
+                    });
+
+                const resizeHandles = createResizeHandles();
+                resizeHandles.forEach(handle => imgDiv.append(handle));
+                imgDiv.append(createDeleteButton());
+                imgDiv.append(createRotateHandle());
+                imgDiv.append(imgContent);
+
+                designContent.append(imgDiv);
+                setupImageEditing(imgDiv[0]);
+                return imgDiv;
+            }
+
+            // Update design area based on view
+            function updateDesignArea(view) {
+                const config = boundaryConfigs[view] || boundaryConfigs.front;
+                boundary.css({
+                    top: config.top,
+                    left: config.left,
+                    width: config.width,
+                    height: config.height,
+                    transform: 'translateX(-50%)'
+                });
+
+                designContent.css({
+                    top: config.top,
+                    left: config.left,
+                    width: config.width,
+                    height: config.height,
+                    transform: 'translateX(-50%)'
+                });
+
+                designContent.empty();
+                selectedElement = null;
+            }
+
+            // Toolbar functionality
+            $('#pan-btn').on('click', function() {
+                isPanning = !isPanning;
+                $(this).toggleClass('active-btn', isPanning);
+                designArea.css('cursor', isPanning ? 'grab' : 'default');
+            });
+
+            designArea.on('mousedown', function(e) {
+                if (isPanning) {
+                    panStart = {
+                        x: e.clientX,
+                        y: e.clientY
+                    };
+                    designArea.css('cursor', 'grabbing');
+                }
+            });
+
+            designArea.on('mousemove', function(e) {
+                if (isPanning && panStart.x) {
+                    panOffset.x += e.clientX - panStart.x;
+                    panOffset.y += e.clientY - panStart.y;
+                    panStart = {
+                        x: e.clientX,
+                        y: e.clientY
+                    };
+                    updateTransform();
+                }
+            });
+
+            designArea.on('mouseup', function() {
+                if (isPanning) {
+                    designArea.css('cursor', 'grab');
+                    saveState();
+                }
+            });
+
+            // Zoom functionality
+            $('#zoomIn-btn').on('click', function() {
+                zoomLevel = Math.min(zoomLevel + 0.1, 3);
+                updateTransform();
+                saveState();
+            });
+
+            $('#zoomOut-btn').on('click', function() {
+                zoomLevel = Math.max(zoomLevel - 0.1, 0.5);
+                updateTransform();
+                saveState();
+            });
+
+            function updateTransform() {
+                currentView.css('transform', `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoomLevel})`);
+            }
+
+            // Undo/Redo functionality
+            $('#undo-btn').on('click', function() {
+                if (undoStack.length > 0) {
+                    const state = undoStack.pop();
+                    redoStack.push({
+                        src: currentView.attr('src'),
+                        transform: currentView.css('transform'),
+                        zoom: zoomLevel,
+                        offset: {
+                            ...panOffset
+                        }
+                    });
+                    applyState(state);
+                }
+            });
+
+            $('#redo-btn').on('click', function() {
+                if (redoStack.length > 0) {
+                    const state = redoStack.pop();
+                    undoStack.push({
+                        src: currentView.attr('src'),
+                        transform: currentView.css('transform'),
+                        zoom: zoomLevel,
+                        offset: {
+                            ...panOffset
+                        }
+                    });
+                    applyState(state);
+                }
+            });
+
+            function applyState(state) {
+                currentView.attr('src', state.src);
+                currentView.css('transform', state.transform);
+                zoomLevel = state.zoom;
+                panOffset = {
+                    ...state.offset
+                };
+            }
+
+            // Lock functionality
+            $('#lock-btn').on('click', function() {
+                isLocked = !isLocked;
+                $(this).toggleClass('active-btn', isLocked);
+                currentView.css('pointer-events', isLocked ? 'none' : 'auto');
+            });
+
+            // Image upload handling
+            $('.upload-area button').on('click', function() {
+                const input = $('<input>').attr({
+                    type: 'file',
+                    accept: 'image/*'
+                }).on('change', function(e) {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const img = $('<div>').addClass('editable-image');
+                        const imgContent = $('<img>').attr({
+                            src: event.target.result,
+                            draggable: false
+                        });
+
+                        createResizeHandles().forEach(handle => img.append(handle));
+                        img.append(createDeleteButton());
+                        img.append(createRotateHandle());
+                        img.append(imgContent);
+                        designContent.append(img);
+
+                        img.css({
+                            left: '50%',
+                            top: '50%'
+                        });
+                        setupImageEditing(img[0]);
+                        selectElement(img[0]);
+                        saveState();
+                    };
+                    reader.readAsDataURL(file);
+                });
+                input.click();
+            });
+
+            // Design thumbnail selection
+            $('.design-thumbnail').on('click', function() {
+                const img = $('<div>').addClass('editable-image');
+                const imgContent = $('<img>').attr({
+                    src: $(this).css('backgroundImage').replace('url("', '').replace('")', ''),
+                    draggable: false
+                });
+
+                createResizeHandles().forEach(handle => img.append(handle));
+                img.append(createDeleteButton());
+                img.append(createRotateHandle());
+                img.append(imgContent);
+                designContent.append(img);
+
+                img.css({
+                    left: '50%',
+                    top: '50%',
+                    transform: 'translate(-50%, -50%)'
+                });
+                setupImageEditing(img[0]);
+                selectElement(img[0]);
+                saveState();
+            });
+
+            // Helper functions for element creation
+            function createResizeHandles() {
+                return ['nw', 'ne', 'sw', 'se'].map(pos =>
+                    $('<div>').addClass(`resize-handle resize-${pos}`)
+                );
+            }
+
+            function createDeleteButton() {
+                return $('<div>').addClass('delete-btn').html('&times;');
+            }
+
+            function createRotateHandle() {
+                return $('<div>').addClass('rotate-handle').html('↻');
+            }
+
+            // Element editing setup
+            function setupImageEditing(element) {
+                const $element = $(element);
+                const imgContent = $element.find('img')[0];
+                let startX, startY, startWidth, startHeight, startAngle;
+                let isDragging = false,
+                    isResizing = false,
+                    isRotating = false;
+                let resizeDirection = '';
+
+                $element.on('mousedown', function(e) {
+                    if (e.target === element || e.target === imgContent) {
+                        isDragging = true;
+                        startX = e.clientX - element.getBoundingClientRect().left;
+                        startY = e.clientY - element.getBoundingClientRect().top;
+                        selectElement(element);
+                        e.preventDefault();
+                    }
+                });
+
+                $element.find('.resize-handle').on('mousedown', function(e) {
+                    isResizing = true;
+                    resizeDirection = $(this).attr('class').split(' ')[1].split('-')[1];
+                    startWidth = parseInt($element.css('width')) || imgContent.offsetWidth;
+                    startHeight = parseInt($element.css('height')) || imgContent.offsetHeight;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    selectElement(element);
+                    e.stopPropagation();
+                    e.preventDefault();
+                });
+
+                $element.find('.rotate-handle').on('mousedown', function(e) {
+                    isRotating = true;
+                    const rect = element.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
+                    const currentAngle = parseFloat($element.css('transform')?.replace(/[^0-9\-.,]/g, '') ||
+                        0);
+                    startAngle -= currentAngle;
+                    selectElement(element);
+                    e.stopPropagation();
+                    e.preventDefault();
+                });
+
+                $element.find('.delete-btn').on('click', function(e) {
+                    $element.remove();
+                    saveState();
+                    e.stopPropagation();
+                });
+
+                $(document).on('mousemove', function(e) {
+                    if (!selectedElement || selectedElement !== element) return;
+
+                    const boundaryRect = designContent[0].getBoundingClientRect();
+                    const elemRect = element.getBoundingClientRect();
+
+                    if (isDragging) {
+                        let newLeft = e.clientX - boundaryRect.left - startX;
+                        let newTop = e.clientY - boundaryRect.top - startY;
+                        newLeft = Math.max(0, Math.min(newLeft, boundaryRect.width - elemRect.width));
+                        newTop = Math.max(0, Math.min(newTop, boundaryRect.height - elemRect.height));
+                        $element.css({
+                            left: `${newLeft}px`,
+                            top: `${newTop}px`
+                        });
+                    } else if (isResizing) {
+                        const widthChange = e.clientX - startX;
+                        const heightChange = e.clientY - startY;
+                        let newWidth = startWidth,
+                            newHeight = startHeight;
+
+                        if (resizeDirection.includes('e')) newWidth += widthChange;
+                        if (resizeDirection.includes('w')) newWidth -= widthChange;
+                        if (resizeDirection.includes('s')) newHeight += heightChange;
+                        if (resizeDirection.includes('n')) newHeight -= heightChange;
+
+                        if (e.shiftKey) {
+                            const aspectRatio = startWidth / startHeight;
+                            if (Math.abs(widthChange) > Math.abs(heightChange)) {
+                                newHeight = newWidth / aspectRatio;
+                            } else {
+                                newWidth = newHeight * aspectRatio;
+                            }
+                        }
+
+                        newWidth = Math.max(newWidth, 30);
+                        newHeight = Math.max(newHeight, 30);
+
+                        const currentLeft = parseFloat($element.css('left')) || 0;
+                        const currentTop = parseFloat($element.css('top')) || 0;
+                        const maxWidth = boundaryRect.width - currentLeft;
+                        const maxHeight = boundaryRect.height - currentTop;
+                        newWidth = Math.min(newWidth, maxWidth);
+                        newHeight = Math.min(newHeight, maxHeight);
+
+                        $element.css({
+                            width: `${newWidth}px`,
+                            height: `${newHeight}px`
+                        });
+                        $(imgContent).css({
+                            width: '100%',
+                            height: '100%'
+                        });
+
+                        if (resizeDirection.includes('w')) {
+                            const leftChange = startWidth - newWidth;
+                            $element.css('left', `${Math.max(currentLeft + leftChange, 0)}px`);
+                        }
+                        if (resizeDirection.includes('n')) {
+                            const topChange = startHeight - newHeight;
+                            $element.css('top', `${Math.max(currentTop + topChange, 0)}px`);
+                        }
+                    } else if (isRotating) {
+                        const rect = element.getBoundingClientRect();
+                        const centerX = rect.left + rect.width / 2;
+                        const centerY = rect.top + rect.height / 2;
+                        const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
+                        $element.css('transform', `rotate(${angle - startAngle}deg)`);
+                    }
+                });
+
+                $(document).on('mouseup', function() {
+                    if (isDragging || isResizing || isRotating) saveState();
+                    isDragging = isResizing = isRotating = false;
+                });
+            }
+
+            // Text editing setup
+            function setupTextEditing(element) {
+                const $element = $(element);
+                let isDragging = false;
+                let offset = {
+                    x: 0,
+                    y: 0
+                };
+
+                $element.on('mousedown', function(e) {
+                    if ($('#lock-btn').hasClass('active-btn')) return;
+                    isDragging = true;
+                    offset = {
+                        x: e.clientX - element.getBoundingClientRect().left,
+                        y: e.clientY - element.getBoundingClientRect().top
+                    };
+                    $element.css('cursor', 'grabbing');
+                    selectElement(element);
+                    e.preventDefault();
+                });
+
+                $(document).on('mousemove', function(e) {
+                    if (!isDragging) return;
+                    const boundaryRect = designContent[0].getBoundingClientRect();
+                    const newLeft = e.clientX - boundaryRect.left - offset.x;
+                    const newTop = e.clientY - boundaryRect.top - offset.y;
+                    const maxX = boundaryRect.width - element.offsetWidth;
+                    const maxY = boundaryRect.height - element.offsetHeight;
+                    $element.css({
+                        left: `${Math.min(Math.max(newLeft, 0), maxX)}px`,
+                        top: `${Math.min(Math.max(newTop, 0), maxY)}px`
+                    });
+                });
+
+                $(document).on('mouseup', function() {
+                    isDragging = false;
+                    $element.css('cursor', 'grab');
+                    saveState();
+                });
+            }
+
+            // Text input handling
+            $('#text-panel input[type="text"]').on('input', function() {
+                const text = $(this).val();
+                if (!currentTextElement) {
+                    const activeColorOption = $('.color-option.active').css('backgroundImage');
+                    currentTextElement = $('<div>').addClass('text-design').text(text || 'Your Text')
+                        .prop('contentEditable', true)
+                        .css({
+                            position: 'absolute',
+                            left: '50%',
+                            top: '50%',
+                            backgroundImage: activeColorOption,
+                            backgroundClip: 'text',
+                            color: 'transparent',
+                            fontFamily: $('#text-panel select').val(),
+                            fontSize: $('#text-panel input[type="range"]').val() + 'px'
+                        });
+                    designContent.append(currentTextElement);
+                    setupTextEditing(currentTextElement[0]);
+                } else {
+                    currentTextElement.text(text || 'Your Text');
+                }
+                saveState();
+            });
+
+            // Text styling updates
+            $('#text-panel select, #text-panel input[type="range"]').on('change', function() {
+                if (!currentTextElement) return;
+                currentTextElement.css({
+                    fontFamily: $('#text-panel select').val(),
+                    fontSize: $('#text-panel input[type="range"]').val() + 'px'
+                });
+                saveState();
+            });
+
+            // Element selection
+            function selectElement(element) {
+                if (selectedElement) $(selectedElement).removeClass('selected');
+                selectedElement = element;
+                if (element) $(element).addClass('selected');
+            }
+
+            // Save state function
+            function saveState() {
+                saveCurrentViewState();
+                undoStack.push({
+                    src: currentView.attr('src'),
+                    transform: currentView.css('transform'),
+                    zoom: zoomLevel,
+                    offset: {
+                        ...panOffset
+                    },
+                    content: designContent.html()
+                });
+                redoStack.length = 0;
+            }
+
+            // Initialize the design area
+            updateDesignArea('front');
+            $('.view-option[data-view="front"]').trigger('click');
+
+            // Add CSS styles
+            $('<style>').text(`
               .design-boundary {
                   position: absolute;
                   border: 2px dashed #3a86ff;
@@ -3252,6 +3352,6 @@
                   cursor: grabbing;
               }
           `).appendTo('head');
-      });
-  </script>
+        });
+    </script>
 @endsection
