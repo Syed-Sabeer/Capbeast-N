@@ -33,6 +33,7 @@
     <h3>Shipping Details:</h3>
     <p>
         Name: {{ $order->shippingDetails->firstname }} {{ $order->shippingDetails->lastname }} <br>
+        Country: {{ $order->shippingDetails->country }} <br>
         Address: {{ $order->shippingDetails->address }} <br>
         Email: {{ $order->shippingDetails->email }} <br>
         Phone: {{ $order->shippingDetails->phone }}
