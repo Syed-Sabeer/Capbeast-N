@@ -591,20 +591,20 @@
                     </div>
                 </div>
 
-              <!-- Dynamic Options Sidebar -->
-              <div class="col-md-3 sidebar-option p-4">
-                  <!-- Upload Panel -->
-                  <div class="option-panel active" id="upload-panel">
-                      <h4 class="mb-4">Upload Your Design</h4>
-                      <div class="upload-area border rounded p-4 text-center mb-4"
-                          style="background-color: #f8f9fa; border-style: dashed !important;">
-                          <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-muted"></i>
-                          <p>Drag & drop your image here</p>
-                          <p class="small text-muted">or</p>
-                          <button class="btn btn-primary">Browse Files</button>
-                          <p class="small text-muted mt-2">Supports: JPG, PNG, SVG (Max 5MB)</p>
-                      </div>
-                  </div>
+                <!-- Dynamic Options Sidebar -->
+                <div class="col-md-3 sidebar-option p-4">
+                    <!-- Upload Panel -->
+                    <div class="option-panel active" id="upload-panel">
+                        <h4 class="mb-4">Upload Your Design</h4>
+                        <div class="upload-area border rounded p-4 text-center mb-4"
+                            style="background-color: #f8f9fa; border-style: dashed !important;">
+                            <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-muted"></i>
+                            <p>Drag & drop your image here</p>
+                            <p class="small text-muted">or</p>
+                            <button class="btn btn-primary">Browse Files</button>
+                            <p class="small text-muted mt-2">Supports: JPG, PNG, SVG (Max 5MB)</p>
+                        </div>
+                    </div>
 
                     <!-- Text Panel -->
                     <div class="option-panel" id="text-panel">
@@ -695,31 +695,31 @@
                             </div>
 
 
-                          <label class="form-label">Text Style</label>
-                          <div class="text-style-option active">
-                              <div style="font-weight: normal;">Normal</div>
-                          </div>
-                          <div class="text-style-option">
-                              <div style="font-weight: bold;">Bold</div>
-                          </div>
-                          <div class="text-style-option">
-                              <div style="font-style: italic;">Italic</div>
-                          </div>
-                          <div class="text-style-option">
-                              <div style="text-decoration: underline;">Underline</div>
-                          </div>
-                      </div>
-                  </div>
+                            <label class="form-label">Text Style</label>
+                            <div class="text-style-option active">
+                                <div style="font-weight: normal;">Normal</div>
+                            </div>
+                            <div class="text-style-option">
+                                <div style="font-weight: bold;">Bold</div>
+                            </div>
+                            <div class="text-style-option">
+                                <div style="font-style: italic;">Italic</div>
+                            </div>
+                            <div class="text-style-option">
+                                <div style="text-decoration: underline;">Underline</div>
+                            </div>
+                        </div>
+                    </div>
 
-                  <!-- Design Panel -->
-                  <div class="option-panel" id="design-panel">
-                      <h4 class="mb-4">Add Design Elements</h4>
-                      <div class="input-group mb-3">
-                          <input type="text" class="form-control" placeholder="Search designs...">
-                          <button class="btn btn-outline-secondary" type="button">
-                              <i class="fas fa-search"></i>
-                          </button>
-                      </div>
+                    <!-- Design Panel -->
+                    <div class="option-panel" id="design-panel">
+                        <h4 class="mb-4">Add Design Elements</h4>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="Search designs...">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
 
                         <div class="design-grid">
                           @if (isset($customizerDesigns) && count($customizerDesigns) > 0)
@@ -730,16 +730,16 @@
                           @endif
                         </div>
 
-                      <div class="d-flex justify-content-between mt-3">
-                          <button class="btn btn-outline-secondary">
-                              <i class="fas fa-chevron-left"></i> Previous
-                          </button>
-                          <button class="btn btn-outline-secondary">
-                              Next <i class="fas fa-chevron-right"></i>
-                          </button>
-                      </div>
-                  </div>
-              </div>
+                        <div class="d-flex justify-content-between mt-3">
+                            <button class="btn btn-outline-secondary">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </button>
+                            <button class="btn btn-outline-secondary">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Main Content - Hat Preview -->
                 <div class="col-md-7 main-content p-4">
@@ -1298,55 +1298,77 @@
             const designContent = $('<div>').addClass('design-content').appendTo(designArea);
             const boundary = $('<div>').addClass('design-boundary').appendTo(designArea);
 
-          // Boundary configurations
-          const boundaryConfigs = {
-              'front': { top: '20%', left: '50%', width: '60%', height: '40%' },
-              'back': { top: '20%', left: '50%', width: '60%', height: '40%' },
-              'left': { top: '46%', left: '65%', width: '30%', height: '15%' },
-              'right': { top: '46%', left: '35%', width: '30%', height: '15%' }
-          };
+            // Boundary configurations
+            const boundaryConfigs = {
+                'front': {
+                    top: '20%',
+                    left: '50%',
+                    width: '60%',
+                    height: '40%'
+                },
+                'back': {
+                    top: '20%',
+                    left: '50%',
+                    width: '60%',
+                    height: '40%'
+                },
+                'left': {
+                    top: '46%',
+                    left: '65%',
+                    width: '30%',
+                    height: '15%'
+                },
+                'right': {
+                    top: '46%',
+                    left: '35%',
+                    width: '30%',
+                    height: '15%'
+                }
+            };
 
-          // Panel switching functionality
-          $('.sidebar button').on('click', function() {
-              const panelId = $(this).data('panel');
-              $('.sidebar button').removeClass('active');
-              $(this).addClass('active');
-              $('.option-panel').removeClass('active');
-              $('#' + panelId).addClass('active');
-          });
+            // Panel switching functionality
+            $('.sidebar button').on('click', function() {
+                const panelId = $(this).data('panel');
+                $('.sidebar button').removeClass('active');
+                $(this).addClass('active');
+                $('.option-panel').removeClass('active');
+                $('#' + panelId).addClass('active');
+            });
 
-          // Color selection
-          $('.color-option').on('click', function() {
-              const parent = $(this).closest('.color-options');
-              if (parent.length) parent.find('.color-option').removeClass('active');
-              $(this).addClass('active');
+            // Color selection
+            $('.color-option').on('click', function() {
+                const parent = $(this).closest('.color-options');
+                if (parent.length) parent.find('.color-option').removeClass('active');
+                $(this).addClass('active');
 
-              if ($(this).closest('.sidebar .tool-section').length) {
-                  const colorName = $(this).attr('title') || $(this).text();
-                  $('.option-bar span strong').text(colorName);
-              }
+                if ($(this).closest('.sidebar .tool-section').length) {
+                    const colorName = $(this).attr('title') || $(this).text();
+                    $('.option-bar span strong').text(colorName);
+                }
 
-              if (currentTextElement) {
-                  currentTextElement.css('backgroundImage', $(this).css('backgroundImage'));
-                  saveState();
-              }
-          });
+                if (currentTextElement) {
+                    currentTextElement.css('backgroundImage', $(this).css('backgroundImage'));
+                    saveState();
+                }
+            });
 
-          // Text style selection
-          $('.text-style-option').on('click', function() {
-              $('.text-style-option').removeClass('active');
-              $(this).addClass('active');
+            // Text style selection
+            $('.text-style-option').on('click', function() {
+                $('.text-style-option').removeClass('active');
+                $(this).addClass('active');
 
-              if (currentTextElement) {
-                  const textStyle = $('.text-style-option.active div').css(['fontWeight', 'fontStyle', 'textDecoration']);
-                  currentTextElement.css({
-                      fontWeight: textStyle.fontWeight,
-                      fontStyle: textStyle.fontStyle,
-                      textDecoration: textStyle.textDecoration
-                  });
-                  saveState();
-              }
-          });
+                if (currentTextElement) {
+                    const textStyle = $('.text-style-option.active div').css(['fontWeight', 'fontStyle',
+                        'textDecoration'
+                    ]);
+                    currentTextElement.css({
+                        fontWeight: textStyle.fontWeight,
+                        fontStyle: textStyle.fontStyle,
+                        textDecoration: textStyle.textDecoration
+                    });
+                    saveState();
+                }
+            });
 
             // View switching functionality - modified
             $('.view-option').on('click', function() {
@@ -1385,37 +1407,38 @@
                 const view = designState.currentView;
                 designState.views[view].elements = [];
 
-              $('.editable-image, .text-design').each(function() {
-                  const $el = $(this);
-                  const elementData = {
-                      type: $el.hasClass('text-design') ? 'text' : 'image',
-                      content: $el.hasClass('text-design') ? $el.text() : $el.find('img').attr('src'),
-                      position: {
-                          left: parseFloat($el.css('left')) || 0,
-                          top: parseFloat($el.css('top')) || 0
-                      },
-                      size: {
-                          width: parseFloat($el.css('width')) || $el.width(),
-                          height: parseFloat($el.css('height')) || $el.height()
-                      },
-                      rotation: parseFloat($el.css('transform').replace(/[^0-9\-.,]/g, '')) || 0,
-                      styles: {}
-                  };
+                // Capture both image and text elements
+                $('.editable-image, .text-design').each(function() {
+                    const $el = $(this);
+                    const elementData = {
+                        type: $el.hasClass('text-design') ? 'text' : 'image',
+                        content: $el.hasClass('text-design') ? $el.text() : $el.find('img').attr('src'),
+                        position: {
+                            left: parseFloat($el.css('left')) || 0,
+                            top: parseFloat($el.css('top')) || 0
+                        },
+                        size: {
+                            width: parseFloat($el.css('width')) || $el.width(),
+                            height: parseFloat($el.css('height')) || $el.height()
+                        },
+                        rotation: parseFloat($el.css('transform').replace(/[^0-9\-.,]/g, '')) || 0,
+                        styles: {}
+                    };
 
-                  if (elementData.type === 'text') {
-                      elementData.styles = {
-                          fontFamily: $el.css('fontFamily'),
-                          fontSize: $el.css('fontSize'),
-                          color: $el.css('backgroundImage'),
-                          fontWeight: $el.css('fontWeight'),
-                          fontStyle: $el.css('fontStyle'),
-                          textDecoration: $el.css('textDecoration')
-                      };
-                  }
+                    if (elementData.type === 'text') {
+                        elementData.styles = {
+                            fontFamily: $el.css('fontFamily'),
+                            fontSize: $el.css('fontSize'),
+                            color: $el.css('backgroundImage'),
+                            fontWeight: $el.css('fontWeight'),
+                            fontStyle: $el.css('fontStyle'),
+                            textDecoration: $el.css('textDecoration')
+                        };
+                    }
 
-                  designState.views[view].elements.push(elementData);
-              });
-          }
+                    designState.views[view].elements.push(elementData);
+                });
+            }
 
 
             function loadViewState(view) {
@@ -1463,59 +1486,59 @@
                         textDecoration: elementData.styles.textDecoration
                     });
 
-              designContent.append(textDiv);
-              setupTextEditing(textDiv[0]);
-              return textDiv;
-          }
+                designContent.append(textDiv);
+                setupTextEditing(textDiv[0]);
+                return textDiv;
+            }
 
-          // Create image element
-          function createImageElement(elementData) {
-              const imgDiv = $('<div>').addClass('editable-image')
-                  .css({
-                      position: 'absolute',
-                      left: `${elementData.position.left}px`,
-                      top: `${elementData.position.top}px`,
-                      width: `${elementData.size.width}px`,
-                      height: `${elementData.size.height}px`,
-                      transform: `rotate(${elementData.rotation}deg)`
-                  });
+            // Create image element
+            function createImageElement(elementData) {
+                const imgDiv = $('<div>').addClass('editable-image')
+                    .css({
+                        position: 'absolute',
+                        left: `${elementData.position.left}px`,
+                        top: `${elementData.position.top}px`,
+                        width: `${elementData.size.width}px`,
+                        height: `${elementData.size.height}px`,
+                        transform: `rotate(${elementData.rotation}deg)`
+                    });
 
-              const imgContent = $('<img>').attr('src', elementData.content)
-                  .css({
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'contain'
-                  });
+                const imgContent = $('<img>').attr('src', elementData.content)
+                    .css({
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain'
+                    });
 
-              const resizeHandles = createResizeHandles();
-              resizeHandles.forEach(handle => imgDiv.append(handle));
-              imgDiv.append(createDeleteButton());
-              imgDiv.append(createRotateHandle());
-              imgDiv.append(imgContent);
+                const resizeHandles = createResizeHandles();
+                resizeHandles.forEach(handle => imgDiv.append(handle));
+                imgDiv.append(createDeleteButton());
+                imgDiv.append(createRotateHandle());
+                imgDiv.append(imgContent);
 
-              designContent.append(imgDiv);
-              setupImageEditing(imgDiv[0]);
-              return imgDiv;
-          }
+                designContent.append(imgDiv);
+                setupImageEditing(imgDiv[0]);
+                return imgDiv;
+            }
 
-          // Update design area based on view
-          function updateDesignArea(view) {
-              const config = boundaryConfigs[view] || boundaryConfigs.front;
-              boundary.css({
-                  top: config.top,
-                  left: config.left,
-                  width: config.width,
-                  height: config.height,
-                  transform: 'translateX(-50%)'
-              });
+            // Update design area based on view
+            function updateDesignArea(view) {
+                const config = boundaryConfigs[view] || boundaryConfigs.front;
+                boundary.css({
+                    top: config.top,
+                    left: config.left,
+                    width: config.width,
+                    height: config.height,
+                    transform: 'translateX(-50%)'
+                });
 
-              designContent.css({
-                  top: config.top,
-                  left: config.left,
-                  width: config.width,
-                  height: config.height,
-                  transform: 'translateX(-50%)'
-              });
+                designContent.css({
+                    top: config.top,
+                    left: config.left,
+                    width: config.width,
+                    height: config.height,
+                    transform: 'translateX(-50%)'
+                });
 
                 designContent.empty();
                 selectedElement = null;
@@ -1530,21 +1553,24 @@
                       const img = $('<div>').addClass('editable-image');
                       const imgContent = $('<img>').attr({ src: event.target.result, draggable: false });
 
-                      createResizeHandles().forEach(handle => img.append(handle));
-                      img.append(createDeleteButton());
-                      img.append(createRotateHandle());
-                      img.append(imgContent);
-                      designContent.append(img);
+                        createResizeHandles().forEach(handle => img.append(handle));
+                        img.append(createDeleteButton());
+                        img.append(createRotateHandle());
+                        img.append(imgContent);
+                        designContent.append(img);
 
-                      img.css({ left: '50%', top: '50%' });
-                      setupImageEditing(img[0]);
-                      selectElement(img[0]);
-                      saveState();
-                  };
-                  reader.readAsDataURL(file);
-              });
-              input.click();
-          });
+                        img.css({
+                            left: '50%',
+                            top: '50%'
+                        });
+                        setupImageEditing(img[0]);
+                        selectElement(img[0]);
+                        saveState();
+                    };
+                    reader.readAsDataURL(file);
+                });
+                input.click();
+            });
 
             // Design thumbnail selection
             // Fix for design thumbnail boundary constraints
@@ -1605,38 +1631,40 @@
   }
 `).appendTo('head');
 
-          // Helper functions for element creation
-          function createResizeHandles() {
-              return ['nw', 'ne', 'sw', 'se'].map(pos =>
-                  $('<div>').addClass(`resize-handle resize-${pos}`)
-              );
-          }
+            // Helper functions for element creation
+            function createResizeHandles() {
+                return ['nw', 'ne', 'sw', 'se'].map(pos =>
+                    $('<div>').addClass(`resize-handle resize-${pos}`)
+                );
+            }
 
-          function createDeleteButton() {
-              return $('<div>').addClass('delete-btn').html('&times;');
-          }
+            function createDeleteButton() {
+                return $('<div>').addClass('delete-btn').html('&times;');
+            }
 
-          function createRotateHandle() {
-              return $('<div>').addClass('rotate-handle').html('↻');
-          }
+            function createRotateHandle() {
+                return $('<div>').addClass('rotate-handle').html('↻');
+            }
 
-          // Element editing setup
-          function setupImageEditing(element) {
-              const $element = $(element);
-              const imgContent = $element.find('img')[0];
-              let startX, startY, startWidth, startHeight, startAngle;
-              let isDragging = false, isResizing = false, isRotating = false;
-              let resizeDirection = '';
+            // Element editing setup
+            function setupImageEditing(element) {
+                const $element = $(element);
+                const imgContent = $element.find('img')[0];
+                let startX, startY, startWidth, startHeight, startAngle;
+                let isDragging = false,
+                    isResizing = false,
+                    isRotating = false;
+                let resizeDirection = '';
 
-              $element.on('mousedown', function(e) {
-                  if (e.target === element || e.target === imgContent) {
-                      isDragging = true;
-                      startX = e.clientX - element.getBoundingClientRect().left;
-                      startY = e.clientY - element.getBoundingClientRect().top;
-                      selectElement(element);
-                      e.preventDefault();
-                  }
-              });
+                $element.on('mousedown', function(e) {
+                    if (e.target === element || e.target === imgContent) {
+                        isDragging = true;
+                        startX = e.clientX - element.getBoundingClientRect().left;
+                        startY = e.clientY - element.getBoundingClientRect().top;
+                        selectElement(element);
+                        e.preventDefault();
+                    }
+                });
 
                 $element.find('.resize-handle').on('mousedown', function(e) {
                     isResizing = true;
@@ -1653,30 +1681,31 @@
                     e.preventDefault();
                 });
 
-              $element.find('.rotate-handle').on('mousedown', function(e) {
-                  isRotating = true;
-                  const rect = element.getBoundingClientRect();
-                  const centerX = rect.left + rect.width / 2;
-                  const centerY = rect.top + rect.height / 2;
-                  startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
-                  const currentAngle = parseFloat($element.css('transform')?.replace(/[^0-9\-.,]/g, '') || 0);
-                  startAngle -= currentAngle;
-                  selectElement(element);
-                  e.stopPropagation();
-                  e.preventDefault();
-              });
+                $element.find('.rotate-handle').on('mousedown', function(e) {
+                    isRotating = true;
+                    const rect = element.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
+                    const currentAngle = parseFloat($element.css('transform')?.replace(/[^0-9\-.,]/g, '') ||
+                        0);
+                    startAngle -= currentAngle;
+                    selectElement(element);
+                    e.stopPropagation();
+                    e.preventDefault();
+                });
 
-              $element.find('.delete-btn').on('click', function(e) {
-                  $element.remove();
-                  saveState();
-                  e.stopPropagation();
-              });
+                $element.find('.delete-btn').on('click', function(e) {
+                    $element.remove();
+                    saveState();
+                    e.stopPropagation();
+                });
 
-              $(document).on('mousemove', function(e) {
-                  if (!selectedElement || selectedElement !== element) return;
+                $(document).on('mousemove', function(e) {
+                    if (!selectedElement || selectedElement !== element) return;
 
-                  const boundaryRect = designContent[0].getBoundingClientRect();
-                  const elemRect = element.getBoundingClientRect();
+                    const boundaryRect = designContent[0].getBoundingClientRect();
+                    const elemRect = element.getBoundingClientRect();
 
                     if (isDragging) {
                         let newLeft = e.clientX - boundaryRect.left - startX;
@@ -1750,17 +1779,20 @@
                     }
                 });
 
-              $(document).on('mouseup', function() {
-                  if (isDragging || isResizing || isRotating) saveState();
-                  isDragging = isResizing = isRotating = false;
-              });
-          }
+                $(document).on('mouseup', function() {
+                    if (isDragging || isResizing || isRotating) saveState();
+                    isDragging = isResizing = isRotating = false;
+                });
+            }
 
-          // Text editing setup
-          function setupTextEditing(element) {
-              const $element = $(element);
-              let isDragging = false;
-              let offset = { x: 0, y: 0 };
+            // Text editing setup
+            function setupTextEditing(element) {
+                const $element = $(element);
+                let isDragging = false;
+                let offset = {
+                    x: 0,
+                    y: 0
+                };
 
                 $element.on('mousedown', function(e) {
                     // Only allow editing if this is the current view's text
@@ -1782,18 +1814,18 @@
                     }
                 });
 
-              $(document).on('mousemove', function(e) {
-                  if (!isDragging) return;
-                  const boundaryRect = designContent[0].getBoundingClientRect();
-                  const newLeft = e.clientX - boundaryRect.left - offset.x;
-                  const newTop = e.clientY - boundaryRect.top - offset.y;
-                  const maxX = boundaryRect.width - element.offsetWidth;
-                  const maxY = boundaryRect.height - element.offsetHeight;
-                  $element.css({
-                      left: `${Math.min(Math.max(newLeft, 0), maxX)}px`,
-                      top: `${Math.min(Math.max(newTop, 0), maxY)}px`
-                  });
-              });
+                $(document).on('mousemove', function(e) {
+                    if (!isDragging) return;
+                    const boundaryRect = designContent[0].getBoundingClientRect();
+                    const newLeft = e.clientX - boundaryRect.left - offset.x;
+                    const newTop = e.clientY - boundaryRect.top - offset.y;
+                    const maxX = boundaryRect.width - element.offsetWidth;
+                    const maxY = boundaryRect.height - element.offsetHeight;
+                    $element.css({
+                        left: `${Math.min(Math.max(newLeft, 0), maxX)}px`,
+                        top: `${Math.min(Math.max(newTop, 0), maxY)}px`
+                    });
+                });
 
                 $(document).on('mouseup', function() {
                     isDragging = false;
@@ -1858,31 +1890,31 @@
                 saveState();
             });
 
-          // Text styling updates
-          $('#text-panel select, #text-panel input[type="range"]').on('change', function() {
-              if (!currentTextElement) return;
-              currentTextElement.css({
-                  fontFamily: $('#text-panel select').val(),
-                  fontSize: $('#text-panel input[type="range"]').val() + 'px'
-              });
-              saveState();
-          });
+            // Text styling updates
+            $('#text-panel select, #text-panel input[type="range"]').on('change', function() {
+                if (!currentTextElement) return;
+                currentTextElement.css({
+                    fontFamily: $('#text-panel select').val(),
+                    fontSize: $('#text-panel input[type="range"]').val() + 'px'
+                });
+                saveState();
+            });
 
-          // Element selection
-          function selectElement(element) {
-              if (selectedElement) $(selectedElement).removeClass('selected');
-              selectedElement = element;
-              if (element) $(element).addClass('selected');
-          }
+            // Element selection
+            function selectElement(element) {
+                if (selectedElement) $(selectedElement).removeClass('selected');
+                selectedElement = element;
+                if (element) $(element).addClass('selected');
+            }
 
             // Save state function
             function saveState() {
                 saveCurrentViewState();
             }
 
-          // Initialize the design area
-          updateDesignArea('front');
-          $('.view-option[data-view="front"]').trigger('click');
+            // Initialize the design area
+            updateDesignArea('front');
+            $('.view-option[data-view="front"]').trigger('click');
 
             // Add CSS styles
             $('<style>').text(`
