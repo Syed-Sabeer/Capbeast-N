@@ -190,7 +190,7 @@ class AuthController extends Controller
       $cartFromLocalStorage = json_decode($cartCookie, true) ?? [];
       if (empty($cartFromLocalStorage)) {
         Log::error('Cart cookie is empty or not received properly!');
-        return redirect()->route('dashboard'); // Or wherever appropriate
+        return redirect()->route('home'); // Or wherever appropriate
       }
 
       // Only take the first cart item

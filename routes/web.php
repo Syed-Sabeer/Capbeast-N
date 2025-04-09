@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\apps\CustomizerDesignController;
 use App\Http\Controllers\Main\TOSDController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
@@ -247,6 +248,16 @@ foreach ($roles as $role => $prefix) {
           Route::get('/TPS_TaxPrice/{id}/edit', [TPSTaxPricingController::class, 'edit'])->name(Route::prefixed($prefix, 'TPStax_price.edit'));
           Route::put('/TPS_TaxPrice/{id}/update', [TPSTaxPricingController::class, 'update'])->name(Route::prefixed($prefix, 'TPStax_price.update'));
           Route::delete('/TPS_TaxPrice/{id}/delete', [TPSTaxPricingController::class, 'destroy'])->name(Route::prefixed($prefix, 'TPStax_price.destroy'));
+        });
+
+        Route::prefix('/customizer')->group(function () use ($prefix) {
+          //designs
+          Route::get('/designs/list', [CustomizerDesignController::class, 'index'])->name(Route::prefixed($prefix, 'customizer-designs.list'));
+          Route::get('/designs/add', [CustomizerDesignController::class, 'create'])->name(Route::prefixed($prefix, 'customizer-designs.create'));
+          Route::post('/designs/store', [CustomizerDesignController::class, 'store'])->name(Route::prefixed($prefix, 'customizer-designs.store'));
+          Route::get('/designs/edit/{id}', [CustomizerDesignController::class, 'edit'])->name(Route::prefixed($prefix, 'customizer-designs.edit'));
+          Route::put('/designs/update/{id}', [CustomizerDesignController::class, 'update'])->name(Route::prefixed($prefix, 'customizer-designs.update'));
+          Route::delete('/designs/delete/{id}', [CustomizerDesignController::class, 'destroy'])->name(Route::prefixed($prefix, 'customizer-designs.destroy'));
         });
 
 
