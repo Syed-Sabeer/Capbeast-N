@@ -18,7 +18,8 @@ class OrderItem extends Model
         'size',
         'quantity',
         'product_price',
-        
+        'user_customization_id',
+
     ];
 
     public function order()
@@ -36,6 +37,6 @@ class OrderItem extends Model
     {
         return $this->belongsTo(ProductColor::class, 'color_id');
     }
-    
-   
+
+
 }

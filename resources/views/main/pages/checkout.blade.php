@@ -453,7 +453,8 @@
             });
 
             // Checkout function
-            function proceedToCheckout() {
+            function proceedToCheckout(event) {
+              event?.preventDefault();
                 if (confirm('Are you sure you want to proceed to checkout?')) {
                     let checkoutButton = document.getElementById('checkoutButton');
                     checkoutButton.innerHTML =
