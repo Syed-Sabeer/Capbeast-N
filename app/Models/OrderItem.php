@@ -38,5 +38,10 @@ class OrderItem extends Model
         return $this->belongsTo(ProductColor::class, 'color_id');
     }
 
+    public function userCustomization()
+    {
+        return $this->belongsTo(UserCustomization::class, 'user_customization_id');
+    }
+
 
 }

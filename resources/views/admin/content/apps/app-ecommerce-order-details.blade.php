@@ -28,7 +28,6 @@
     {{-- <script src="{{ asset('assets/js/modal-edit-user.js') }}"></script> --}}
     <script src="{{ asset('assets/js/modal-add-new-address.js') }}"></script>
 @endsection
-
 @section('content')
     <h4 class="py-3 mb-2">
         <span class="text-muted fw-light">eCommerce /</span> Order Details
@@ -38,13 +37,13 @@
 
         <div class="d-flex flex-column justify-content-center gap-2 gap-sm-0">
             <h5 class="mb-1 mt-3 d-flex flex-wrap gap-2 align-items-end">Order #{{ $order->order_id }}
-                    {{-- <span class="badge bg-label-success">Paid</span>  --}}
-                    @if ($latestStatus && $latestStatus->internalStatus)
-            <span class="badge bg-label-info">{{ $latestStatus->internalStatus->title }}</span>
-        @else
-            <span class="badge bg-label-warning">No Status Set</span>
-        @endif
-                  </h5>
+                {{-- <span class="badge bg-label-success">Paid</span>  --}}
+                @if ($latestStatus && $latestStatus->internalStatus)
+                    <span class="badge bg-label-info">{{ $latestStatus->internalStatus->title }}</span>
+                @else
+                    <span class="badge bg-label-warning">No Status Set</span>
+                @endif
+            </h5>
             <p class="text-body">
                 Date: {{ \Carbon\Carbon::parse($order->created_at)->format('F j, Y') }}
                 {{-- Time: <span id="orderYear">{{ \Carbon\Carbon::parse($order->created_at)->timezone('America/New_York')->format('g:i A') }}</span> (ET) --}}
@@ -85,7 +84,8 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-start align-items-center mb-4">
                                 <div class="avatar me-2">
-                                    <img src="{{ asset('assets/img/avatars/1.png') }}" alt="Avatar" class="rounded-circle">
+                                    <img src="{{ asset('assets/img/avatars/1.png') }}" alt="Avatar"
+                                        class="rounded-circle">
                                 </div>
                                 <div class="d-flex flex-column">
                                     <a href="{{ url('app/user/view/account') }}" class="text-body text-nowrap">
@@ -100,7 +100,8 @@
                                 <span
                                     class="avatar rounded-circle bg-label-success me-2 d-flex align-items-center justify-content-center"><i
                                         class='ti ti-shopping-cart ti-sm'></i></span>
-                                        <h6 class="text-body text-nowrap mb-0">{{ $order->user->orders->count() }} Orders Placed</h6>
+                                <h6 class="text-body text-nowrap mb-0">{{ $order->user->orders->count() }} Orders Placed
+                                </h6>
 
                             </div>
                             <div class="d-flex justify-content-between">
@@ -130,8 +131,8 @@
                                 {{ $order->ShippingDetails->email }}</p>
                             <p class="mb-0"><Span style="font-weight: bold">Phone:</Span>
                                 {{ $order->ShippingDetails->phone }}</p>
-                                <p class="mb-0"><Span style="font-weight: bold">Country:</Span>
-                                    {{ $order->ShippingDetails->country }}</p>
+                            <p class="mb-0"><Span style="font-weight: bold">Country:</Span>
+                                {{ $order->ShippingDetails->country }}</p>
                             <p class="mb-0"><Span style="font-weight: bold">Address:</Span>
                                 {{ $order->ShippingDetails->address }}</p>
                             <p class="mb-0"><Span style="font-weight: bold">Additional Info:</Span>
@@ -142,27 +143,29 @@
 
                 <!-- Order Details Card -->
                 <div class="col-md-4 col-lg-2">
-                  <div class="mb-6">
-                      <label for="select2Basic" class="form-label">Update Internal Status</label>
-                      <form action="{{ route($prefix .'.order-status.update', $order->id) }}" method="POST">
-                          @csrf
-                          <select name="internal_status_id" id="select2Basic" class="select2 form-select form-select-lg">
-                              <option value="">Select Status</option>
-                              @foreach ($statuses as $status)
-                                  <option value="{{ $status->id }}"
-                                      {{ old('internal_status_id', optional($order->internalStatus)->id) == $status->id ? 'selected' : '' }}>
-                                      {{ $status->title }}
-                                      @if ($status->trashed()) <span class="text-muted">(Deleted)</span> @endif
-                                  </option>
-                              @endforeach
-                          </select>
-                          <button type="submit" class="btn btn-primary mt-2">Update Status</button>
-                      </form>
-                <div class="mt-5">
-                      <a href="{{ route($prefix.'.content-internal-status-list') }}" >Add New Status Name</a>
+                    <div class="mb-6">
+                        <label for="select2Basic" class="form-label">Update Internal Status</label>
+                        <form action="{{ route($prefix . '.order-status.update', $order->id) }}" method="POST">
+                            @csrf
+                            <select name="internal_status_id" id="select2Basic" class="select2 form-select form-select-lg">
+                                <option value="">Select Status</option>
+                                @foreach ($statuses as $status)
+                                    <option value="{{ $status->id }}"
+                                        {{ old('internal_status_id', optional($order->internalStatus)->id) == $status->id ? 'selected' : '' }}>
+                                        {{ $status->title }}
+                                        @if ($status->trashed())
+                                            <span class="text-muted">(Deleted)</span>
+                                        @endif
+                                    </option>
+                                @endforeach
+                            </select>
+                            <button type="submit" class="btn btn-primary mt-2">Update Status</button>
+                        </form>
+                        <div class="mt-5">
+                            <a href="{{ route($prefix . '.content-internal-status-list') }}">Add New Status Name</a>
+                        </div>
                     </div>
-                  </div>
-              </div>
+                </div>
 
 
             </div>
@@ -198,14 +201,34 @@
                                     <td>
                                         {{ $item->color->color_name_2 ? $item->color->color_name_1 . ' & ' . $item->color->color_name_2 : $item->color->color_name_1 }}
                                     </td>
-
-
-                                    <td>{{ $item->product_price}} $</td>
-
-
-
+                                    <td>{{ $item->product_price }} $</td>
                                 </tr>
-
+                                @if (isset($item->userCustomization))
+                                  <tr>
+                                      <td></td>
+                                      <td></td>
+                                      <td>
+                                        @if ($item->userCustomization->front_image)
+                                          <img style="width: 50px;" src="{{asset($item->userCustomization->front_image)}}" alt="Front Image">
+                                        @endif
+                                      </td>
+                                      <td>
+                                        @if ($item->userCustomization->left_image)
+                                          <img style="width: 50px;" src="{{asset($item->userCustomization->left_image)}}" alt="Left Image">
+                                        @endif
+                                      </td>
+                                      <td>
+                                        @if ($item->userCustomization->right_image)
+                                          <img style="width: 50px;" src="{{asset($item->userCustomization->right_image)}}" alt="Right Image">
+                                        @endif
+                                      </td>
+                                      <td>
+                                        @if ($item->userCustomization->back_image)
+                                          <img style="width: 50px;" src="{{asset($item->userCustomization->back_image)}}" alt="Back Image">
+                                        @endif
+                                      </td>
+                                  </tr>
+                                @endif
                             @endforeach
                         </tbody>
 
@@ -217,21 +240,25 @@
                                 <span class="w-px-100 text-heading">Subtotal:</span>
                                 <h6 class="mb-0">${{ $order->subtotal_price }}</h6>
                             </div>
-                            @if($order->TaxDetails)
-                            @if($order->TaxDetails->tvq_tax_percentage)
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="w-px-200 text-heading">TVQ Tax {{ $order->TaxDetails->tvq_tax_percentage }}% ({{ $order->TaxDetails->tvq_tax_no }}) :</span>
-                                    <h6 class="mb-0">${{ $order->TaxDetails->tvq_tax_price }}</h6>
-                                </div>
-                            @endif
+                            @if ($order->TaxDetails)
+                                @if ($order->TaxDetails->tvq_tax_percentage)
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="w-px-200 text-heading">TVQ Tax
+                                            {{ $order->TaxDetails->tvq_tax_percentage }}%
+                                            ({{ $order->TaxDetails->tvq_tax_no }}) :</span>
+                                        <h6 class="mb-0">${{ $order->TaxDetails->tvq_tax_price }}</h6>
+                                    </div>
+                                @endif
 
-                            @if($order->TaxDetails->tps_tax_percentage)
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="w-px-200 text-heading">TPS Tax {{ $order->TaxDetails->tps_tax_percentage }}% ({{ $order->TaxDetails->tps_tax_no }}) :</span>
-                                    <h6 class="mb-0">${{ $order->TaxDetails->tps_tax_price }}</h6>
-                                </div>
+                                @if ($order->TaxDetails->tps_tax_percentage)
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="w-px-200 text-heading">TPS Tax
+                                            {{ $order->TaxDetails->tps_tax_percentage }}%
+                                            ({{ $order->TaxDetails->tps_tax_no }}) :</span>
+                                        <h6 class="mb-0">${{ $order->TaxDetails->tps_tax_price }}</h6>
+                                    </div>
+                                @endif
                             @endif
-                        @endif
 
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="w-px-100 text-heading">Discount:</span>
@@ -272,7 +299,8 @@
                                             <h6 class="mb-0">{{ $internalStatus->title ?? 'Unknown Status' }}</h6>
                                             <span class="text-muted">{{ $status->updated_at->format('l h:i A') }}</span>
                                         </div>
-                                        <p class="mt-2 mb-0">{{ $internalStatus->description ?? 'No description available' }}</p>
+                                        <p class="mt-2 mb-0">
+                                            {{ $internalStatus->description ?? 'No description available' }}</p>
                                     </div>
                                 </li>
                             @else
@@ -284,7 +312,8 @@
                                             <h6 class="mb-0">{{ $internalStatus->title ?? 'Unknown Status' }}</h6>
                                             <span class="text-muted">{{ $status->updated_at->format('l h:i A') }}</span>
                                         </div>
-                                        <p class="mt-2">{{ $internalStatus->description ?? 'No description available' }}</p>
+                                        <p class="mt-2">{{ $internalStatus->description ?? 'No description available' }}
+                                        </p>
                                     </div>
                                 </li>
                             @endif
@@ -308,26 +337,21 @@
 
                         <div class="mb-2 d-flex align-items-center"> <!-- Use d-flex to align items horizontally -->
                             <!-- Dynamic icon based on file type -->
-                            @if (in_array($fileExtension, [ 'png']))
-                            <img width="45" src="{{ asset('assetsCommon/svgs/png.svg') }}" alt="">
-
+                            @if (in_array($fileExtension, ['png']))
+                                <img width="45" src="{{ asset('assetsCommon/svgs/png.svg') }}" alt="">
                             @elseif(in_array($fileExtension, ['pdf']))
                                 <img width="45" src="{{ asset('assetsCommon/svgs/pdf.svg') }}" alt="">
-                                @elseif(in_array($fileExtension, ['doc','docx']))
+                            @elseif(in_array($fileExtension, ['doc', 'docx']))
                                 <img width="45" src="{{ asset('assetsCommon/svgs/doc.svg') }}" alt="">
-
-
-                                @elseif(in_array($fileExtension, ['xls','xlsm','xlsx','xltx']))
+                            @elseif(in_array($fileExtension, ['xls', 'xlsm', 'xlsx', 'xltx']))
                                 <img width="45" src="{{ asset('assetsCommon/svgs/excel.svg') }}" alt="">
-
-                                @elseif(in_array($fileExtension, ['jpg', 'jpeg',]))
+                            @elseif(in_array($fileExtension, ['jpg', 'jpeg']))
                                 <img width="45" src="{{ asset('assetsCommon/svgs/jpg.svg') }}" alt="">
-
                             @elseif(in_array($fileExtension, ['zip']))
-                            <img width="45" src="{{ asset('assetsCommon/svgs/zip.svg') }}" alt="">
-
+                                <img width="45" src="{{ asset('assetsCommon/svgs/zip.svg') }}" alt="">
                             @else
-                            <img width="45" src="{{ asset('assetsCommon/svgs/defaultfile.svg') }}" alt="">
+                                <img width="45" src="{{ asset('assetsCommon/svgs/defaultfile.svg') }}"
+                                    alt="">
                             @endif
 
                             <div class="ms-3"> <!-- Add margin-left for spacing between the image and text -->
@@ -348,44 +372,43 @@
 
 
             </div>
-          </div>
-
         </div>
 
-            <div class="modal fade" id="fileUploadModal" tabindex="-1" aria-labelledby="fileUploadModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="fileUploadModalLabel">Upload File</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                        </div>
-                        <form action="{{ route($prefix .'.order.file.upload', $order->id) }}" method="POST"
-                            enctype="multipart/form-data">
-                            @csrf
-                            <div class="modal-body">
-                                <!-- Title Field -->
-                                <div class="mb-3">
-                                    <label for="title" class="form-label">Title</label>
-                                    <input type="text" class="form-control" id="title" name="title"
-                                        placeholder="Enter file title" required>
-                                </div>
-                                <!-- File Input Field -->
-                                <div class="mb-3">
-                                    <label for="file" class="form-label">Select File</label>
-                                    <input type="file" class="form-control" id="file" name="file" required>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Upload</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+    </div>
 
-            {{-- @include('admin._partials/_modals/modal-edit-user')
+    <div class="modal fade" id="fileUploadModal" tabindex="-1" aria-labelledby="fileUploadModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="fileUploadModalLabel">Upload File</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route($prefix . '.order.file.upload', $order->id) }}" method="POST"
+                    enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <!-- Title Field -->
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title"
+                                placeholder="Enter file title" required>
+                        </div>
+                        <!-- File Input Field -->
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Select File</label>
+                            <input type="file" class="form-control" id="file" name="file" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- @include('admin._partials/_modals/modal-edit-user')
             @include('admin._partials/_modals/modal-add-new-address') --}}
-        @endsection
+@endsection
