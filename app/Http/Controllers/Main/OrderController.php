@@ -34,6 +34,7 @@ use PayPal\Api\Payment;
 use PayPal\Api\RedirectUrls;
 use PayPal\Api\Transaction;
 use PayPal\Api\PaymentExecution;
+use PayPal\Exception\PPConnectionException;
 
 class OrderController extends Controller
 {
@@ -42,38 +43,52 @@ class OrderController extends Controller
   public function __construct()
   {
     $paypal = config('paypal');
+    Log::info('PayPal Configuration:', [
+      'client_id' => $paypal['client_id'],
+      'mode' => $paypal['settings']['mode'],
+      'env_client_id' => env('PAYPAL_CLIENT_ID'),
+      'env_secret' => env('PAYPAL_SECRET'),
+      'env_mode' => env('PAYPAL_MODE')
+    ]);
+
     $this->_api_context = new ApiContext(new OAuthTokenCredential($paypal['client_id'], $paypal['secret']));
     $this->_api_context->setConfig($paypal['settings']);
   }
 
   public function PostPaymentWithPaypal($totalPrice)
   {
-    $payer = new Payer();
-    $payer->setPaymentMethod('paypal');
-
-    $amount = new Amount();
-    $amount->setTotal((float)$totalPrice);
-    $amount->setCurrency('USD');
-
-    $transaction = new Transaction();
-    $transaction->setAmount($amount);
-
-    $redirectUrls = new RedirectUrls();
-    $redirectUrls->setReturnUrl(URL::route('status'))
-      ->setCancelUrl(URL::route('status'));
-
-    $payment = new Payment();
-    $payment->setIntent('sale')
-      ->setPayer($payer)
-      ->setTransactions([$transaction])
-      ->setRedirectUrls($redirectUrls);
-
     try {
+      $payer = new Payer();
+      $payer->setPaymentMethod('paypal');
+
+      $amount = new Amount();
+      $amount->setTotal((float)$totalPrice);
+      $amount->setCurrency('USD');
+
+      $transaction = new Transaction();
+      $transaction->setAmount($amount);
+
+      $redirectUrls = new RedirectUrls();
+      $redirectUrls->setReturnUrl(URL::route('status'))
+        ->setCancelUrl(URL::route('status'));
+
+      $payment = new Payment();
+      $payment->setIntent('sale')
+        ->setPayer($payer)
+        ->setTransactions([$transaction])
+        ->setRedirectUrls($redirectUrls);
+
+      Log::info('Creating PayPal payment with context:', [
+        'total_price' => $totalPrice,
+        'currency' => 'USD',
+        'mode' => config('paypal.settings.mode')
+      ]);
+
       $payment->create($this->_api_context);
       Log::info("PayPal Payment Created: " . json_encode($payment));
-    } catch (\PayPal\Exception\PPConnectionException $ex) {
+    } catch (\Exception $ex) {
       Log::error("PayPal Error: " . $ex->getMessage());
-      Session::put('error', 'Connection timeout');
+      Session::put('error', 'Payment failed: ' . $ex->getMessage());
       return Redirect::route('checkout');
     }
 
