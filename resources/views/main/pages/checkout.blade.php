@@ -133,9 +133,9 @@
                             const rateUSD = rate.price_usd || (rate.total * 0.75);
                             shippingHtml += `
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input shipping-method-radio" type="radio" 
-                                        name="shipping_method" 
-                                        value="${rate.postage_type_id}" 
+                                    <input class="form-check-input shipping-method-radio" type="radio"
+                                        name="shipping_method"
+                                        value="${rate.postage_type_id}"
                                         id="shipping_${rate.postage_type_id}"
                                         data-price="${rateUSD}"
                                         data-price-usd="${rateUSD}"
@@ -520,7 +520,7 @@
                                             <th scope="col">Quantity</th>
                                             <th scope="col">Item Price</th>
                                             <th scope="col">Cust. Price</th>
-
+                                            <th scope="col">Pompom Price</th>
                                             <th scope="col">Total</th>
                                         </tr>
                                     </thead>
@@ -535,28 +535,11 @@
                                                     ? $item->userCustomization->price
                                                     : 0;
                                                 $pompomPrice = isset($item->pompom_price) ? $item->pompom_price : 0;
-                                                $printingPrice = isset($item->printing_price)
-                                                    ? $item->printing_price
-                                                    : 0;
-                                                $deliveryPrice = isset($item->delivery_price)
-                                                    ? $item->delivery_price
-                                                    : 0;
-
-                                                // Calculate base price components
-                                                $basePrice = $item->product->selling_price;
-                                                $totalCustomizationPrice = $customizationPrice * $item->quantity;
-                                                $totalPompomPrice = $pompomPrice * $item->quantity;
-                                                $totalPrintingPrice = $printingPrice * $item->quantity;
-                                                $totalDeliveryPrice = $deliveryPrice * $item->quantity;
-
-                                                // Calculate item total
                                                 $itemTotal =
-                                                    $basePrice * $item->quantity +
-                                                    $totalCustomizationPrice +
-                                                    $totalPompomPrice +
-                                                    $totalPrintingPrice +
-                                                    $totalDeliveryPrice;
-
+                                                    ($item->product->selling_price +
+                                                        $customizationPrice +
+                                                        $pompomPrice) *
+                                                    $item->quantity;
                                                 $subtotal += $itemTotal;
                                             @endphp
 
@@ -591,12 +574,12 @@
                                                                                     ($item->userCustomization->back_image ?? 'ProductImages/default.jpg'))),
                                                                     ) }}"
                                                                         alt="" class="avatar-lg ">
-                                                                @else
-                                                                    <img src="{{ asset(
-                                                                        'storage/' .
-                                                                            ($item->color->front_image ??
-                                                                                ($item->color->right_image ??
-                                                                                    ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg')))),
+                                                              @else
+                                                                <img src="{{ asset(
+                                                                    'storage/' .
+                                                                        ($item->color->front_image ??
+                                                                            ($item->color->right_image ??
+                                                                                ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg')))),
                                                                     ) }}"
                                                                         alt="" class="avatar-lg ">
                                                                 @endif
@@ -633,11 +616,14 @@
 >>>>>>> e798c5c (working on checkout page need to modify shipping api for canada)
                                                 </td>
                                                 <td class="text-end">
-                                                    ${{ number_format($customizationPrice, 2) }}
+                                                    ${{ $customizationPrice }}
                                                 </td>
 
                                                 <td class="text-end">
-                                                    ${{ number_format($itemTotal, 2) }}
+                                                    ${{ $pompomPrice }}
+                                                </td>
+                                                <td class="text-end">
+                                                    ${{ ($item->product->selling_price + $customizationPrice + $pompomPrice) * $item->quantity }}
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -691,7 +677,7 @@
                                 <div class="row mb-4">
                                     <div class="col-md-6">
                                         <div data-mdb-input-init class="form-outline">
-                                            <label class="form-label" for="country">Country *</label>
+                                    <label class="form-label" for="country">Country *</label>
                                             <select id="country" name="country" class="form-control" required>
                                                 <option value="">Select Country</option>
                                                 @foreach ($countries as $code => $name)
@@ -987,87 +973,139 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Initial update
-            updateTaxAndTotal(getSubtotal(), 0, 0);
+    $('#address, #country').on('change', calculateShippingLive);
 
-            // Handle shipping calculation
-            $('#address, #country').on('change', calculateShippingLive);
+    function calculateShippingLive() {
+        const country = $('#country').val();
+        const postalCode = $('#address').val();
 
-            function calculateShippingLive() {
-                const country = $('#country').val();
-                const postalCode = $('#address').val();
+        // Prepare products data
+        const products = cartItems?.map(item => {
+            const product = item.product;
 
-                // Prepare products data
-                const products = cartItems?.map(item => {
-                    const product = item.product;
-                    return {
-                        weight: product.weight || 3,
-                        weight_unit: 'kg',
-                        length: product.length || 3,
-                        width: product.width || 3,
-                        height: product.height || 3,
-                        size_unit: 'cm',
-                        quantity: item.quantity
-                    };
-                }).filter(item => item !== null);
+            // Handle missing product data (dimensions or weight)
+            if (!product.weight || !product.length || !product.width || !product.height) {
+                console.log("Missing product data:", product);
 
-                if (products.length === 0) {
-                    alert("No items in the cart to calculate shipping.");
-                    return;
-                }
+                // Default to zero if any product data is missing
+                product.weight = product.weight || 3;
+                product.weight_unit = product.weight_unit || 'kg';
+                product.length = product.length || 3;
+                product.width = product.width || 3;
+                product.height = product.height || 3;
+                product.size_unit = product.size_unit || 'cm';
+                product.quantity = product.quantity || 1;
 
-                if (!country || !postalCode) return;
-
-                fetch("{{ route('shipping.calculate') }}", {
-                        method: "POST",
-                        headers: {
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            destination: {
-                                country: country,
-                                postal_code: postalCode
-                            },
-                            products: products
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success && data.shipping?.data?.length) {
-                            const shippingAmount = data.shipping.data[0].rate;
-                            document.getElementById('shipping-amount').textContent = shippingAmount.toFixed(2);
-                            updateTaxAndTotal(getSubtotal(), appliedDiscount, shippingAmount);
-                        } else {
-                            alert("Shipping rate unavailable for selected address.");
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        alert("Error calculating shipping.");
-                    });
+                alert("Product data was incomplete, using default values.");
             }
 
-            // Handle coupon application
+            return {
+                weight: product.weight,
+                weight_unit: 'kg',
+                length: product.length,
+                width: product.width,
+                height: product.height,
+                size_unit: 'cm',
+                quantity: item.quantity
+            };
+                }).filter(item => item !== null); // Filter out null items
+
+        if (products.length === 0) {
+            alert("No items in the cart to calculate shipping.");
+            return;
+        }
+
+        // Validate country and postal code
+        if (!country || !postalCode) return;
+
+        // Fetch shipping data
+        fetch("{{ route('shipping.calculate') }}", {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                destination: {
+                    country: country,
+                    postal_code: postalCode
+                },
+                products: products
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.shipping?.data?.length) {
+                const shippingAmount = data.shipping.data[0].rate;
+                document.getElementById('shipping-amount').textContent = shippingAmount.toFixed(2);
+                updateTaxAndTotal(getSubtotal(), appliedDiscount, shippingAmount);
+            } else {
+                alert("Shipping rate unavailable for selected address.");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Error calculating shipping.");
+        });
+    }
+
+            function updateTaxAndTotal(subtotal, appliedDiscount = 0, shipping = 0) {
+                let TPStaxElement = document.querySelector('.tps-cart-tax');
+                let TVQtaxElement = document.querySelector('.tvq-cart-tax');
+                let totalElement = document.querySelector('.cart-total');
+
+                let TPStaxPercentage = parseFloat(TPStaxElement.getAttribute('tps-data-tax')) || 0;
+                let TVQtaxPercentage = parseFloat(TVQtaxElement.getAttribute('tvq-data-tax')) || 0;
+
+                let discountedTotal = subtotal - appliedDiscount;
+                if (discountedTotal < 0) discountedTotal = 0;
+
+                let userCountry = $('#country').val();
+
+                let TPStaxAmount = userCountry === "CA" ? (discountedTotal * TPStaxPercentage) / 100 : 0;
+                let TVQtaxAmount = userCountry === "CA" ? (discountedTotal * TVQtaxPercentage) / 100 : 0;
+                let finalTotal = discountedTotal + TPStaxAmount + TVQtaxAmount + shipping;
+
+                document.getElementById('tps-tax-amount').textContent = TPStaxAmount.toFixed(2);
+                document.getElementById('tvq-tax-amount').textContent = TVQtaxAmount.toFixed(2);
+                document.getElementById('final-total-amount').textContent = finalTotal.toFixed(2);
+
+                console.log("User Country:", userCountry);
+                console.log("Discount Id:", discountId);
+                console.log("Subtotal: $" + subtotal.toFixed(2));
+                console.log("Applied Discount: $" + appliedDiscount.toFixed(2));
+                console.log("TPS Tax Amount: $" + TPStaxAmount.toFixed(2));
+                console.log("TVQ Tax Amount: $" + TVQtaxAmount.toFixed(2));
+                console.log("Total after Tax: $" + finalTotal.toFixed(2));
+            }
+
+            function getSubtotal() {
+                let subtotalElement = document.querySelector('.cart-subtotal');
+                return parseFloat(subtotalElement.innerText.replace(/[^0-9.]/g, '')) || 0;
+            }
+
+            updateTaxAndTotal(getSubtotal(), 0, 0);
+
             document.getElementById('applyCoupon').addEventListener('click', function() {
                 let couponCode = document.getElementById('couponCode').value;
 
                 fetch("{{ route('apply.discount') }}", {
-                        method: "POST",
-                        headers: {
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            coupon_code: couponCode
-                        })
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        coupon_code: couponCode
                     })
+                })
                     .then(response => response.json())
                     .then(result => {
                         if (result.success) {
                             alert(result.message);
                             appliedDiscount = parseFloat(result.discount) || 0;
                             discountId = result.discountId ?? null;
+
                             document.getElementById('discount-amount').textContent = appliedDiscount
                                 .toFixed(2);
                             updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(document
@@ -1130,13 +1168,13 @@
                     };
 
                     fetch("{{ route('checkout.add') }}", {
-                            method: "POST",
-                            headers: {
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(formData),
-                        })
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(formData),
+                    })
                         .then(response => response.json())
                         .then(result => {
                             if (result.success) {
