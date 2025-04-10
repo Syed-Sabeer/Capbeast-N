@@ -17,6 +17,7 @@ use App\Models\DiscountCoupon;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 use App\Models\OrderShippingDetail;
+use App\Models\OrderShippingRate;
 use App\Models\OrderArtwork;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -52,13 +53,7 @@ class OrderController extends Controller
 
     $amount = new Amount();
     $amount->setTotal((float)$totalPrice);
-
-
-    $currency = 'USD';
-
-    $amount->setCurrency($currency);
-
-    // $amount->setCurrency('CAD');
+    $amount->setCurrency('USD');
 
     $transaction = new Transaction();
     $transaction->setAmount($amount);
@@ -119,7 +114,10 @@ class OrderController extends Controller
       $TVQtaxNumber = session('checkout_details')['tvq_tax_no'] ?? 0;
       $TPStaxPercentage = session('checkout_details')['tps_tax_percentage'] ?? 0;
       $TVQtaxPercentage = session('checkout_details')['tvq_tax_percentage'] ?? 0;
-      $discount = session('checkout_details')['discount'] ?? null;
+      $shippingPrice = session('checkout_details')['shipping_price'] ?? 0;
+      $shippingMethod = session('checkout_details')['shipping_method'] ?? '';
+      $shippingService = session('checkout_details')['shipping_service'] ?? '';
+      $shippingEstimatedDays = session('checkout_details')['shipping_estimated_days'] ?? '';
 
       $payment = Payment::get($paymentId, $this->_api_context);
       $execution = new PaymentExecution();
@@ -135,102 +133,102 @@ class OrderController extends Controller
 
         DB::beginTransaction();
 
-        // Create Order
-        $order = Order::create([
-          'order_id' => $this->generateOrderId(),
-          'user_id' => auth()->id(),
-          'discount_id' => $discountId,
-          'total_price' => $totalPrice,
-          'subtotal_price' => $subtotalPrice,
-          'discount_price' => $discountAmount,
-          'status' => 0,
-        ]);
-
-        $country = session('checkout_details')['country'] ?? null;
-        if (($TPStaxAmount > 0 || $TVQtaxAmount > 0) && $country === 'CA') {
-
-
-          OrderTaxDetails::create([
-            'order_id' => $order->id,
-            'tps_tax_no' => $TPStaxNumber,
-            'tps_tax_percentage' => $TPStaxPercentage,
-            'tps_tax_price' => $TPStaxAmount,
-            'tvq_tax_no' => $TVQtaxNumber,
-            'tvq_tax_percentage' => $TVQtaxPercentage,
-            'tvq_tax_price' => $TVQtaxAmount,
+        try {
+          // Create Order with basic shipping price
+          $order = Order::create([
+            'order_id' => $this->generateOrderId(),
+            'user_id' => auth()->id(),
+            'discount_id' => $discountId,
+            'total_price' => $totalPrice,
+            'subtotal_price' => $subtotalPrice,
+            'discount_price' => $discountAmount,
+            'shipping_price' => $shippingPrice,
+            'shipping_method' => $shippingMethod,
+            'shipping_service' => $shippingService,
+            'shipping_estimated_days' => $shippingEstimatedDays,
+            'status' => 0,
           ]);
-        }
 
-
-        // Create Shipping Details
-        OrderShippingDetail::create([
-          'order_id' => $order->id,
-          'firstname' => $checkoutDetails['firstname'],
-          'lastname' => $checkoutDetails['lastname'],
-          'companyname' => $checkoutDetails['companyname'],
-          'country' => $checkoutDetails['country'],
-          'address' => $checkoutDetails['address'],
-          'email' => $checkoutDetails['email'],
-          'phone' => $checkoutDetails['phone'],
-          'additional_info' => $checkoutDetails['additional_info'],
-        ]);
-
-        // Insert Order Items
-        Log::info('Order Items: ' . json_encode($checkoutDetails['cart_items']));
-        // foreach ($checkoutDetails['cart_items'] as $item) {
-        //   $orderItem = OrderItem::create([
-        //     'order_id' => $order->id,
-        //     'product_id' => $item->product_id,
-        //     'user_customization_id ' => $item->user_customization->id,
-        //     'color_id' => $item->color_id,
-        //     'size' => $item->size,
-        //     'quantity' => $item->quantity,
-        //     'product_price' => $item->product->selling_price,
-        //   ]);
-        // }
-
-        // Retrieve cart items from database with necessary relationships
-        $cartItemIds = $checkoutDetails['cart_item_ids'] ?? [];
-        $cartItems = Cart::with(['product', 'color', 'userCustomization', 'printing'])
-          ->whereIn('id', $cartItemIds)
-          ->get();
-        Log::info('Order Items 2: ' . $cartItems);
-        foreach ($cartItems as $item) {
-          OrderItem::create([
-            'order_id' => $order->id,
-            'product_id' => $item->product_id,
-            'color_id' => $item->color_id,
-            'user_customization_id' => $item->userCustomization ? $item->userCustomization->id : null, // Fixed typo and added null check
-            'size' => $item->size,
-            'quantity' => $item->quantity,
-            'product_price' => $item->product->selling_price,
-          ]);
-        }
-
-        // Clear Cart
-        // Cart::where('user_id', auth()->id())->delete();
-        // Remove cart_id from UserCustomization records
-        $userId = auth()->id();
-        $cartItems = Cart::where('user_id', $userId)->get();
-
-        foreach ($cartItems as $cart) {
-          if ($cart->userCustomization) {
-            $cart->userCustomization->update(['cart_id' => null]);
+          // Create shipping rate record
+          if ($shippingMethod) {
+            OrderShippingRate::create([
+              'order_id' => $order->id,
+              'postage_type_id' => $shippingMethod,
+              'postage_type' => $shippingService,
+              'shipping_price' => $shippingPrice,
+              'delivery_days' => $shippingEstimatedDays,
+              'service_name' => $shippingService,
+              'rate_details' => session('checkout_details.shipping_rate_details', [])
+            ]);
           }
+
+          $country = session('checkout_details')['country'] ?? null;
+          if (($TPStaxAmount > 0 || $TVQtaxAmount > 0) && $country === 'CA') {
+            OrderTaxDetails::create([
+              'order_id' => $order->id,
+              'tps_tax_no' => $TPStaxNumber,
+              'tps_tax_percentage' => $TPStaxPercentage,
+              'tps_tax_price' => $TPStaxAmount,
+              'tvq_tax_no' => $TVQtaxNumber,
+              'tvq_tax_percentage' => $TVQtaxPercentage,
+              'tvq_tax_price' => $TVQtaxAmount,
+            ]);
+          }
+
+          // Create Shipping Details
+          OrderShippingDetail::create([
+            'order_id' => $order->id,
+            'firstname' => $checkoutDetails['firstname'],
+            'lastname' => $checkoutDetails['lastname'],
+            'companyname' => $checkoutDetails['companyname'],
+            'country' => $checkoutDetails['country'],
+            'address' => $checkoutDetails['address'],
+            'email' => $checkoutDetails['email'],
+            'phone' => $checkoutDetails['phone'],
+            'additional_info' => $checkoutDetails['additional_info'],
+          ]);
+
+          // Insert Order Items
+          $cartItemIds = $checkoutDetails['cart_item_ids'] ?? [];
+          $cartItems = Cart::with(['product', 'color', 'userCustomization', 'printing'])
+            ->whereIn('id', $cartItemIds)
+            ->get();
+
+          foreach ($cartItems as $item) {
+            OrderItem::create([
+              'order_id' => $order->id,
+              'product_id' => $item->product_id,
+              'color_id' => $item->color_id,
+              'user_customization_id' => $item->userCustomization ? $item->userCustomization->id : null,
+              'size' => $item->size,
+              'quantity' => $item->quantity,
+              'product_price' => $item->product->selling_price,
+            ]);
+          }
+
+          // Clear cart and user customizations
+          $userId = auth()->id();
+          $cartItems = Cart::where('user_id', $userId)->get();
+          foreach ($cartItems as $cart) {
+            if ($cart->userCustomization) {
+              $cart->userCustomization->update(['cart_id' => null]);
+            }
+          }
+          Cart::where('user_id', $userId)->delete();
+
+          DB::commit();
+          session()->forget('checkout_details');
+
+          // Send Emails
+          Mail::to(auth()->user()->email)->send(new OrderPlacedMail($order, false));
+          Mail::to('info@capbeast.com')->send(new OrderPlacedMail($order, true));
+
+          return redirect()->route('main.pages.success', ['orderId' => $order->id]);
+        } catch (\Exception $e) {
+          DB::rollBack();
+          Log::error('Order creation failed: ' . $e->getMessage());
+          return redirect()->route('checkout')->with('error', 'Order creation failed. Please try again.');
         }
-
-        // Now delete the cart entries
-        Cart::where('user_id', $userId)->delete();
-
-        DB::commit();
-        session()->forget('checkout_details');
-
-        // Send Emails
-        Mail::to(auth()->user()->email)->send(new OrderPlacedMail($order, false));
-        Mail::to('info@capbeast.com')->send(new OrderPlacedMail($order, true));
-
-
-        return redirect()->route('main.pages.success', ['orderId' => $order->id]);
       }
 
       return redirect()->route('checkout')->with('error', 'Payment failed.');
@@ -270,24 +268,34 @@ class OrderController extends Controller
     $userId = auth()->id();
     $countries = (new CountryList())->getList('en');
 
-    $cart = Cart::with(['product', 'color', 'userCustomization'])
-    ->where('user_id', $userId)
-    ->get();
+    $cart = Cart::with(['product' => function ($query) {
+      $query->select([
+        'id',
+        'title',
+        'selling_price',
+        'visibility',
+        'height',
+        'width',
+        'length',
+        'weight',
+        'size_unit',
+        'weight_unit'
+      ]);
+    }, 'color', 'userCustomization'])
+      ->where('user_id', $userId)
+      ->get();
 
-foreach ($cart as $item) {
-    // Ensure that dimensions and weight are available
-    $product = $item->product;
-    if (!$product->weight || !$product->length || !$product->width || !$product->height) {
-        // Handle missing product data, e.g., set default values or skip this item
-        $product->weight = $product->weight ?: 0;  // Default weight
-        $product->length = $product->length ?: 0;  // Default length
-        $product->width = $product->width ?: 0;    // Default width
-        $product->height = $product->height ?: 0;  // Default height
+    // Log product dimensions for debugging
+    foreach ($cart as $item) {
+      Log::info("Product dimensions for ID {$item->product->id}", [
+        'height' => $item->product->height,
+        'width' => $item->product->width,
+        'length' => $item->product->length,
+        'weight' => $item->product->weight,
+        'size_unit' => $item->product->size_unit,
+        'weight_unit' => $item->product->weight_unit
+      ]);
     }
-}
-
-
-
 
     $TPStaxPercentage = TPSTaxPrice::first();
     $TVQtaxPercentage = TVQTaxPrice::first();
@@ -383,6 +391,17 @@ foreach ($cart as $item) {
           'tvq_tax_percentage' => $TVQtaxPercentage,
           'tps_tax_no' => $TPStaxNumber,
           'tvq_tax_no' => $TVQtaxNumber,
+          'shipping_price' => $request->input('shipping_price'),
+          'shipping_method' => $request->input('shipping_method'),
+          'shipping_service' => $request->input('shipping_service'),
+          'shipping_estimated_days' => $request->input('shipping_estimated_days'),
+          'shipping_rate_details' => [
+            'postage_type_id' => $request->input('shipping_method'),
+            'postage_type' => $request->input('shipping_service'),
+            'shipping_price' => $request->input('shipping_price'),
+            'delivery_days' => $request->input('shipping_estimated_days'),
+            'service_name' => $request->input('shipping_service')
+          ]
         ]
       ]);
 

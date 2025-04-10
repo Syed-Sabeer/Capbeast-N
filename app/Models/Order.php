@@ -20,6 +20,12 @@ class Order extends Model
         'discount_price',
         'tps_tax_price',
         'tvq_tax_price',
+        'shipping_price',
+        'shipping_method',
+        'shipping_tracking_id',
+        'shipping_carrier',
+        'shipping_service',
+        'shipping_estimated_days',
         'status',
     ];
 
@@ -34,7 +40,7 @@ class Order extends Model
         return $this->belongsTo(DiscountCoupon::class, 'discount_id');
     }
 
-  
+
     public function items()
     {
         return $this->hasMany(OrderItem::class, 'order_id')
@@ -45,7 +51,7 @@ class Order extends Model
         return $this->belongsTo(Product::class, 'product_id')
             ->select(['id', 'title', 'description', 'visibility']);
     }
-    
+
     public function Order_files()
     {
         return $this->hasMany(OrderFiles::class, 'order_id');
@@ -58,5 +64,9 @@ class Order extends Model
     {
         return $this->hasOne(OrderTaxDetails::class, 'order_id');
     }
-  
+
+    public function shippingRate()
+    {
+        return $this->hasOne(OrderShippingRate::class);
+    }
 }
