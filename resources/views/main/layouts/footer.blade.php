@@ -14,8 +14,23 @@
                                 <a href="#!" class="text-reset"><i class="mdi mdi-facebook"></i></a>
                             </li> --}}
                             <li class="list-inline-item">
-                                <a target="_blank" href="https://www.instagram.com/monkey_beanies/" class="text-reset"><i
-                                        class="fa-brands fa-instagram"></i></a>
+                                <a target="_blank" href="https://www.instagram.com/capbeast?igsh=MXBkYTh4anJiNXhodQ==" class="text-reset">
+                                    <i class="fa-brands fa-instagram"></i>
+                                </a>
+                            </li>
+                        
+                            <!-- TikTok -->
+                            <li class="list-inline-item">
+                                <a target="_blank" href="https://www.tiktok.com/@capbeast?_t=ZM-8ul4cCmnR5T&_r=1" class="text-reset">
+                                    <i class="fa-brands fa-tiktok"></i>
+                                </a>
+                            </li>
+                        
+                            <!-- Facebook -->
+                            <li class="list-inline-item">
+                                <a target="_blank" href="https://www.facebook.com/share/16Lb2Rqi7w/?mibextid=wwXIfr" class="text-reset">
+                                    <i class="fa-brands fa-facebook"></i>
+                                </a>
                             </li>
                             
                         </ul>

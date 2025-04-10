@@ -257,7 +257,7 @@ var mixer = mixitup('.row', {
         </div>
     
         <div class="mt-4 text-center">
-          <a href="product-list-defualt.html" class="btn btn-soft-primary btn-hover">View All Products
+          <a href="{{ route('products') }}" class="btn btn-soft-primary btn-hover">View All Products
             <i class="mdi mdi-arrow-right align-middle ms-1"></i>
           </a>
         </div>

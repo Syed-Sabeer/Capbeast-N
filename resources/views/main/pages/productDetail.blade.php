@@ -38,27 +38,106 @@
             border-radius: 5px;
             width: 100%;
         }
+
+        .slider-container {
+            position: relative;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .main-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .thumbnail-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .thumbnail-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .thumbnail-image:hover {
+            border-color: #007bff;
+        }
+
+        .thumbnail-image.active {
+            border-color: #007bff;
+        }
+
+        .ProductSliderArrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .ProductSliderArrow.left {
+            left: 10px;
+        }
+
+        .ProductSliderArrow.right {
+            right: 10px;
+        }
     </style>
 
     <section class="section">
         <div class="container">
             <div class="row gx-2">
                 <div class="slider-container mt-3">
-                    <button class="ProductSliderArrow left" onclick="changeSlide(-1)">&lt;</button>
+                    {{-- <button class="ProductSliderArrow left" onclick="changeSlide(-1)">&lt;</button> --}}
 
-                    <img src="{{ asset(
-                        'storage/' .
-                            ($product->productColors->first()->front_image ??
-                                ($product->productColors->first()->right_image ??
-                                    ($product->productColors->first()->left_image ??
-                                        ($product->productColors->first()->back_image ?? 'ProductImages/default.jpg')))),
-                    ) }}"
+                    <img src="{{ asset('storage/' . ($product->productColors->first()->front_image ?? 'ProductImages/default.jpg')) }}"
                         alt="Main Product" class="main-image" id="mainImage">
 
-                    <button class="ProductSliderArrow right" onclick="changeSlide(1)">&gt;</button>
+                    {{-- <button class="ProductSliderArrow right" onclick="changeSlide(1)">&gt;</button> --}}
 
                     <div class="thumbnail-container">
-
+                        @if($product->productColors->first()->front_image)
+                            <img src="{{ asset('storage/' . $product->productColors->first()->front_image) }}" 
+                                alt="Front View" 
+                                class="thumbnail-image" 
+                                onclick="changeMainImage(this.src)"
+                                data-view="front">
+                        @endif
+                        @if($product->productColors->first()->back_image)
+                            <img src="{{ asset('storage/' . $product->productColors->first()->back_image) }}" 
+                                alt="Back View" 
+                                class="thumbnail-image" 
+                                onclick="changeMainImage(this.src)"
+                                data-view="back">
+                        @endif
+                        @if($product->productColors->first()->right_image)
+                            <img src="{{ asset('storage/' . $product->productColors->first()->right_image) }}" 
+                                alt="Right View" 
+                                class="thumbnail-image" 
+                                onclick="changeMainImage(this.src)"
+                                data-view="right">
+                        @endif
+                        @if($product->productColors->first()->left_image)
+                            <img src="{{ asset('storage/' . $product->productColors->first()->left_image) }}" 
+                                alt="Left View" 
+                                class="thumbnail-image" 
+                                onclick="changeMainImage(this.src)"
+                                data-view="left">
+                        @endif
                     </div>
                 </div>
                 <div class="col-lg-5 ms-auto">
@@ -327,6 +406,25 @@
                         button.classList.remove("loading");
                     });
             });
+        });
+
+        function changeMainImage(src) {
+            document.getElementById('mainImage').src = src;
+            // Update active state of thumbnails
+            document.querySelectorAll('.thumbnail-image').forEach(img => {
+                img.classList.remove('active');
+                if(img.src === src) {
+                    img.classList.add('active');
+                }
+            });
+        }
+
+        // Set first thumbnail as active by default
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstThumbnail = document.querySelector('.thumbnail-image');
+            if(firstThumbnail) {
+                firstThumbnail.classList.add('active');
+            }
         });
     </script>
 

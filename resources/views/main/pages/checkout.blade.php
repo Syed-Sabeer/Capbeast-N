@@ -315,6 +315,7 @@
                                             <th scope="col">Quantity</th>
                                             <th scope="col">Item Price</th>
                                             <th scope="col">Cust. Price</th>
+                                            <th scope="col">Pompom Price</th>
                                             <th scope="col">Total</th>
                                         </tr>
                                     </thead>
@@ -328,9 +329,12 @@
                                                 $customizationPrice = isset($item->userCustomization)
                                                     ? $item->userCustomization->price
                                                     : 0;
+                                                $pompomPrice = isset($item->pompom_price) ? $item->pompom_price : 0;
                                                 $itemTotal =
-                                                    $item->product->selling_price * $item->quantity +
-                                                    $customizationPrice * $item->quantity;
+                                                    ($item->product->selling_price +
+                                                        $customizationPrice +
+                                                        $pompomPrice) *
+                                                    $item->quantity;
                                                 $subtotal += $itemTotal;
                                             @endphp
 
@@ -339,23 +343,23 @@
                                                     <div class="d-flex align-items-center gap-2">
                                                         <div class="avatar-sm flex-shrink-0">
                                                             <div class="avatar-title  rounded-3">
-                                                                @if ($item->userCustomization)
-                                                                    <img src="{{ asset(
+                                                              @if ($item->userCustomization)
+                                                                <img src="{{ asset(
                                                                         $item->userCustomization->front_image ??
                                                                             ($item->userCustomization->right_image ??
                                                                                 ($item->userCustomization->left_image ??
                                                                                     ($item->userCustomization->back_image ?? 'ProductImages/default.jpg'))),
                                                                     ) }}"
                                                                         alt="" class="avatar-lg ">
-                                                                @else
-                                                                    <img src="{{ asset(
-                                                                        'storage/' .
-                                                                            ($item->color->front_image ??
-                                                                                ($item->color->right_image ??
-                                                                                    ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg')))),
+                                                              @else
+                                                                <img src="{{ asset(
+                                                                    'storage/' .
+                                                                        ($item->color->front_image ??
+                                                                            ($item->color->right_image ??
+                                                                                ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg')))),
                                                                     ) }}"
                                                                         alt="" class="avatar-lg ">
-                                                                @endif
+                                                              @endif
                                                             </div>
                                                         </div>
                                                         <div class="flex-grow-1">
@@ -371,10 +375,13 @@
                                                     ${{ $item->product->selling_price }}
                                                 </td>
                                                 <td class="text-end">
-                                                    ${{ $item->userCustomization->price }}
+                                                    ${{ $customizationPrice }}
                                                 </td>
                                                 <td class="text-end">
-                                                    ${{ $item->product->selling_price * $item->quantity + $customizationPrice * $item->quantity }}
+                                                    ${{ $pompomPrice }}
+                                                </td>
+                                                <td class="text-end">
+                                                    ${{ ($item->product->selling_price + $customizationPrice + $pompomPrice) * $item->quantity }}
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -428,13 +435,13 @@
                                 <div class="row mb-4">
                                     <div class="col-md-6">
                                         <div data-mdb-input-init class="form-outline">
-                                            <label class="form-label" for="country">Country *</label>
+                                    <label class="form-label" for="country">Country *</label>
                                             <select id="country" name="country" class="form-control" required>
                                                 <option value="">Select Country</option>
-                                                @foreach ($countries as $code => $name)
-                                                    <option value="{{ $code }}">{{ $name }}</option>
-                                                @endforeach
-                                            </select>
+                                        @foreach ($countries as $code => $name)
+                                            <option value="{{ $code }}">{{ $name }}</option>
+                                        @endforeach
+                                    </select>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -627,7 +634,7 @@
                                                     $<span id="shipping-amount">0.00</span>
                                                 </td>
                                             </tr>
-
+                                            
                                             <tr class="table-active">
                                                 <th>Total ( ) :</th>
                                                 <td class="text-end">
@@ -659,107 +666,107 @@
     </section>
 
     <script>
-        let appliedDiscount = 0;
-        let discountId = null;
+       let appliedDiscount = 0;
+let discountId = null;
         const cartItems = @json($cart); // Your cart data passed from PHP
         document.addEventListener('DOMContentLoaded', function() {
-            $('#address, #country').on('change', calculateShippingLive);
+    $('#address, #country').on('change', calculateShippingLive);
 
-            function calculateShippingLive() {
-                const country = $('#country').val();
-                const postalCode = $('#address').val();
-
-                // Prepare products data
-                const products = cartItems?.map(item => {
-                    const product = item.product;
-
-                    // Handle missing product data (dimensions or weight)
-                    if (!product.weight || !product.length || !product.width || !product.height) {
-                        console.log("Missing product data:", product);
-
-                        // Default to zero if any product data is missing
-                        product.weight = product.weight || 3;
-                        product.weight_unit = product.weight_unit || 'kg';
-                        product.length = product.length || 3;
-                        product.width = product.width || 3;
-                        product.height = product.height || 3;
-                        product.size_unit = product.size_unit || 'cm';
-                        product.quantity = product.quantity || 1;
-
-                        alert("Product data was incomplete, using default values.");
-                    }
-
-                    return {
-                        weight: product.weight,
-                        weight_unit: 'kg',
-                        length: product.length,
-                        width: product.width,
-                        height: product.height,
-                        size_unit: 'cm',
-                        quantity: item.quantity
-                    };
+    function calculateShippingLive() {
+        const country = $('#country').val();
+        const postalCode = $('#address').val();
+        
+        // Prepare products data
+        const products = cartItems?.map(item => {
+            const product = item.product;
+            
+            // Handle missing product data (dimensions or weight)
+            if (!product.weight || !product.length || !product.width || !product.height) {
+                console.log("Missing product data:", product);
+                
+                // Default to zero if any product data is missing
+                product.weight = product.weight || 3;
+                product.weight_unit = product.weight_unit || 'kg';
+                product.length = product.length || 3;
+                product.width = product.width || 3;
+                product.height = product.height || 3;
+                product.size_unit = product.size_unit || 'cm';
+                product.quantity = product.quantity || 1;
+      
+                alert("Product data was incomplete, using default values.");
+            }
+            
+            return {
+                weight: product.weight,
+                weight_unit: 'kg',
+                length: product.length,
+                width: product.width,
+                height: product.height,
+                size_unit: 'cm',
+                quantity: item.quantity
+            };
                 }).filter(item => item !== null); // Filter out null items
 
-                if (products.length === 0) {
-                    alert("No items in the cart to calculate shipping.");
-                    return;
-                }
+        if (products.length === 0) {
+            alert("No items in the cart to calculate shipping.");
+            return;
+        }
 
-                // Validate country and postal code
-                if (!country || !postalCode) return;
+        // Validate country and postal code
+        if (!country || !postalCode) return;
 
-                // Fetch shipping data
-                fetch("{{ route('shipping.calculate') }}", {
-                        method: "POST",
-                        headers: {
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            destination: {
-                                country: country,
-                                postal_code: postalCode
-                            },
-                            products: products
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success && data.shipping?.data?.length) {
-                            const shippingAmount = data.shipping.data[0].rate;
-                            document.getElementById('shipping-amount').textContent = shippingAmount.toFixed(2);
-                            updateTaxAndTotal(getSubtotal(), appliedDiscount, shippingAmount);
-                        } else {
-                            alert("Shipping rate unavailable for selected address.");
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        alert("Error calculating shipping.");
-                    });
+        // Fetch shipping data
+        fetch("{{ route('shipping.calculate') }}", {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                destination: {
+                    country: country,
+                    postal_code: postalCode
+                },
+                products: products
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.shipping?.data?.length) {
+                const shippingAmount = data.shipping.data[0].rate;
+                document.getElementById('shipping-amount').textContent = shippingAmount.toFixed(2);
+                updateTaxAndTotal(getSubtotal(), appliedDiscount, shippingAmount);
+            } else {
+                alert("Shipping rate unavailable for selected address.");
             }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Error calculating shipping.");
+        });
+    }
 
             function updateTaxAndTotal(subtotal, appliedDiscount = 0, shipping = 0) {
                 let TPStaxElement = document.querySelector('.tps-cart-tax');
                 let TVQtaxElement = document.querySelector('.tvq-cart-tax');
                 let totalElement = document.querySelector('.cart-total');
-
+    
                 let TPStaxPercentage = parseFloat(TPStaxElement.getAttribute('tps-data-tax')) || 0;
                 let TVQtaxPercentage = parseFloat(TVQtaxElement.getAttribute('tvq-data-tax')) || 0;
-
+    
                 let discountedTotal = subtotal - appliedDiscount;
                 if (discountedTotal < 0) discountedTotal = 0;
-
+    
                 let userCountry = $('#country').val();
-
+    
                 let TPStaxAmount = userCountry === "CA" ? (discountedTotal * TPStaxPercentage) / 100 : 0;
                 let TVQtaxAmount = userCountry === "CA" ? (discountedTotal * TVQtaxPercentage) / 100 : 0;
                 let finalTotal = discountedTotal + TPStaxAmount + TVQtaxAmount + shipping;
-
+    
                 document.getElementById('tps-tax-amount').textContent = TPStaxAmount.toFixed(2);
                 document.getElementById('tvq-tax-amount').textContent = TVQtaxAmount.toFixed(2);
                 document.getElementById('final-total-amount').textContent = finalTotal.toFixed(2);
-
+    
                 console.log("User Country:", userCountry);
                 console.log("Discount Id:", discountId);
                 console.log("Subtotal: $" + subtotal.toFixed(2));
@@ -768,34 +775,34 @@
                 console.log("TVQ Tax Amount: $" + TVQtaxAmount.toFixed(2));
                 console.log("Total after Tax: $" + finalTotal.toFixed(2));
             }
-
+    
             function getSubtotal() {
                 let subtotalElement = document.querySelector('.cart-subtotal');
                 return parseFloat(subtotalElement.innerText.replace(/[^0-9.]/g, '')) || 0;
             }
-
+    
             updateTaxAndTotal(getSubtotal(), 0, 0);
-
+    
             document.getElementById('applyCoupon').addEventListener('click', function() {
                 let couponCode = document.getElementById('couponCode').value;
-
+    
                 fetch("{{ route('apply.discount') }}", {
-                        method: "POST",
-                        headers: {
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            coupon_code: couponCode
-                        })
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        coupon_code: couponCode
                     })
+                })
                     .then(response => response.json())
                     .then(result => {
                         if (result.success) {
                             alert(result.message);
                             appliedDiscount = parseFloat(result.discount) || 0;
                             discountId = result.discountId ?? null;
-
+    
                             document.getElementById('discount-amount').textContent = appliedDiscount
                                 .toFixed(2);
                             updateTaxAndTotal(getSubtotal(), appliedDiscount);
@@ -805,7 +812,7 @@
                     })
                     .catch(error => console.error('Error:', error));
             });
-
+    
             function proceedToCheckout(event) {
                 event?.preventDefault();
                 if (confirm('Are you sure you want to proceed to checkout?')) {
@@ -813,23 +820,23 @@
                     checkoutButton.innerHTML =
                         'Processing... <span class="spinner-border spinner-border-sm"></span>';
                     checkoutButton.disabled = true;
-
+    
                     let subtotal = getSubtotal();
-
+    
                     let TPStaxElement = document.querySelector('.tps-cart-tax');
                     let TPStaxAmount = parseFloat(TPStaxElement.innerText.replace(/[^0-9.]/g, '')) || 0;
                     let TPStaxNumber = TPStaxElement.getAttribute('tps-data-taxno');
                     let TPStaxPercentage = TPStaxElement.getAttribute('tps-data-percentage');
-
+    
                     let TVQtaxElement = document.querySelector('.tvq-cart-tax');
                     let TVQtaxAmount = parseFloat(TVQtaxElement.innerText.replace(/[^0-9.]/g, '')) || 0;
                     let TVQtaxNumber = TVQtaxElement.getAttribute('tvq-data-taxno');
                     let TVQtaxPercentage = TVQtaxElement.getAttribute('tvq-data-percentage');
-
+    
                     // Use the USD total for PayPal
                     let finalTotal = window.paypalTotal || (subtotal - appliedDiscount + TPStaxAmount +
                         TVQtaxAmount) * 0.75;
-
+    
                     const formData = {
                         firstname: document.getElementById('firstname').value,
                         lastname: document.getElementById('lastname').value,
@@ -855,15 +862,15 @@
                         shipping_service: window.selectedShipping.service,
                         shipping_estimated_days: window.selectedShipping.estimated_days
                     };
-
+    
                     fetch("{{ route('checkout.add') }}", {
-                            method: "POST",
-                            headers: {
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(formData),
-                        })
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(formData),
+                    })
                         .then(response => response.json())
                         .then(result => {
                             if (result.success) {
@@ -886,22 +893,22 @@
                         });
                 }
             }
-
+    
             const countriesRoute = "{{ route('countries.index') }}";
             let countrySelect = document.getElementById('country');
             let tpsTaxRow = document.querySelector('.tps-cart-tax').parentElement;
             let tvqTaxRow = document.querySelector('.tvq-cart-tax').parentElement;
-
+    
             function setLoading(selectElement) {
                 selectElement.innerHTML = '<option value="">Loading...</option>';
                 selectElement.disabled = true;
             }
-
+    
             function removeLoading(selectElement, placeholder) {
                 selectElement.innerHTML = `<option value="">${placeholder}</option>`;
                 selectElement.disabled = false;
             }
-
+    
             setLoading(countrySelect);
             fetch(countriesRoute)
                 .then(response => response.json())
@@ -916,7 +923,7 @@
                     removeLoading(countrySelect, "Failed to load countries, Kindly Refresh the page");
                     console.error(error);
                 });
-
+    
             function updateTaxRowsVisibility() {
                 if (countrySelect.value === "CA") {
                     tpsTaxRow.style.display = 'table-row';
@@ -927,12 +934,12 @@
                     tvqTaxRow.style.display = 'none';
                 }
             }
-
+    
             $('#country').on('change', function() {
                 console.log("Selected country code:", $(this).val());
                 updateTaxRowsVisibility();
             });
-
+    
             updateTaxRowsVisibility();
             document.getElementById('checkoutButton').addEventListener('click', proceedToCheckout);
         });

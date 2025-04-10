@@ -1,35 +1,22 @@
 <div class="order-summary">
     <h3>Order Summary</h3>
-    <div class="order-details">
-        <p><strong>Order ID:</strong> {{ $order->order_id }}</p>
-        <p><strong>Date:</strong> {{ $order->created_at->format('F j, Y') }}</p>
+    <p><strong>Order ID:</strong> {{ $order->id }}</p>
+    <p><strong>Date:</strong> {{ $order->created_at->format('Y-m-d H:i:s') }}</p>
 
-        @if ($order->shippingRate)
-            <div class="shipping-details">
-                <h4>Shipping Details</h4>
-                <p><strong>Service:</strong> {{ $order->shippingRate->service_name }}</p>
-                <p><strong>Estimated Delivery:</strong> {{ $order->shippingRate->delivery_days }} days</p>
-                <p><strong>Shipping Cost:</strong> ${{ number_format($order->shippingRate->shipping_price, 2) }}</p>
-            </div>
-        @endif
+    <h4>Shipping Details</h4>
+    <p><strong>Service:</strong> {{ $order->shipping_service }}</p>
+    <p><strong>Estimated Delivery:</strong> {{ $order->shipping_estimated_days }} days</p>
+    <p><strong>Shipping Cost:</strong> ${{ number_format($order->shipping_price, 2) }}</p>
 
-        <div class="price-breakdown">
-            <p><strong>Subtotal:</strong> ${{ number_format($order->subtotal_price, 2) }}</p>
-            @if ($order->discount_price > 0)
-                <p><strong>Discount:</strong> -${{ number_format($order->discount_price, 2) }}</p>
-            @endif
-            <p><strong>Shipping:</strong> ${{ number_format($order->shipping_price, 2) }}</p>
-            @if ($order->tps_tax_price > 0)
-                <p><strong>TPS ({{ $order->taxDetails->tps_tax_percentage }}%):</strong>
-                    ${{ number_format($order->tps_tax_price, 2) }}</p>
-            @endif
-            @if ($order->tvq_tax_price > 0)
-                <p><strong>TVQ ({{ $order->taxDetails->tvq_tax_percentage }}%):</strong>
-                    ${{ number_format($order->tvq_tax_price, 2) }}</p>
-            @endif
-            <p class="total"><strong>Total:</strong> ${{ number_format($order->total_price, 2) }}</p>
-        </div>
-    </div>
+    <h4>Price Breakdown</h4>
+    <p><strong>Subtotal:</strong> ${{ number_format($order->subtotal, 2) }}</p>
+    @if ($order->discount_amount > 0)
+        <p><strong>Discount:</strong> -${{ number_format($order->discount_amount, 2) }}</p>
+    @endif
+    <p><strong>Shipping:</strong> ${{ number_format($order->shipping_price, 2) }}</p>
+    <p><strong>TPS Tax:</strong> ${{ number_format($order->tps_tax_amount, 2) }}</p>
+    <p><strong>TVQ Tax:</strong> ${{ number_format($order->tvq_tax_amount, 2) }}</p>
+    <p><strong>Total:</strong> ${{ number_format($order->final_total, 2) }}</p>
 </div>
 
 <style>
