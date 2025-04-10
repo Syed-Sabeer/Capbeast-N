@@ -32,8 +32,14 @@
                     @endphp
 
                     @foreach ($carts as $cart)
-                        @php
+                        {{-- @php
                             $itemTotal = ($cart->product->selling_price * $cart->quantity) + ($cart->userCustomization->price * $cart->quantity);
+                            $subtotal += $itemTotal;
+                        @endphp --}}
+
+                        @php
+                            $customizationPrice = isset($cart->userCustomization) ? $cart->userCustomization->price : 0;
+                            $itemTotal = ($cart->product->selling_price * $cart->quantity) + ($customizationPrice * $cart->quantity);
                             $subtotal += $itemTotal;
                         @endphp
 
@@ -86,7 +92,7 @@
                                             <p class="text-muted mb-1 fs-12">Item Price: <span
                                               class="product-line-price fs-16" style="color: #000; font-weight:500;">${{ number_format($cart->product->selling_price, 2) }}</span></p>
                                             <p class="text-muted mb-1 fs-12">Customization Price: <span
-                                              class="product-line-price fs-16" style="color: #000; font-weight:500;">${{ number_format($cart->userCustomization->price, 2) }}</span></p>
+                                              class="product-line-price fs-16" style="color: #000; font-weight:500;">${{ number_format($customizationPrice, 2) }}</span></p>
                                             {{-- <p class="text-muted mb-1 fs-12">Customization Price:</p>
                                             <h5 class="fs-16">${{ number_format($cart->userCustomization->price, 2) }}</h5> --}}
                                         </div>

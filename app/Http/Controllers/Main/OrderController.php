@@ -271,8 +271,23 @@ class OrderController extends Controller
     $countries = (new CountryList())->getList('en');
 
     $cart = Cart::with(['product', 'color', 'userCustomization'])
-      ->where('user_id', $userId)
-      ->get();
+    ->where('user_id', $userId)
+    ->get();
+
+foreach ($cart as $item) {
+    // Ensure that dimensions and weight are available
+    $product = $item->product;
+    if (!$product->weight || !$product->length || !$product->width || !$product->height) {
+        // Handle missing product data, e.g., set default values or skip this item
+        $product->weight = $product->weight ?: 0;  // Default weight
+        $product->length = $product->length ?: 0;  // Default length
+        $product->width = $product->width ?: 0;    // Default width
+        $product->height = $product->height ?: 0;  // Default height
+    }
+}
+
+
+
 
     $TPStaxPercentage = TPSTaxPrice::first();
     $TVQtaxPercentage = TVQTaxPrice::first();

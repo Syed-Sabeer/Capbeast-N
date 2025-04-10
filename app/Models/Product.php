@@ -13,7 +13,11 @@ class Product extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'products'; // Define the table name
-    protected $fillable = ['brand_id', 'mlb_id', 'title', 'slug', 'description', 'cost_price', 'selling_price', 'visibility'];
+    protected $fillable = [
+        'brand_id', 'mlb_id', 'title', 'slug', 'description', 'cost_price', 'selling_price',
+        'size_unit', 'height', 'width', 'length', 'weight_unit', 'weight', 'visibility'
+    ];
+    
 
     public function productColors()
     {

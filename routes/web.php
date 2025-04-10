@@ -69,6 +69,8 @@ Route::middleware(['web'])->group(function () {
     Route::post('/customizer/update/{id}', [CustomizerController::class, 'update'])->name('customizer.update');
     Route::post('/customizer/upload-image', [CustomizerController::class, 'uploadImage'])->name('customizer.upload-image');
     Route::get('/delete/customizer-image/{id}', [CustomizerController::class, 'deleteImage'])->name('customizer.delete-image');
+// routes/web.php
+Route::post('/shipping/calculate', [ShippingController::class, 'calculate'])->name('shipping.calculate');
 
     Route::get('/countries', [OrderController::class, 'getCountries'])->name('countries.index');
     Route::get('/countries/{code}/states', [OrderController::class, 'getStates'])->name('countries.states');

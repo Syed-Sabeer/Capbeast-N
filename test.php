@@ -70,7 +70,7 @@ $payload = array(
 
 curl_setopt_array($curl, [
   CURLOPT_HTTPHEADER => [
-    "Authorization: Bearer Qg4R52MivDdmAYHBsdiAjfJ3w4uSVU6lTKjmb0mP87rj1zv8IDO6zS8c0wUr",  // Replace with your API token
+    "Authorization: Bearer lyuIwPalBwOrRYIMkFRaCbhLK81cYQUOuu6IGF2naZlzQIpdSQduK5faXfB7",  // Replace with your API token
     "Content-Type: application/json"
   ],
   CURLOPT_POSTFIELDS => json_encode($payload),

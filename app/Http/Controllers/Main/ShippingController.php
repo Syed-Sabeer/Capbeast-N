@@ -5,99 +5,112 @@ namespace App\Http\Controllers\Main;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class ShippingController extends Controller
 {
-    /**
-     * Calculate shipping rates from Stallion Express API.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function getShippingRate(Request $request)
+    public function calculate(Request $request)
     {
-        // Validate the inputs
+        Log::info('Shipping calculation request received', $request->all());
+
+        // Validate request
         $validator = Validator::make($request->all(), [
-            'weight' => 'required|numeric|min:0.01',
-            'length' => 'required|numeric|min:0.01',
-            'width' => 'required|numeric|min:0.01',
-            'height' => 'required|numeric|min:0.01',
-            'country' => 'required|string|max:2',
-            'postal_code' => 'required|string|max:10',
+            'products' => 'required|array',
+            'products.*.weight' => 'required|numeric',
+            'products.*.weight_unit' => 'required|string',
+            'products.*.length' => 'required|numeric',
+            'products.*.width' => 'required|numeric',
+            'products.*.height' => 'required|numeric',
+            'products.*.size_unit' => 'required|string',
+            'products.*.quantity' => 'nullable|integer',
+            'destination' => 'required|array',
+            'destination.country' => 'required|string',
+            'destination.postal_code' => 'required|string',
         ]);
 
         if ($validator->fails()) {
-            Log::error('Validation failed in shipping rate calculation', [
-                'errors' => $validator->errors(),
-                'request' => $request->all()
-            ]);
-            return response()->json(['success' => false, 'message' => $validator->errors()->first()], 400);
-        }
-
-        try {
-            // Prepare payload for Stallion Express API
-            $payload = [
-                "carrier_type" => "stallion",
-                "to_address" => [
-                    "country" => $request->country,
-                    "postal_code" => $request->postal_code,
-                ],
-                "parcels" => [
-                    [
-                        "weight" => $request->weight, // in pounds
-                        "length" => $request->length, // in inches
-                        "width"  => $request->width,
-                        "height" => $request->height,
-                    ]
-                ],
-            ];
-
-            // Log the payload being sent to the API for debugging
-            Log::info('Sending request to Stallion Express API', ['payload' => $payload]);
-
-            // Send request to Stallion API for shipping rates
-            $response = Http::withToken(config('services.stallion.api_key'))
-                ->post('https://api.stallionexpress.ca/v1/shipping/rates', $payload);
-
-            // Log the response from the API
-            Log::info('Received response from Stallion Express API', ['response' => $response->body()]);
-
-            if ($response->successful()) {
-                $rates = $response->json();
-
-                // Choose the cheapest rate (customize logic if needed)
-                $cheapest = collect($rates['rates'])->sortBy('rate')->first();
-
-                return response()->json([
-                    'success' => true,
-                    'rate' => $cheapest['rate'] ?? 0,
-                    'service_name' => $cheapest['service_name'] ?? 'Standard',
-                    'delivery_time' => $cheapest['estimated_days'] ?? 'N/A',
-                ]);
-            }
-
-            // Log the error if the response is not successful
-            Log::error('Failed to fetch shipping rates from Stallion Express API', [
-                'response' => $response->body()
+            Log::error('Validation failed for shipping calculation', [
+                'errors' => $validator->errors()->all()
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Unable to fetch shipping rates.',
-                'response' => $response->body()
-            ], 500);
+                'message' => 'Validation error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $validated = $validator->validated();
+        $products = $validated['products'];
+        $destination = $validated['destination'];
+
+        $packages = [];
+
+        foreach ($products as $index => $product) {
+            $packages[] = [
+                'weight' => [
+                    'value' => $product['weight'],
+                    'unit' => $product['weight_unit']
+                ],
+                'dimensions' => [
+                    'length' => $product['length'],
+                    'width' => $product['width'],
+                    'height' => $product['height'],
+                    'unit' => $product['size_unit']
+                ],
+                'quantity' => $product['quantity'] ?? 1
+            ];
+        }
+
+        $payload = [
+            'from' => [
+                'country' => 'CA',
+                'postal_code' => 'L4W2T7'
+            ],
+            'to' => [
+                'country' => $destination['country'],
+                'postal_code' => $destination['postal_code']
+            ],
+            'packages' => $packages // ← THIS WAS EMPTY EARLIER
+        ];
+        
+        
+
+        Log::info('Sending shipping rate request to Stallion Express', $payload);
+
+        try {
+            $response = Http::withToken('lyuIwPalBwOrRYIMkFRaCbhLK81cYQUOuu6IGF2naZlzQIpdSQduK5faXfB7')
+                ->post('https://sandbox.stallionexpress.ca/api/v4/rates', $payload);
+
+            if ($response->successful()) {
+                Log::info('Stallion Express response received', $response->json());
+                return response()->json([
+                    'success' => true,
+                    'shipping' => $response->json()
+                ]);
+            } else {
+                Log::error('Stallion Express shipping API error', [
+                    'status' => $response->status(),
+                    'response_body' => $response->body()
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to fetch shipping rate.',
+                    'details' => $response->body()
+                ], $response->status());
+            }
         } catch (\Exception $e) {
-            // Log any exception that occurs
-            Log::error('Exception occurred while calculating shipping rate', [
-                'error' => $e->getMessage(),
+            Log::critical('Exception during shipping rate calculation', [
+                'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'An error occurred while calculating shipping.',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
