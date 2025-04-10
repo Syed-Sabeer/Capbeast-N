@@ -67,7 +67,9 @@ class CustomizerController extends Controller
 
       // Check if a customization already exists for this user and color
       $userCustomization = UserCustomization::where('user_id', auth()->id())
-        ->where('product_color_id', $request->colorId)->where('cart_id', null)
+        ->where('product_color_id', $request->colorId)
+        ->where('cart_id', null)
+        ->whereDoesntHave('orderItem') // This ensures it has not been used in an order
         ->first();
 
       // If no customization exists, create a new one

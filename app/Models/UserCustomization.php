@@ -17,4 +17,9 @@ class UserCustomization extends Model
   {
     return $this->hasMany(CustomizerUpload::class, 'user_customization_id');
   }
+
+  public function orderItem()
+  {
+    return $this->hasOne(OrderItem::class, 'user_customization_id');
+  }
 }
