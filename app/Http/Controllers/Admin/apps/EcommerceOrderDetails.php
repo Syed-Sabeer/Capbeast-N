@@ -14,23 +14,23 @@ class EcommerceOrderDetails extends Controller
 {
     public function index($orderId)
 {
-   
+
     // $order = Order::with(['TaxDetails','user', 'Order_files', 'ShippingDetails', 'items' => function ($query) {
     //     $query->with('orderArtwork');
     // }])->findOrFail($orderId);
 
-    $order = Order::findOrFail($orderId);
+    $order = Order::with('items.userCustomization')->findOrFail($orderId);
 
-    
+
     $latestStatus = OrderInternalStatus::where('order_id', $orderId)
-        ->orderBy('updated_at', 'desc')  
-        ->with('internalStatus') 
+        ->orderBy('updated_at', 'desc')
+        ->with('internalStatus')
         ->first();
 
     // Retrieve status history
     $statusHistory = OrderInternalStatus::where('order_id', $orderId)
-        ->orderBy('updated_at', 'asc') 
-        ->with('internalStatus')  
+        ->orderBy('updated_at', 'asc')
+        ->with('internalStatus')
         ->get();
 
     // Retrieve only active (non-soft-deleted) statuses for the dropdown
@@ -39,8 +39,8 @@ class EcommerceOrderDetails extends Controller
     return view('admin.content.apps.app-ecommerce-order-details', compact('order', 'statuses', 'latestStatus', 'statusHistory'));
 }
 
-    
-    
+
+
 public function updateOrderStatus(Request $request, $orderId)
 {
     $request->validate([
@@ -55,7 +55,7 @@ public function updateOrderStatus(Request $request, $orderId)
     foreach ($validGuards as $guard) {
         if (Auth::guard($guard)->check()) {
             $user = Auth::guard($guard)->user();
-            
+
             if ($user->role === $guard) {
                 $authenticatedGuard = $guard;
                 break;
@@ -87,33 +87,33 @@ public function updateOrderStatus(Request $request, $orderId)
         ->with('success', 'Order status updated successfully.');
 }
 
-    
-    
+
+
 
     public function orderfileupload(Request $request, $id)
     {
-       
+
         $request->validate([
-            'title' => 'required|string|max:255', 
-            'file' => 'required|file|mimes:jpg,jpeg,png,pdf,doc,docx,zip,xls,xlsm,xlsx,xltx|max:2048', 
+            'title' => 'required|string|max:255',
+            'file' => 'required|file|mimes:jpg,jpeg,png,pdf,doc,docx,zip,xls,xlsm,xlsx,xltx|max:2048',
         ]);
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-        
+
             // Store the file using the public disk
             $filePath = $file->store('OrderFiles', 'public');
-        
+
             // Save the file details in the database
             OrderFiles::create([
                 'order_id' => $id,
                 'title' => $request->input('title'),
                 'file' => $filePath, // Path stored in 'public/OrderFiles'
             ]);
-        
+
             return back()->with('success', 'File uploaded successfully!');
         }
-        
+
         return back()->with('error', 'No file was uploaded.');
     }
 }
