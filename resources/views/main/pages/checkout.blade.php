@@ -209,13 +209,17 @@
 
         // Function to update tax and total
         function updateTaxAndTotal(subtotal, appliedDiscount = 0, shipping = 0) {
+        function updateTaxAndTotal(subtotal, appliedDiscount = 0, shipping = 0) {
             let TPStaxElement = document.querySelector('.tps-cart-tax');
             let TVQtaxElement = document.querySelector('.tvq-cart-tax');
+            let totalElement = document.querySelector('.cart-total');
             let totalElement = document.querySelector('.cart-total');
 
             let TPStaxPercentage = parseFloat(TPStaxElement.getAttribute('tps-data-tax')) || 0;
             let TVQtaxPercentage = parseFloat(TVQtaxElement.getAttribute('tvq-data-tax')) || 0;
 
+            // Calculate discounted subtotal
+            let discountedTotal = subtotal - appliedDiscount;
             // Calculate discounted subtotal
             let discountedTotal = subtotal - appliedDiscount;
             if (discountedTotal < 0) discountedTotal = 0;
@@ -226,7 +230,15 @@
             // Calculate taxes based on country
             let TPStaxAmount = userCountry === "CA" ? (discountedTotal * TPStaxPercentage) / 100 : 0;
             let TVQtaxAmount = userCountry === "CA" ? (discountedTotal * TVQtaxPercentage) / 100 : 0;
+            // Get user's country
+            let userCountry = $('#country').val();
 
+            // Calculate taxes based on country
+            let TPStaxAmount = userCountry === "CA" ? (discountedTotal * TPStaxPercentage) / 100 : 0;
+            let TVQtaxAmount = userCountry === "CA" ? (discountedTotal * TVQtaxPercentage) / 100 : 0;
+
+            // Calculate final total including all components
+            let finalTotal = discountedTotal + TPStaxAmount + TVQtaxAmount + shipping;
             // Calculate final total including all components
             let finalTotal = discountedTotal + TPStaxAmount + TVQtaxAmount + shipping;
 
@@ -257,6 +269,8 @@
 
         // Function to get subtotal
         function getSubtotal() {
+            let subtotalElement = document.querySelector('.cart-subtotal');
+            return parseFloat(subtotalElement.innerText.replace(/[^0-9.]/g, '')) || 0;
             let subtotalElement = document.querySelector('.cart-subtotal');
             return parseFloat(subtotalElement.innerText.replace(/[^0-9.]/g, '')) || 0;
         }
@@ -520,7 +534,7 @@
                                             <th scope="col">Quantity</th>
                                             <th scope="col">Item Price</th>
                                             <th scope="col">Cust. Price</th>
-                                            <th scope="col">Pompom Price</th>
+
                                             <th scope="col">Total</th>
                                         </tr>
                                     </thead>
@@ -535,11 +549,28 @@
                                                     ? $item->userCustomization->price
                                                     : 0;
                                                 $pompomPrice = isset($item->pompom_price) ? $item->pompom_price : 0;
+                                                $printingPrice = isset($item->printing_price)
+                                                    ? $item->printing_price
+                                                    : 0;
+                                                $deliveryPrice = isset($item->delivery_price)
+                                                    ? $item->delivery_price
+                                                    : 0;
+
+                                                // Calculate base price components
+                                                $basePrice = $item->product->selling_price;
+                                                $totalCustomizationPrice = $customizationPrice * $item->quantity;
+                                                $totalPompomPrice = $pompomPrice * $item->quantity;
+                                                $totalPrintingPrice = $printingPrice * $item->quantity;
+                                                $totalDeliveryPrice = $deliveryPrice * $item->quantity;
+
+                                                // Calculate item total
                                                 $itemTotal =
-                                                    ($item->product->selling_price +
-                                                        $customizationPrice +
-                                                        $pompomPrice) *
-                                                    $item->quantity;
+                                                    $basePrice * $item->quantity +
+                                                    $totalCustomizationPrice +
+                                                    $totalPompomPrice +
+                                                    $totalPrintingPrice +
+                                                    $totalDeliveryPrice;
+
                                                 $subtotal += $itemTotal;
                                             @endphp
 
@@ -574,12 +605,12 @@
                                                                                     ($item->userCustomization->back_image ?? 'ProductImages/default.jpg'))),
                                                                     ) }}"
                                                                         alt="" class="avatar-lg ">
-                                                              @else
-                                                                <img src="{{ asset(
-                                                                    'storage/' .
-                                                                        ($item->color->front_image ??
-                                                                            ($item->color->right_image ??
-                                                                                ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg')))),
+                                                                @else
+                                                                    <img src="{{ asset(
+                                                                        'storage/' .
+                                                                            ($item->color->front_image ??
+                                                                                ($item->color->right_image ??
+                                                                                    ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg')))),
                                                                     ) }}"
                                                                         alt="" class="avatar-lg ">
                                                                 @endif
@@ -616,14 +647,12 @@
 >>>>>>> e798c5c (working on checkout page need to modify shipping api for canada)
                                                 </td>
                                                 <td class="text-end">
-                                                    ${{ $customizationPrice }}
+                                                    ${{ number_format($customizationPrice, 2) }}
                                                 </td>
 
+
                                                 <td class="text-end">
-                                                    ${{ $pompomPrice }}
-                                                </td>
-                                                <td class="text-end">
-                                                    ${{ ($item->product->selling_price + $customizationPrice + $pompomPrice) * $item->quantity }}
+                                                    ${{ number_format($itemTotal, 2) }}
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -677,7 +706,7 @@
                                 <div class="row mb-4">
                                     <div class="col-md-6">
                                         <div data-mdb-input-init class="form-outline">
-                                    <label class="form-label" for="country">Country *</label>
+                                            <label class="form-label" for="country">Country *</label>
                                             <select id="country" name="country" class="form-control" required>
                                                 <option value="">Select Country</option>
                                                 @foreach ($countries as $code => $name)
@@ -885,6 +914,7 @@
                                                 </td>
                                             </tr>
 
+
                                             <tr class="table-active">
                                                 <th>Total ( ) :</th>
                                                 <td class="text-end">
@@ -973,7 +1003,11 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-    $('#address, #country').on('change', calculateShippingLive);
+            // Initial update
+            updateTaxAndTotal(getSubtotal(), 0, 0);
+
+            // Handle shipping calculation
+            $('#address, #country').on('change', calculateShippingLive);
 
     function calculateShippingLive() {
         const country = $('#country').val();
@@ -1009,45 +1043,60 @@
                 quantity: item.quantity
             };
                 }).filter(item => item !== null); // Filter out null items
+            function calculateShippingLive() {
+                const country = $('#country').val();
+                const postalCode = $('#address').val();
 
-        if (products.length === 0) {
-            alert("No items in the cart to calculate shipping.");
-            return;
-        }
+                // Prepare products data
+                const products = cartItems?.map(item => {
+                    const product = item.product;
+                    return {
+                        weight: product.weight || 3,
+                        weight_unit: 'kg',
+                        length: product.length || 3,
+                        width: product.width || 3,
+                        height: product.height || 3,
+                        size_unit: 'cm',
+                        quantity: item.quantity
+                    };
+                }).filter(item => item !== null);
 
-        // Validate country and postal code
-        if (!country || !postalCode) return;
+                if (products.length === 0) {
+                    alert("No items in the cart to calculate shipping.");
+                    return;
+                }
 
-        // Fetch shipping data
-        fetch("{{ route('shipping.calculate') }}", {
-            method: "POST",
-            headers: {
-                "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                destination: {
-                    country: country,
-                    postal_code: postalCode
-                },
-                products: products
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success && data.shipping?.data?.length) {
-                const shippingAmount = data.shipping.data[0].rate;
-                document.getElementById('shipping-amount').textContent = shippingAmount.toFixed(2);
-                updateTaxAndTotal(getSubtotal(), appliedDiscount, shippingAmount);
-            } else {
-                alert("Shipping rate unavailable for selected address.");
+                if (!country || !postalCode) return;
+
+                fetch("{{ route('shipping.calculate') }}", {
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            destination: {
+                                country: country,
+                                postal_code: postalCode
+                            },
+                            products: products
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success && data.shipping?.data?.length) {
+                            const shippingAmount = data.shipping.data[0].rate;
+                            document.getElementById('shipping-amount').textContent = shippingAmount.toFixed(2);
+                            updateTaxAndTotal(getSubtotal(), appliedDiscount, shippingAmount);
+                        } else {
+                            alert("Shipping rate unavailable for selected address.");
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Error calculating shipping.");
+                    });
             }
-        })
-        .catch(err => {
-            console.error(err);
-            alert("Error calculating shipping.");
-        });
-    }
 
             function updateTaxAndTotal(subtotal, appliedDiscount = 0, shipping = 0) {
                 let TPStaxElement = document.querySelector('.tps-cart-tax');
@@ -1086,19 +1135,21 @@
 
             updateTaxAndTotal(getSubtotal(), 0, 0);
 
+            // Handle coupon application
             document.getElementById('applyCoupon').addEventListener('click', function() {
                 let couponCode = document.getElementById('couponCode').value;
 
+
                 fetch("{{ route('apply.discount') }}", {
-                    method: "POST",
-                    headers: {
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        coupon_code: couponCode
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            coupon_code: couponCode
+                        })
                     })
-                })
                     .then(response => response.json())
                     .then(result => {
                         if (result.success) {
@@ -1110,12 +1161,15 @@
                                 .toFixed(2);
                             updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(document
                                 .getElementById('shipping-amount').textContent) || 0);
+                            updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(document
+                                .getElementById('shipping-amount').textContent) || 0);
                         } else {
                             alert(result.message);
                         }
                     })
                     .catch(error => console.error('Error:', error));
             });
+
 
             function proceedToCheckout(event) {
                 event?.preventDefault();
@@ -1125,21 +1179,26 @@
                         'Processing... <span class="spinner-border spinner-border-sm"></span>';
                     checkoutButton.disabled = true;
 
+
                     let subtotal = getSubtotal();
+
 
                     let TPStaxElement = document.querySelector('.tps-cart-tax');
                     let TPStaxAmount = parseFloat(TPStaxElement.innerText.replace(/[^0-9.]/g, '')) || 0;
                     let TPStaxNumber = TPStaxElement.getAttribute('tps-data-taxno');
                     let TPStaxPercentage = TPStaxElement.getAttribute('tps-data-percentage');
 
+
                     let TVQtaxElement = document.querySelector('.tvq-cart-tax');
                     let TVQtaxAmount = parseFloat(TVQtaxElement.innerText.replace(/[^0-9.]/g, '')) || 0;
                     let TVQtaxNumber = TVQtaxElement.getAttribute('tvq-data-taxno');
                     let TVQtaxPercentage = TVQtaxElement.getAttribute('tvq-data-percentage');
 
+
                     // Use the USD total for PayPal
                     let finalTotal = window.paypalTotal || (subtotal - appliedDiscount + TPStaxAmount +
                         TVQtaxAmount) * 0.75;
+
 
                     const formData = {
                         firstname: document.getElementById('firstname').value,
@@ -1167,14 +1226,15 @@
                         shipping_estimated_days: window.selectedShipping.estimated_days
                     };
 
+
                     fetch("{{ route('checkout.add') }}", {
-                        method: "POST",
-                        headers: {
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(formData),
-                    })
+                            method: "POST",
+                            headers: {
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(formData),
+                        })
                         .then(response => response.json())
                         .then(result => {
                             if (result.success) {
@@ -1198,20 +1258,24 @@
                 }
             }
 
+
             const countriesRoute = "{{ route('countries.index') }}";
             let countrySelect = document.getElementById('country');
             let tpsTaxRow = document.querySelector('.tps-cart-tax').parentElement;
             let tvqTaxRow = document.querySelector('.tvq-cart-tax').parentElement;
+
 
             function setLoading(selectElement) {
                 selectElement.innerHTML = '<option value="">Loading...</option>';
                 selectElement.disabled = true;
             }
 
+
             function removeLoading(selectElement, placeholder) {
                 selectElement.innerHTML = `<option value="">${placeholder}</option>`;
                 selectElement.disabled = false;
             }
+
 
             setLoading(countrySelect);
             fetch(countriesRoute)
@@ -1228,6 +1292,7 @@
                     console.error(error);
                 });
 
+
             function updateTaxRowsVisibility() {
                 if (countrySelect.value === "CA") {
                     tpsTaxRow.style.display = 'table-row';
@@ -1239,10 +1304,12 @@
                 }
             }
 
+
             $('#country').on('change', function() {
                 console.log("Selected country code:", $(this).val());
                 updateTaxRowsVisibility();
             });
+
 
             updateTaxRowsVisibility();
             document.getElementById('checkoutButton').addEventListener('click', proceedToCheckout);
