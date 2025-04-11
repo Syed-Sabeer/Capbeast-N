@@ -235,8 +235,13 @@
             document.getElementById('tvq-tax-amount').textContent = TVQtaxAmount.toFixed(2);
             document.getElementById('final-total-amount').textContent = finalTotal.toFixed(2);
 
+<<<<<<< HEAD
             // Store the USD total for PayPal
             window.paypalTotal = finalTotal;
+=======
+            // Store the USD total for PayPal (convert to USD if needed)
+            window.paypalTotal = finalTotal * 0.75;
+>>>>>>> e798c5c (working on checkout page need to modify shipping api for canada)
 
             // Debug logging
             console.log("User Country:", userCountry);
@@ -352,6 +357,7 @@
             console.log("Selected country:", selectedCountry);
             updateTaxRowsVisibility();
         });
+<<<<<<< HEAD
 
         function calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts) {
             let discount = 0;
@@ -431,6 +437,8 @@
                 updatePriceDisplay(itemId, quantity);
             });
         });
+=======
+>>>>>>> e798c5c (working on checkout page need to modify shipping api for canada)
     });
 </script>
 
@@ -571,8 +579,28 @@
                                                     <div class="d-flex align-items-center gap-2">
                                                         <div class="avatar-sm flex-shrink-0">
                                                             <div class="avatar-title  rounded-3">
+<<<<<<< HEAD
                                                                 <img src="{{ asset('storage/' . ($item->color->front_image ?? ($item->color->right_image ?? ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg'))))) }}"
                                                                     alt="" class="avatar-xs">
+=======
+                                                                @if ($item->userCustomization)
+                                                                    <img src="{{ asset(
+                                                                        $item->userCustomization->front_image ??
+                                                                            ($item->userCustomization->right_image ??
+                                                                                ($item->userCustomization->left_image ??
+                                                                                    ($item->userCustomization->back_image ?? 'ProductImages/default.jpg'))),
+                                                                    ) }}"
+                                                                        alt="" class="avatar-lg ">
+                                                                @else
+                                                                    <img src="{{ asset(
+                                                                        'storage/' .
+                                                                            ($item->color->front_image ??
+                                                                                ($item->color->right_image ??
+                                                                                    ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg')))),
+                                                                    ) }}"
+                                                                        alt="" class="avatar-lg ">
+                                                                @endif
+>>>>>>> e798c5c (working on checkout page need to modify shipping api for canada)
                                                             </div>
                                                         </div>
                                                         <div class="flex-grow-1">
@@ -597,8 +625,12 @@
                                                     {{ $item->quantity }}
                                                 </td>
                                                 <td class="text-end">
+<<<<<<< HEAD
                                                     <span class="item-total-price"
                                                         data-item-id="{{ $item->id }}">${{ number_format($itemTotal, 2) }}</span>
+=======
+                                                    ${{ number_format($basePrice, 2) }}
+>>>>>>> e798c5c (working on checkout page need to modify shipping api for canada)
                                                 </td>
                                                 <td class="text-end">
                                                     ${{ number_format($customizationPrice, 2) }}
@@ -929,8 +961,13 @@
             document.getElementById('tvq-tax-amount').textContent = TVQtaxAmount.toFixed(2);
             document.getElementById('final-total-amount').textContent = finalTotal.toFixed(2);
 
+<<<<<<< HEAD
             // Store the USD total for PayPal
             window.paypalTotal = finalTotal;
+=======
+            // Store the USD total for PayPal (convert to USD if needed)
+            window.paypalTotal = finalTotal * 0.75;
+>>>>>>> e798c5c (working on checkout page need to modify shipping api for canada)
 
             // Debug logging
             console.log("User Country:", userCountry);
