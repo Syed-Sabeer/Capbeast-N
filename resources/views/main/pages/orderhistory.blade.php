@@ -145,7 +145,7 @@
                                                     href="https://capbeast.com/" class="link-primary" target="_blank"
                                                     id="website">www.capbeast.com</a></h6>
                                             <h6 class="mb-0"><span class="text-muted fw-normal">Contact No: </span><span
-                                                    id="contact-no"> +1 855 932 6752</span></h6>
+                                                    id="contact-no"> +1 888 882 2780</span></h6>
                                         </div>
                                     </div>
                                 </div>
