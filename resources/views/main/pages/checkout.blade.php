@@ -659,7 +659,7 @@
                                 <div class="row mb-4">
                                     <div class="col-md-6">
                                         <div data-mdb-input-init class="form-outline">
-                                    <label class="form-label" for="country">Country *</label>
+                                            <label class="form-label" for="country">Country *</label>
                                             <select id="country" name="country" class="form-control" required>
                                                 <option value="">Select Country</option>
                                                 @foreach ($countries as $code => $name)
@@ -866,7 +866,7 @@
                                                     $<span id="shipping-amount">0.00</span>
                                                 </td>
                                             </tr>
-                                            
+
                                             <tr class="table-active">
                                                 <th>Total ( ) :</th>
                                                 <td class="text-end">
@@ -974,10 +974,10 @@
                     };
                 }).filter(item => item !== null);
 
-        if (products.length === 0) {
-            alert("No items in the cart to calculate shipping.");
-            return;
-        }
+                if (products.length === 0) {
+                    alert("No items in the cart to calculate shipping.");
+                    return;
+                }
 
                 if (!country || !postalCode) return;
 
@@ -1014,17 +1014,17 @@
             // Handle coupon application
             document.getElementById('applyCoupon').addEventListener('click', function() {
                 let couponCode = document.getElementById('couponCode').value;
-    
+
                 fetch("{{ route('apply.discount') }}", {
-                    method: "POST",
-                    headers: {
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        coupon_code: couponCode
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            coupon_code: couponCode
+                        })
                     })
-                })
                     .then(response => response.json())
                     .then(result => {
                         if (result.success) {
@@ -1041,7 +1041,7 @@
                     })
                     .catch(error => console.error('Error:', error));
             });
-    
+
             function proceedToCheckout(event) {
                 event?.preventDefault();
                 if (confirm('Are you sure you want to proceed to checkout?')) {
@@ -1049,23 +1049,23 @@
                     checkoutButton.innerHTML =
                         'Processing... <span class="spinner-border spinner-border-sm"></span>';
                     checkoutButton.disabled = true;
-    
+
                     let subtotal = getSubtotal();
-    
+
                     let TPStaxElement = document.querySelector('.tps-cart-tax');
                     let TPStaxAmount = parseFloat(TPStaxElement.innerText.replace(/[^0-9.]/g, '')) || 0;
                     let TPStaxNumber = TPStaxElement.getAttribute('tps-data-taxno');
                     let TPStaxPercentage = TPStaxElement.getAttribute('tps-data-percentage');
-    
+
                     let TVQtaxElement = document.querySelector('.tvq-cart-tax');
                     let TVQtaxAmount = parseFloat(TVQtaxElement.innerText.replace(/[^0-9.]/g, '')) || 0;
                     let TVQtaxNumber = TVQtaxElement.getAttribute('tvq-data-taxno');
                     let TVQtaxPercentage = TVQtaxElement.getAttribute('tvq-data-percentage');
-    
+
                     // Use the USD total for PayPal
                     let finalTotal = window.paypalTotal || (subtotal - appliedDiscount + TPStaxAmount +
                         TVQtaxAmount) * 0.75;
-    
+
                     const formData = {
                         firstname: document.getElementById('firstname').value,
                         lastname: document.getElementById('lastname').value,
@@ -1091,15 +1091,15 @@
                         shipping_service: window.selectedShipping.service,
                         shipping_estimated_days: window.selectedShipping.estimated_days
                     };
-    
+
                     fetch("{{ route('checkout.add') }}", {
-                        method: "POST",
-                        headers: {
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(formData),
-                    })
+                            method: "POST",
+                            headers: {
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(formData),
+                        })
                         .then(response => response.json())
                         .then(result => {
                             if (result.success) {
@@ -1122,22 +1122,22 @@
                         });
                 }
             }
-    
+
             const countriesRoute = "{{ route('countries.index') }}";
             let countrySelect = document.getElementById('country');
             let tpsTaxRow = document.querySelector('.tps-cart-tax').parentElement;
             let tvqTaxRow = document.querySelector('.tvq-cart-tax').parentElement;
-    
+
             function setLoading(selectElement) {
                 selectElement.innerHTML = '<option value="">Loading...</option>';
                 selectElement.disabled = true;
             }
-    
+
             function removeLoading(selectElement, placeholder) {
                 selectElement.innerHTML = `<option value="">${placeholder}</option>`;
                 selectElement.disabled = false;
             }
-    
+
             setLoading(countrySelect);
             fetch(countriesRoute)
                 .then(response => response.json())
@@ -1152,7 +1152,7 @@
                     removeLoading(countrySelect, "Failed to load countries, Kindly Refresh the page");
                     console.error(error);
                 });
-    
+
             function updateTaxRowsVisibility() {
                 if (countrySelect.value === "CA") {
                     tpsTaxRow.style.display = 'table-row';
@@ -1163,12 +1163,12 @@
                     tvqTaxRow.style.display = 'none';
                 }
             }
-    
+
             $('#country').on('change', function() {
                 console.log("Selected country code:", $(this).val());
                 updateTaxRowsVisibility();
             });
-    
+
             updateTaxRowsVisibility();
             document.getElementById('checkoutButton').addEventListener('click', proceedToCheckout);
         });
