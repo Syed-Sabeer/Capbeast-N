@@ -750,14 +750,14 @@
                                                 </td>
                                             </tr>
 
-                                            <tr>
+                                            {{-- <tr>
                                                 <td>Shipping Method:</td>
                                                 <td class="text-end">
                                                     <div id="shipping-methods-container">
-                                                        <!-- Shipping methods will be loaded here -->
+                                                     
                                                     </div>
                                                 </td>
-                                            </tr>
+                                            </tr> --}}
 
                                             <tr>
                                                 <td>Shipping Cost:</td>
