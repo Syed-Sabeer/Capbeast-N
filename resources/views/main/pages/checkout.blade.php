@@ -11,26 +11,66 @@
 
 <!-- Include Select2 JS from CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script>
+    const statesUrlTemplate = "{{ route('countries.states', ['code' => '__CODE__']) }}";
+</script>
 
 <script>
     $(document).ready(function() {
-        // Initialize Select2 with proper event handling
+        // Initialize Select2 for country dropdown
         $('#country').select2({
             placeholder: 'Select Country',
             width: '100%',
             theme: 'classic'
         }).on('select2:select', function(e) {
+            const countryCode = $(this).val();
+            loadStates(countryCode);
             calculateShipping();
             updateTaxRowsVisibility();
         });
 
+        // Initialize Select2 for state dropdown
+        $('#state').select2({
+            placeholder: 'Select State/Province',
+            width: '100%',
+            theme: 'classic'
+        });
+
+        // Function to load states based on country
+        function loadStates(countryCode) {
+            if (!countryCode) {
+                $('#state').empty().append('<option value="">Select State/Province</option>');
+                return;
+            }
+
+            const url = statesUrlTemplate.replace('__CODE__', countryCode);
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(response) {
+                    $('#state').empty().append('<option value="">Select State/Province</option>');
+                    response.forEach(function(state) {
+                        $('#state').append(
+                            `<option value="${state.code}">${state.name}</option>`);
+                    });
+                },
+                error: function(xhr) {
+                    console.error('Error loading states:', xhr);
+                    $('#state').empty().append('<option value="">Select State/Province</option>');
+                }
+            });
+        }
+
+
         // Function to calculate shipping
         function calculateShipping() {
             const country = $('#country').val();
+            const state = $('#state').val();
             const postalCode = $('#postal_code').val();
             const address = $('#address').val();
 
-            if (!country || !postalCode || !address) {
+            if (!country || !state || !postalCode || !address) {
                 $('#shipping-methods-container').html(
                     '<div class="alert alert-warning">Please fill in all address fields</div>');
                 return;
@@ -45,8 +85,6 @@
             const cartItems = @json($cart);
             const products = cartItems.map(item => {
                 const product = item.product;
-                console.log('Processing product:', product); // Debug log
-
                 return {
                     weight: parseFloat(product.weight) || 0,
                     weight_unit: product.weight_unit || 'kg',
@@ -63,8 +101,6 @@
                 product.height > 0
             );
 
-            console.log('Processed products:', products); // Debug log
-
             if (products.length === 0) {
                 $('#shipping-methods-container').html(
                     '<div class="alert alert-danger">Unable to calculate shipping: No valid products found. Please ensure all products have valid dimensions.</div>'
@@ -78,6 +114,7 @@
                 data: {
                     destination: {
                         country: country,
+                        state: state,
                         postal_code: postalCode,
                         address: address
                     },
@@ -110,10 +147,8 @@
                         });
                         shippingHtml += '</div>';
 
-                        // Update shipping section in order summary
                         $('#shipping-methods-container').html(shippingHtml);
 
-                        // Select first shipping method by default
                         if (response.shipping.rates.length > 0) {
                             $('input[name="shipping_method"]:first').prop('checked', true).trigger(
                                 'change');
@@ -145,7 +180,6 @@
 
             $('#shipping-amount').text(selectedRate.toFixed(2));
 
-            // Store shipping details for checkout
             window.selectedShipping = {
                 method: $(this).val(),
                 price: selectedRate,
@@ -156,12 +190,9 @@
             updateTaxAndTotal(getSubtotal(), appliedDiscount, selectedRate);
         });
 
-        // Remove any existing event listeners
-        $('#country, #postal_code, #address').off('change keyup');
-
         // Add event listeners for all address fields
         let typingTimer;
-        $('#postal_code, #address').on('change keyup', function() {
+        $('#state, #postal_code, #address, #country').on('change keyup', function() {
             clearTimeout(typingTimer);
             typingTimer = setTimeout(calculateShipping, 500);
         });
@@ -538,10 +569,18 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div data-mdb-input-init class="form-outline">
-                                            <label class="form-label" for="postal_code">Postal Code *</label>
-                                            <input type="text" id="postal_code" name="postal_code" class="form-control"
-                                                required />
+                                            <label class="form-label" for="state">State/Province *</label>
+                                            <select id="state" name="state" class="form-control" required>
+                                                <option value="">Select State/Province</option>
+                                            </select>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div data-mdb-input-init class="form-outline">
+                                        <label class="form-label" for="postal_code">Postal Code *</label>
+                                        <input type="text" id="postal_code" name="postal_code" class="form-control"
+                                            required />
                                     </div>
                                 </div>
 

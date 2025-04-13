@@ -10,6 +10,7 @@ use Monarobase\CountryList\CountryList;
 use App\Mail\OrderPlacedMail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Order;
+use App\Models\State;
 use App\Models\OrderTaxDetails;
 use App\Models\TVQTaxPrice;
 use App\Models\TPSTaxPrice;
@@ -54,6 +55,18 @@ class OrderController extends Controller
     $this->_api_context = new ApiContext(new OAuthTokenCredential($paypal['client_id'], $paypal['secret']));
     $this->_api_context->setConfig($paypal['settings']);
   }
+
+  public function getStates($code)
+  {
+      try {
+          $states = State::where('country_code', $code)->get(['code', 'name']);
+          return response()->json($states);
+      } catch (\Exception $e) {
+          \Log::error('Error in getStates: ' . $e->getMessage());
+          return response()->json(['error' => 'Failed to load states'], 500);
+      }
+  }
+  
 
   public function PostPaymentWithPaypal($totalPrice)
   {

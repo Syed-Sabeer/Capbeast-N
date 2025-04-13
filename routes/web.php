@@ -69,16 +69,16 @@ Route::middleware(['web'])->group(function () {
     Route::post('/customizer/update/{id}', [CustomizerController::class, 'update'])->name('customizer.update');
     Route::post('/customizer/upload-image', [CustomizerController::class, 'uploadImage'])->name('customizer.upload-image');
     Route::get('/delete/customizer-image/{id}', [CustomizerController::class, 'deleteImage'])->name('customizer.delete-image');
-// routes/web.php
-Route::post('/shipping/calculate', [ShippingController::class, 'calculate'])->name('shipping.calculate');
+    // routes/web.php
+    Route::post('/shipping/calculate', [ShippingController::class, 'calculate'])->name('shipping.calculate');
 
     Route::get('/countries', [OrderController::class, 'getCountries'])->name('countries.index');
     Route::get('/countries/{code}/states', [OrderController::class, 'getStates'])->name('countries.states');
 
     Route::post('/shipping/rate', [ShippingController::class, 'getShippingRate'])->name('shipping.rate');
-Route::get('/shipping/countries', [ShippingController::class, 'getCountries'])->name('shipping.countries');
-Route::post('/shipping/address/validate', [ShippingController::class, 'validateAddress'])->name('shipping.validate.address');
-Route::post('/shipping/discount', [ShippingController::class, 'applyShippingDiscount'])->name('shipping.discount');
+    Route::get('/shipping/countries', [ShippingController::class, 'getCountries'])->name('shipping.countries');
+    Route::post('/shipping/address/validate', [ShippingController::class, 'validateAddress'])->name('shipping.validate.address');
+    Route::post('/shipping/discount', [ShippingController::class, 'applyShippingDiscount'])->name('shipping.discount');
 
 
 
@@ -182,34 +182,34 @@ foreach ($roles as $role => $prefix) {
       if ($prefix == 'superadmin') {
 
 
-        Route::get('/category', [EcommerceProductCategory::class, 'index'])->name(Route::prefixed($prefix,'app-ecommerce-product-category'));
-        Route::get('/category/add', [EcommerceProductCategory::class, 'create'])->name(Route::prefixed($prefix,'category.add'));
-        Route::post('/category/store', [EcommerceProductCategory::class, 'store'])->name(Route::prefixed($prefix,'category.store'));
-        Route::get('/category/edit/{category}', [EcommerceProductCategory::class, 'edit'])->name(Route::prefixed($prefix,'category.edit'));
-        Route::post('/category/update/{category}', [EcommerceProductCategory::class, 'update'])->name(Route::prefixed($prefix,'category.update'));
-        Route::get('/category/delete/{category}', [EcommerceProductCategory::class, 'destroy'])->name(Route::prefixed($prefix,'category.delete'));
+        Route::get('/category', [EcommerceProductCategory::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-product-category'));
+        Route::get('/category/add', [EcommerceProductCategory::class, 'create'])->name(Route::prefixed($prefix, 'category.add'));
+        Route::post('/category/store', [EcommerceProductCategory::class, 'store'])->name(Route::prefixed($prefix, 'category.store'));
+        Route::get('/category/edit/{category}', [EcommerceProductCategory::class, 'edit'])->name(Route::prefixed($prefix, 'category.edit'));
+        Route::post('/category/update/{category}', [EcommerceProductCategory::class, 'update'])->name(Route::prefixed($prefix, 'category.update'));
+        Route::get('/category/delete/{category}', [EcommerceProductCategory::class, 'destroy'])->name(Route::prefixed($prefix, 'category.delete'));
         Route::post('/category/update-visibility/{id}', [EcommerceProductCategory::class, 'updateCategoryVisibility'])
-        ->name(Route::prefixed($prefix, 'category.update.visibility'));
+          ->name(Route::prefixed($prefix, 'category.update.visibility'));
 
 
-        Route::get('/brand', [EcommerceProductBrand::class, 'index'])->name(Route::prefixed($prefix,'app-ecommerce-product-brand'));
-        Route::get('/brand/add', [EcommerceProductBrand::class, 'create'])->name(Route::prefixed($prefix,'brand.add'));
-        Route::post('/brand/store', [EcommerceProductBrand::class, 'store'])->name(Route::prefixed($prefix,'brand.store'));
-        Route::get('/brand/edit/{brand}', [EcommerceProductBrand::class, 'edit'])->name(Route::prefixed($prefix,'brand.edit'));
-        Route::post('/brand/update/{brand}', [EcommerceProductBrand::class, 'update'])->name(Route::prefixed($prefix,'brand.update'));
-        Route::get('/brand/delete/{brand}', [EcommerceProductBrand::class, 'destroy'])->name(Route::prefixed($prefix,'brand.delete'));
+        Route::get('/brand', [EcommerceProductBrand::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-product-brand'));
+        Route::get('/brand/add', [EcommerceProductBrand::class, 'create'])->name(Route::prefixed($prefix, 'brand.add'));
+        Route::post('/brand/store', [EcommerceProductBrand::class, 'store'])->name(Route::prefixed($prefix, 'brand.store'));
+        Route::get('/brand/edit/{brand}', [EcommerceProductBrand::class, 'edit'])->name(Route::prefixed($prefix, 'brand.edit'));
+        Route::post('/brand/update/{brand}', [EcommerceProductBrand::class, 'update'])->name(Route::prefixed($prefix, 'brand.update'));
+        Route::get('/brand/delete/{brand}', [EcommerceProductBrand::class, 'destroy'])->name(Route::prefixed($prefix, 'brand.delete'));
         Route::post('/brand/update-visibility/{id}', [EcommerceProductBrand::class, 'updateBrandVisibility'])
-        ->name(Route::prefixed($prefix, 'brand.update.visibility'));
+          ->name(Route::prefixed($prefix, 'brand.update.visibility'));
 
 
-        Route::get('/mlb', [EcommerceProductMlb::class, 'index'])->name(Route::prefixed($prefix,'app-ecommerce-product-mlb'));
-        Route::get('/mlb/add', [EcommerceProductMlb::class, 'create'])->name(Route::prefixed($prefix,'mlb.add'));
-        Route::post('/mlb/store', [EcommerceProductMlb::class, 'store'])->name(Route::prefixed($prefix,'mlb.store'));
-        Route::get('/mlb/edit/{mlb}', [EcommerceProductMlb::class, 'edit'])->name(Route::prefixed($prefix,'mlb.edit'));
-        Route::post('/mlb/update/{mlb}', [EcommerceProductMlb::class, 'update'])->name(Route::prefixed($prefix,'mlb.update'));
-        Route::get('/mlb/delete/{mlb}', [EcommerceProductMlb::class, 'destroy'])->name(Route::prefixed($prefix,'mlb.delete'));
+        Route::get('/mlb', [EcommerceProductMlb::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-product-mlb'));
+        Route::get('/mlb/add', [EcommerceProductMlb::class, 'create'])->name(Route::prefixed($prefix, 'mlb.add'));
+        Route::post('/mlb/store', [EcommerceProductMlb::class, 'store'])->name(Route::prefixed($prefix, 'mlb.store'));
+        Route::get('/mlb/edit/{mlb}', [EcommerceProductMlb::class, 'edit'])->name(Route::prefixed($prefix, 'mlb.edit'));
+        Route::post('/mlb/update/{mlb}', [EcommerceProductMlb::class, 'update'])->name(Route::prefixed($prefix, 'mlb.update'));
+        Route::get('/mlb/delete/{mlb}', [EcommerceProductMlb::class, 'destroy'])->name(Route::prefixed($prefix, 'mlb.delete'));
         Route::post('/mlb/update-visibility/{id}', [EcommerceProductMlb::class, 'updateMlbVisibility'])
-        ->name(Route::prefixed($prefix, 'mlb.update.visibility'));
+          ->name(Route::prefixed($prefix, 'mlb.update.visibility'));
 
 
 
@@ -291,9 +291,7 @@ foreach ($roles as $role => $prefix) {
         Route::delete('/customers/delete/{id}', [EcommerceCustomerAll::class, 'destroy'])->name(Route::prefixed($prefix, 'admin.customers.destroy'));
 
         Route::post('/logout', [EcommerceAuthController::class, 'logout'])->name(Route::prefixed($prefix, 'admin.logout'));
-
       }
-
     });
   });
 }

@@ -26,8 +26,9 @@ class ShippingController extends Controller
             'products.*.quantity' => 'nullable|integer',
             'destination' => 'required|array',
             'destination.country' => 'required|string',
+            'destination.state' => 'required|string',
             'destination.postal_code' => 'required|string',
-            'destination.address' => 'required|string',
+            'destination.address' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -53,7 +54,7 @@ class ShippingController extends Controller
                 'address1' => $destination['address'],
                 'address2' => '',
                 'city' => 'Rock Springs',
-                'province_code' => 'WY',
+                'province_code' => $destination['state'] ?? '',
                 'postal_code' => $destination['postal_code'],
                 'country_code' => strtoupper($destination['country']),
                 'phone' => '5145618019',
