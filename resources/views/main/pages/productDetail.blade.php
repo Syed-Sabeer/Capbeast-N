@@ -157,11 +157,18 @@
                                 @endif
                             </ul>
 
-                            <h5 class="fs-24 mb-4">${{ $product->selling_price }} <span
-                                    class="text-muted fs-14">
-                                    {{-- <del>$280.99</del></span> <span class="fs-14 ms-2 text-danger">
-                                    (50% off)</span> --}}
-                                </h5>
+                            <script>
+                                const volumeDiscounts = @json($product->productVolumeDiscount->sortBy('quantity')->values());
+                                const sellingPrice = {{ $product->selling_price }};
+                            </script>
+<h5 class="fs-24 mb-4">
+    <span id="discounted-price">${{ $product->selling_price }}</span>
+    <span class="text-muted fs-14 ms-2">
+        <del id="original-price" style="display: none;">${{ $product->selling_price }}</del>
+    </span>
+    <span id="percent-off" class="fs-14 ms-2 text-danger"></span>
+</h5>
+                            
 
                         </div>
                         @if ($product->productColors->isNotEmpty())
@@ -197,14 +204,22 @@
                             </div>
                         </div>
 
+                        <script>
+                            const volumeDiscounts = @json($product->productVolumeDiscount->sortBy('quantity')->values());
+                        </script>
+                        
+
                         <h6 class="fs-14 fw-medium text-muted mt-3">Quantity :</h6>
-                        <div class="input-step ">
+                        <div class="input-step">
                             <button type="button" class="minus">–</button>
-                            <input type="number" class="product-quantity1" value="1" min="0" max="100"
-                                readonly="">
+                            <input type="number" class="product-quantity1" value="1" min="1" max="100" readonly>
                             <button type="button" class="plus">+</button>
                         </div>
-
+                        
+                        <div id="discount-info" class="mt-2 text-success fs-13 fw-medium"></div>
+                        <div id="next-tier-info" class="text-muted fs-12"></div>
+                        
+                        
                         {{-- <button class="btn btn-primary fs-14 add-to-cart-btn" data-product-id="{{ $product->id }}"
                             data-color-id="{{ $product->productColors->first()->id ?? '' }}"
                             data-user-id="{{ auth()->id() }}" data-size="">

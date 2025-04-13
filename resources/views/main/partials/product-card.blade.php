@@ -17,9 +17,18 @@
                                 <span class="icon-off"><i class="ri-heart-fill"></i></span>
                             </button>
                         </div>
-                        <div class="avatar-xs label">
-                            <div class="avatar-title bg-danger rounded-circle fs-11">25%</div>
-                        </div>
+                        @php
+    $maxDiscount = $product->productVolumeDiscount->max('discount');
+@endphp
+
+{{-- @if($maxDiscount)
+    <div class="avatar-xs label">
+        <div class="avatar-title bg-danger rounded-circle fs-11">
+            {{ $maxDiscount }}%
+        </div>
+    </div>
+@endif --}}
+
                     </div>
                     <div class="pt-4">
                         <div>

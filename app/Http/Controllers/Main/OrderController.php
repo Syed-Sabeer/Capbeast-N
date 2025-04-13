@@ -289,7 +289,7 @@ class OrderController extends Controller
                   'sku' => $item->product->sku ?? 'SKU123',
                   'quantity' => $item->quantity,
                   'value' => $item->product_price,
-                  'currency' => 'CAD',
+                  'currency' => 'USD',
                   'country_of_origin' => 'CN',
                   'hs_code' => '123456',
                   'manufacturer_name' => 'Beast Group Inc.',

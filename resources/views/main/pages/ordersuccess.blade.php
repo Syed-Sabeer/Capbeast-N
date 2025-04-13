@@ -172,6 +172,18 @@
                             </th>
                     </tr>
 
+
+                    <tr>
+                        <td colspan="3" style="padding: 12px 8px; font-size: 15px;">
+                            Shipping 
+                        </td>
+                        <td style="padding: 12px 8px; font-size: 15px;text-align: end; ">
+                            <h6 style="font-size: 15px; margin: 0px;font-weight: 600; font-family: 'Inter', sans-serif;">
+                            ${{ number_format($order->shipping_price, 2) ?? 0 }}
+                            </h6>
+                            </th>
+                    </tr>
+
                     
 
                     <tr>

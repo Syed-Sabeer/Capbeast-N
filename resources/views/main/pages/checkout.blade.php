@@ -73,6 +73,7 @@
             if (!country || !state || !postalCode || !address) {
                 $('#shipping-methods-container').html(
                     '<div class="alert alert-warning">Please fill in all address fields</div>');
+                $('#shipping-amount').text('0.00');
                 return;
             }
 
@@ -105,6 +106,7 @@
                 $('#shipping-methods-container').html(
                     '<div class="alert alert-danger">Unable to calculate shipping: No valid products found. Please ensure all products have valid dimensions.</div>'
                 );
+                $('#shipping-amount').text('0.00');
                 return;
             }
 
@@ -127,18 +129,20 @@
                     if (response.success && response.shipping.rates) {
                         let shippingHtml = '<div class="shipping-methods-list">';
                         response.shipping.rates.forEach(rate => {
+                            // Always use USD price
+                            const rateUSD = rate.price_usd || (rate.total * 0.75);
                             shippingHtml += `
                                 <div class="form-check mb-2">
                                     <input class="form-check-input shipping-method-radio" type="radio" 
                                         name="shipping_method" 
                                         value="${rate.postage_type_id}" 
                                         id="shipping_${rate.postage_type_id}"
-                                        data-price="${rate.total}"
-                                        data-price-usd="${rate.price_usd || (rate.total * 0.75)}"
+                                        data-price="${rateUSD}"
+                                        data-price-usd="${rateUSD}"
                                         data-service="${rate.postage_type}"
                                         data-days="${rate.delivery_days}">
                                     <label class="form-check-label" for="shipping_${rate.postage_type_id}">
-                                        ${rate.postage_type} - $${(rate.price_usd || (rate.total * 0.75)).toFixed(2)} USD
+                                        ${rate.postage_type} - $${rateUSD.toFixed(2)} USD
                                         <br>
                                         <small class="text-muted">Estimated delivery: ${rate.delivery_days} days</small>
                                     </label>
@@ -150,8 +154,13 @@
                         $('#shipping-methods-container').html(shippingHtml);
 
                         if (response.shipping.rates.length > 0) {
+                            // Select the first shipping method by default
+                            const firstRate = response.shipping.rates[0];
+                            const firstRateUSD = firstRate.price_usd || (firstRate.total * 0.75);
                             $('input[name="shipping_method"]:first').prop('checked', true).trigger(
                                 'change');
+                            $('#shipping-amount').text(firstRateUSD.toFixed(2));
+                            updateTaxAndTotal(getSubtotal(), appliedDiscount, firstRateUSD);
                         }
                     } else {
                         $('#shipping-methods-container').html(
@@ -174,10 +183,11 @@
 
         // Handle shipping method selection
         $(document).on('change', 'input[name="shipping_method"]', function() {
-            const selectedRate = $(this).data('price');
+            const selectedRate = $(this).data('price-usd');
             const selectedService = $(this).data('service');
             const selectedDays = $(this).data('days');
 
+            // Update shipping amount in both places
             $('#shipping-amount').text(selectedRate.toFixed(2));
 
             window.selectedShipping = {
@@ -225,8 +235,8 @@
             document.getElementById('tvq-tax-amount').textContent = TVQtaxAmount.toFixed(2);
             document.getElementById('final-total-amount').textContent = finalTotal.toFixed(2);
 
-            // Store the USD total for PayPal (convert to USD if needed)
-            window.paypalTotal = finalTotal * 0.75;
+            // Store the USD total for PayPal
+            window.paypalTotal = finalTotal;
 
             // Debug logging
             console.log("User Country:", userCountry);
@@ -828,8 +838,8 @@
             document.getElementById('tvq-tax-amount').textContent = TVQtaxAmount.toFixed(2);
             document.getElementById('final-total-amount').textContent = finalTotal.toFixed(2);
 
-            // Store the USD total for PayPal (convert to USD if needed)
-            window.paypalTotal = finalTotal * 0.75;
+            // Store the USD total for PayPal
+            window.paypalTotal = finalTotal;
 
             // Debug logging
             console.log("User Country:", userCountry);
