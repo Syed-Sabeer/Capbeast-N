@@ -20,12 +20,28 @@ class OrderShippingRate extends Model
         'tracking_number',
         'tracking_url',
         'label_url',
+        'label_base64',
+        'shipment_code',
+        'base_rate',
+        'rate',
+        'tax',
+        'total',
+        'currency',
+        'trackable',
+        'package_type',
+        'add_ons',
         'rate_details'
     ];
 
     protected $casts = [
         'rate_details' => 'array',
-        'shipping_price' => 'decimal:2'
+        'add_ons' => 'array',
+        'shipping_price' => 'decimal:2',
+        'base_rate' => 'decimal:2',
+        'rate' => 'decimal:2',
+        'tax' => 'decimal:2',
+        'total' => 'decimal:2',
+        'trackable' => 'boolean'
     ];
 
     public function order()

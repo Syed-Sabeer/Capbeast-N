@@ -23,6 +23,16 @@ return new class extends Migration
             $table->string('tracking_number')->nullable();
             $table->string('tracking_url')->nullable();
             $table->string('label_url')->nullable();
+            $table->text('label_base64')->nullable(); // Store base64 label
+            $table->string('shipment_code')->nullable(); // Store shipment code
+            $table->decimal('base_rate', 10, 2)->nullable();
+            $table->decimal('rate', 10, 2)->nullable();
+            $table->decimal('tax', 10, 2)->nullable();
+            $table->decimal('total', 10, 2)->nullable();
+            $table->string('currency')->nullable();
+            $table->boolean('trackable')->default(false);
+            $table->string('package_type')->nullable();
+            $table->json('add_ons')->nullable();
             $table->json('rate_details')->nullable(); // Store full rate response
             $table->timestamps();
         });

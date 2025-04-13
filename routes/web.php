@@ -48,6 +48,7 @@ use App\Http\Controllers\Main\DeliveryInfoController;
 use App\Http\Controllers\Main\PrivacyPolicyController;
 use App\Http\Controllers\Main\ReturnController;
 use App\Http\Controllers\Main\ShippingController;
+use App\Http\Controllers\Main\ShipmentController;
 
 Route::get('/', function () {
   return redirect()->route('home');
@@ -71,6 +72,10 @@ Route::middleware(['web'])->group(function () {
     Route::get('/delete/customizer-image/{id}', [CustomizerController::class, 'deleteImage'])->name('customizer.delete-image');
     // routes/web.php
     Route::post('/shipping/calculate', [ShippingController::class, 'calculate'])->name('shipping.calculate');
+
+    // Shipment routes
+    Route::get('/shipments', [ShipmentController::class, 'getShipments'])->name('shipments.index');
+    Route::post('/shipments/create', [ShipmentController::class, 'createShipment'])->name('shipments.create');
 
     Route::get('/countries', [OrderController::class, 'getCountries'])->name('countries.index');
     Route::get('/countries/{code}/states', [OrderController::class, 'getStates'])->name('countries.states');

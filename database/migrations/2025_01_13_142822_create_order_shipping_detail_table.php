@@ -14,14 +14,18 @@ return new class extends Migration
         Schema::create('order_shipping_detail', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade'); // Link to the order
-           
+
             $table->string('firstname');
             $table->string('lastname');
-            $table->string('companyname');
+            $table->string('companyname')->nullable();
+            $table->string('country');
+            $table->string('state');
+            $table->string('city');
+            $table->string('postal_code');
             $table->text('address');
             $table->string('email');
             $table->string('phone');
-            $table->text('additional_info');
+            $table->text('additional_info')->nullable();
             $table->timestamps();
         });
     }

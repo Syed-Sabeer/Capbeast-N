@@ -9,10 +9,8 @@ class OrderShippingDetail extends Model
 {
     use HasFactory;
 
- 
     protected $table = 'order_shipping_detail';
 
- 
     protected $fillable = [
         'order_id',
         'firstname',
@@ -20,6 +18,8 @@ class OrderShippingDetail extends Model
         'companyname',
         'country',
         'state',
+        'city',
+        'postal_code',
         'address',
         'email',
         'phone',
