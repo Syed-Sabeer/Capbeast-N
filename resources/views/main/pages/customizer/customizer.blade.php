@@ -591,6 +591,7 @@
             align-items: center;
             z-index: 9999;
         }
+
         .loader-spinner {
             position: absolute;
             top: 50%;
@@ -602,9 +603,15 @@
             height: 40px;
             animation: spin 1s linear infinite;
         }
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
     <section class="section">
@@ -779,23 +786,36 @@
                     </div>
                     <div class="mt-4 p-3 bg-light rounded">
                         <div class="d-flex justify-content-around text-center view-selector">
-                            <div class="px-3 view-option" data-view="front">
-                                <img height="50px" src="{{ asset($userCustomization->front_image) }}" alt="Front View"
-                                    class="active">
-                                <p class="small mb-0 active">Front-${{ $customizerPrice->front_price }}</p>
-                            </div>
-                            <div class="px-3 view-option" data-view="left">
-                                <img height="50px" src="{{ asset($userCustomization->left_image) }}" alt="Left View">
-                                <p class="small mb-0">Left-${{ $customizerPrice->back_price }}</p>
-                            </div>
-                            <div class="px-3 view-option" data-view="right">
-                                <img height="50px" src="{{ asset($userCustomization->right_image) }}" alt="Right View">
-                                <p class="small mb-0">Right-${{ $customizerPrice->right_price }}</p>
-                            </div>
-                            <div class="px-3 view-option" data-view="back">
-                                <img height="50px" src="{{ asset($userCustomization->back_image) }}" alt="Back View">
-                                <p class="small mb-0">Back-${{ $customizerPrice->left_price }}</p>
-                            </div>
+                            @if (isset($productColor))
+                                @if ($productColor->is_front == '1')
+                                    <div class="px-3 view-option" data-view="front">
+                                        <img height="50px" src="{{ asset($userCustomization->front_image) }}"
+                                            alt="Front View" class="active">
+                                        <p class="small mb-0 active">Front-${{ $customizerPrice->front_price }}</p>
+                                    </div>
+                                @endif
+                                @if ($productColor->is_left == '1')
+                                    <div class="px-3 view-option" data-view="left">
+                                        <img height="50px" src="{{ asset($userCustomization->left_image) }}"
+                                            alt="Left View">
+                                        <p class="small mb-0">Left-${{ $customizerPrice->back_price }}</p>
+                                    </div>
+                                @endif
+                                @if ($productColor->is_right == '1')
+                                    <div class="px-3 view-option" data-view="right">
+                                        <img height="50px" src="{{ asset($userCustomization->right_image) }}"
+                                            alt="Right View">
+                                        <p class="small mb-0">Right-${{ $customizerPrice->right_price }}</p>
+                                    </div>
+                                @endif
+                                @if ($productColor->is_back == '1')
+                                    <div class="px-3 view-option" data-view="back">
+                                        <img height="50px" src="{{ asset($userCustomization->back_image) }}"
+                                            alt="Back View">
+                                        <p class="small mb-0">Back-${{ $customizerPrice->left_price }}</p>
+                                    </div>
+                                @endif
+                            @endif
                         </div>
                     </div>
                     <div class="option-bar mt-4 d-flex justify-content-between align-items-center p-3">
@@ -849,10 +869,10 @@
                 </div>
             </div>
         </div>
-      </section>
-      <div id="loader">
-          <div class="loader-spinner"></div>
-      </div>
+    </section>
+    <div id="loader">
+        <div class="loader-spinner"></div>
+    </div>
 
     <!-- jQuery CDN (latest version) -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -1476,16 +1496,16 @@
                         previews: previews
                     },
                     success: function(response) {
-                      if (response.redirect_url) {
-                          // Redirect to the customizer index page
-                          window.location.href = response.redirect_url;
-                          $('#loader').hide();
+                        if (response.redirect_url) {
+                            // Redirect to the customizer index page
+                            window.location.href = response.redirect_url;
+                            $('#loader').hide();
                         } else {
                             alert("Failed to add item to cart.");
                         }
                     },
                     error: function(xhr) {
-                      $('#loader').hide();
+                        $('#loader').hide();
                         alert('Error adding item to cart. Please try again.');
                     }
                 });
@@ -1913,12 +1933,12 @@
                             $('#loader').hide();
                             // Create image element using the server's image URL
                             const imgDiv = $('<div>').addClass('editable-image')
-                              .attr('data-image-id', response.image_id).css({
-                                position: 'absolute',
-                                left: '50%',
-                                top: '50%',
-                                // transform: 'translate(-50%, -50%)'
-                            });
+                                .attr('data-image-id', response.image_id).css({
+                                    position: 'absolute',
+                                    left: '50%',
+                                    top: '50%',
+                                    // transform: 'translate(-50%, -50%)'
+                                });
 
                             const imgContent = $('<img>').attr('src', response
                                 .image_url).css({
@@ -1940,7 +1960,7 @@
                             saveState();
                         },
                         error: function(xhr) {
-                          $('#loader').hide();
+                            $('#loader').hide();
                             alert('Error uploading image. Please try again.');
                         }
                     });
@@ -2090,8 +2110,8 @@
                                     saveState();
                                 },
                                 error: () => {
-                                  $('#loader').hide();
-                                  alert('Failed to delete image from server');
+                                    $('#loader').hide();
+                                    alert('Failed to delete image from server');
                                 }
                             });
                         }

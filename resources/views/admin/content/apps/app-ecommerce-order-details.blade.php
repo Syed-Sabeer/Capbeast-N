@@ -188,6 +188,7 @@
                                 <th>Color</th>
 
                                 <th>Product Price</th>
+                                <th>Customization Price</th>
 
                             </tr>
                         </thead>
@@ -202,32 +203,102 @@
                                         {{ $item->color->color_name_2 ? $item->color->color_name_1 . ' & ' . $item->color->color_name_2 : $item->color->color_name_1 }}
                                     </td>
                                     <td>{{ $item->product_price }} $</td>
+                                    <td>{{ isset($item->userCustomization) ? $item->userCustomization->price : '0.00' }} $</td>
                                 </tr>
                                 @if (isset($item->userCustomization))
-                                  <tr>
-                                      <td></td>
-                                      <td></td>
-                                      <td>
-                                        @if ($item->userCustomization->front_image)
-                                          <img style="width: 50px;" src="{{asset($item->userCustomization->front_image)}}" alt="Front Image">
-                                        @endif
-                                      </td>
-                                      <td>
-                                        @if ($item->userCustomization->left_image)
-                                          <img style="width: 50px;" src="{{asset($item->userCustomization->left_image)}}" alt="Left Image">
-                                        @endif
-                                      </td>
-                                      <td>
-                                        @if ($item->userCustomization->right_image)
-                                          <img style="width: 50px;" src="{{asset($item->userCustomization->right_image)}}" alt="Right Image">
-                                        @endif
-                                      </td>
-                                      <td>
-                                        @if ($item->userCustomization->back_image)
-                                          <img style="width: 50px;" src="{{asset($item->userCustomization->back_image)}}" alt="Back Image">
-                                        @endif
-                                      </td>
-                                  </tr>
+                                    @php
+                                      $totalCustomizationPrice = 0;
+                                      $totalCustomizationPrice += $item->userCustomization->price;
+                                    @endphp
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+
+                                        <td>
+                                            @if ($item->userCustomization->front_image)
+                                                <a href="{{ asset($item->userCustomization->front_image) }}" download>
+                                                    <img style="width: 50px;"
+                                                        src="{{ asset($item->userCustomization->front_image) }}"
+                                                        alt="Front Image">
+                                                </a>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($item->userCustomization->left_image)
+                                                <a href="{{ asset($item->userCustomization->left_image) }}" download>
+                                                    <img style="width: 50px;"
+                                                        src="{{ asset($item->userCustomization->left_image) }}"
+                                                        alt="Left Image">
+                                                </a>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($item->userCustomization->right_image)
+                                                <a href="{{ asset($item->userCustomization->right_image) }}" download>
+                                                    <img style="width: 50px;"
+                                                        src="{{ asset($item->userCustomization->right_image) }}"
+                                                        alt="Right Image">
+                                                </a>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($item->userCustomization->back_image)
+                                                <a href="{{ asset($item->userCustomization->back_image) }}" download>
+                                                    <img style="width: 50px;"
+                                                        src="{{ asset($item->userCustomization->back_image) }}"
+                                                        alt="Back Image">
+                                                </a>
+                                            @endif
+                                        </td>
+                                        <td><button class="btn btn-primary" data-bs-toggle="modal"
+                                          data-bs-target="#CustomizerUploadModal{{ $item->id }}">View
+                                          Customization Uploads</button></td>
+                                    </tr>
+                                    {{-- Modal --}}
+                                    <div class="modal fade" id="CustomizerUploadModal{{ $item->id }}" tabindex="-1"
+                                        aria-labelledby="CustomizerUploadModalLabel{{ $item->id }}"
+                                        aria-hidden="true">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title"
+                                                        id="CustomizerUploadModalLabel{{ $item->id }}">
+                                                        Customization Upload Files
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    @if ($item->userCustomization->customizerUploads->count())
+                                                        <ul class="list-group">
+                                                            @foreach ($item->userCustomization->customizerUploads as $upload)
+                                                                <li
+                                                                    class="list-group-item d-flex justify-content-between align-items-center">
+                                                                    <a href="{{ asset('storage/' . $upload->image) }}"
+                                                                        target="_blank">
+                                                                        <img src="{{ asset('storage/' . $upload->image) }}"
+                                                                            style="width: 80px;" alt="Upload">
+                                                                    </a>
+                                                                    <a href="{{ asset('storage/' . $upload->image) }}"
+                                                                        download class="btn btn-sm btn-success">
+                                                                        Download
+                                                                    </a>
+                                                                </li>
+                                                            @endforeach
+                                                        </ul>
+                                                    @else
+                                                        <p>No uploads available.</p>
+                                                    @endif
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">
+                                                        Close
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 @endif
                             @endforeach
                         </tbody>
@@ -261,13 +332,17 @@
                             @endif
 
                             <div class="d-flex justify-content-between mb-2">
+                                <span class="w-px-100 text-heading">Custom. Price:</span>
+                                <h6 class="mb-0"> ${{ $totalCustomizationPrice }}</h6>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
                                 <span class="w-px-100 text-heading">Discount:</span>
                                 <h6 class="mb-0">- ${{ $order->discount_price }}</h6>
                             </div>
                             {{-- <div class="d-flex justify-content-between mb-2">
-              <span class="w-px-100 text-heading">Tax:</span>
-              <h6 class="mb-0">$30</h6>
-            </div> --}}
+                                  <span class="w-px-100 text-heading">Tax:</span>
+                                  <h6 class="mb-0">$30</h6>
+                                </div> --}}
                             <div class="d-flex justify-content-between">
                                 <h6 class="w-px-100 mb-0">Total:</h6>
                                 <h6 class="mb-0">${{ $order->total_price }}</h6>

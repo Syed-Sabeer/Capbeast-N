@@ -40,8 +40,8 @@
                                 <input type="text" name="title" class="form-control" placeholder="Product title"
                                     value="{{ $product->title }}" required>
                             </div>
-                            
-                            
+
+
                         </div>
                         <div class="row">
 
@@ -49,16 +49,16 @@
                                 <label for="select2Category" class="form-label">Select Categories</label>
                                 <select name="category_ids[]" id="select2Category" class="select2 form-select form-select-lg" multiple>
                                     @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}" 
+                                        <option value="{{ $category->id }}"
                                             @if(isset($product) && $product->categories && $product->categories->contains($category->id)) selected @endif>
                                             {{ $category->title }}
                                         </option>
                                     @endforeach
                                 </select>
-                                
+
                             </div>
 
-                           
+
 
                             <div class="mb-3 col-3">
                                 <label for="select2Brand" class="form-label">Select Brand</label>
@@ -180,16 +180,21 @@
 
                                     @php
                                         $images = [
-                                            'front_image' => 'Front',
-                                            'back_image' => 'Back',
-                                            'right_image' => 'Right',
-                                            'left_image' => 'Left',
+                                            'front_image' => ['label' => 'Front', 'flag' => 'is_front'],
+                                            'back_image' => ['label' => 'Back', 'flag' => 'is_back'],
+                                            'right_image' => ['label' => 'Right', 'flag' => 'is_right'],
+                                            'left_image' => ['label' => 'Left', 'flag' => 'is_left'],
                                         ];
                                     @endphp
 
-                                    @foreach ($images as $key => $label)
+                                    @foreach ($images as $key => $info)
                                         <div class="col-3 mt-4">
-                                            <label class="form-label">{{ $label }} Image</label>
+                                          @if (!empty($color->{$info['flag']}) && $color->{$info['flag']} == '1')
+                                              <span class="badge bg-success small">Customizable</span>
+                                          @else
+                                              <span class="badge bg-danger small">Non Customizable</span>
+                                          @endif
+                                            <label class="form-label">{{ $info['label'] }} Image</label>
                                             @if ($color->$key)
                                                 <img src="{{ asset('storage/' . $color->$key) }}" width="100">
                                             @else
@@ -302,6 +307,7 @@
     <script>
         $(document).ready(function() {
             // Add new color section
+            let colorIndex = 0;
             $("#add-color").click(function() {
                 let colorHtml = `
                         <div class="color-item">
@@ -325,18 +331,34 @@
                                 <div class="col-3 mt-4">
                                     <label class="form-label">Front Image</label>
                                     <input type="file" name="frontimage[]" class="form-control">
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" name="is_front[${colorIndex}]" checked>
+                                        <label class="form-check-label">Allow Customization</label>
+                                    </div>
                                 </div>
                                 <div class="col-3 mt-4">
                                     <label class="form-label">Back Image</label>
                                     <input type="file" name="backimage[]" class="form-control">
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" name="is_back[${colorIndex}]" checked>
+                                        <label class="form-check-label">Allow Customization</label>
+                                    </div>
                                 </div>
                                 <div class="col-3 mt-4">
                                     <label class="form-label">Right Image</label>
                                     <input type="file" name="rightimage[]" class="form-control">
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" name="is_right[${colorIndex}]" checked>
+                                        <label class="form-check-label">Allow Customization</label>
+                                    </div>
                                 </div>
                                 <div class="col-3 mt-4">
                                     <label class="form-label">Left Image</label>
                                     <input type="file" name="leftimage[]" class="form-control">
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" name="is_left[${colorIndex}]" checked>
+                                        <label class="form-check-label">Allow Customization</label>
+                                    </div>
                                 </div>
                                 <div class="col-3 mt-4">
                                     <button type="button" class="btn btn-sm btn-danger mt-2 remove-color">Remove</button>
@@ -344,6 +366,7 @@
                             </div>
                         </div>`;
                 $("#color-section").append(colorHtml);
+                colorIndex++;
             });
 
             // Remove color section

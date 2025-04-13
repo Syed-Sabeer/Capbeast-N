@@ -30,6 +30,7 @@ class EcommerceProductAdd extends Controller
 
   public function store(Request $request)
   {
+    // dd($request);
     try {
       DB::beginTransaction();
 
@@ -113,7 +114,15 @@ class EcommerceProductAdd extends Controller
         $rightImagePath = $request->hasFile("rightimage.$index") ? $request->file("rightimage")[$index]->store('ProductImages/RightImage', 'public') : null;
         $leftImagePath = $request->hasFile("leftimage.$index") ? $request->file("leftimage")[$index]->store('ProductImages/LeftImage', 'public') : null;
 
+        // Get checkbox values for this color entry
+        $isFront = isset($request->is_front[$index]) && $request->is_front[$index] === 'on' ? '1' : '0';
+        $isBack = isset($request->is_back[$index]) && $request->is_back[$index] === 'on' ? '1' : '0';
+        $isRight = isset($request->is_right[$index]) && $request->is_right[$index] === 'on' ? '1' : '0';
+        $isLeft = isset($request->is_left[$index]) && $request->is_left[$index] === 'on' ? '1' : '0';
+
         Log::info("Image paths", compact('frontImagePath', 'backImagePath', 'rightImagePath', 'leftImagePath'));
+        // Log::info("Request", $request->all());
+        // Log::info("Image allowance", ["front" => $isFront, "back" => $isBack, "right" => $isRight, "left" => $isLeft]);
 
         // Create the product color entry if any image or color exists
         if ($colorName1 || $colorName2 || $frontImagePath || $backImagePath || $rightImagePath || $leftImagePath) {
@@ -127,6 +136,11 @@ class EcommerceProductAdd extends Controller
             'back_image' => $backImagePath,
             'right_image' => $rightImagePath,
             'left_image' => $leftImagePath,
+            // Add checkbox values
+            'is_front' => $isFront,
+            'is_back' => $isBack,
+            'is_right' => $isRight,
+            'is_left' => $isLeft,
           ]);
 
           if ($productColor) {

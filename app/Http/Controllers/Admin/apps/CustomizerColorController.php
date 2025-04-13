@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Admin\apps;
 use App\Http\Controllers\Controller;
 use App\Models\TextColor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class CustomizerColorController extends Controller
 {
@@ -42,24 +46,24 @@ class CustomizerColorController extends Controller
   {
     // Manual validation
     $validator = Validator::make($request->all(), [
-      'name' => 'required|string|max:255',
-      'design_category_id' => 'required|exists:design_categories,id',
-      'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+      'color_name' => 'required|string|max:255',
+      'text_color_code' => 'nullable|string|max:255',
+      'color_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
     ]);
 
     // If validation fails
     if ($validator->fails()) {
       return redirect()->back()
         ->withErrors($validator)
-        ->withInput();
+        ->withInput()->with('error', 'Validation Error!');
     }
 
     try {
       $validated = $validator->validated();
 
       // Handle the image upload
-      if ($request->hasFile('image')) {
-        $file = $request->file('image');
+      if ($request->hasFile('color_image')) {
+        $file = $request->file('color_image');
 
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $extension = $file->getClientOriginalExtension();
@@ -69,19 +73,19 @@ class CustomizerColorController extends Controller
 
         $filename = $shortName . '.' . $extension;
 
-        $destinationPath = 'storage/designs'; // inside public/uploads/designs
+        $destinationPath = 'storage/text_colors'; // inside public/uploads/designs
         $file->move(public_path($destinationPath), $filename);
         $imagePath = $destinationPath . '/' . $filename;
       }
 
       // Save to DB
-      CustomizerDesign::create([
-        'name' => $validated['name'],
-        'design_category_id' => $validated['design_category_id'],
-        'image' => $imagePath ?? null,
+      TextColor::create([
+        'color_name' => $validated['color_name'],
+        'text_color_code' => $validated['text_color_code'],
+        'color_image' => $imagePath ?? null,
       ]);
 
-      return redirect()->route(Auth::user()->role . '.customizer-designs.list')->with('success', 'Design added successfully!');
+      return redirect()->route(Auth::user()->role . '.customizer-colors.list')->with('success', 'Color added successfully!');
       // return redirect()->back()->with('success', 'Design added successfully!');
     } catch (\Throwable $th) {
       Log::error($th->getMessage());
@@ -103,9 +107,8 @@ class CustomizerColorController extends Controller
   public function edit(string $id)
   {
     try {
-      $designCategories = DesignCategory::all();
-      $customizerDesign = CustomizerDesign::findOrFail($id);
-      return view('admin.content.apps.customizer.designs.edit', compact('customizerDesign', 'designCategories'));
+      $textColor = TextColor::findOrFail($id);
+      return view('admin.content.apps.customizer.colors.edit', compact('textColor'));
     } catch (\Throwable $th) {
       //throw $th;
       return redirect()->back()->with('error', 'Something went wrong. Please try again!');
@@ -119,9 +122,9 @@ class CustomizerColorController extends Controller
   {
     // Manual validation
     $validator = Validator::make($request->all(), [
-      'name' => 'required|string|max:255',
-      'design_category_id' => 'required|exists:design_categories,id',
-      'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+      'color_name' => 'required|string|max:255',
+      'text_color_code' => 'nullable|string|max:255',
+      'color_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
     ]);
 
     // If validation fails
@@ -132,18 +135,18 @@ class CustomizerColorController extends Controller
     }
 
     try {
-      $customizerDesign = CustomizerDesign::findOrFail($id);
+      $textColor = TextColor::findOrFail($id);
       $validated = $validator->validated();
 
-      $imagePath = $customizerDesign->image; // Keep existing image path
+      $imagePath = $textColor->color_image; // Keep existing image path
 
       // If new image is uploaded
-      if ($request->hasFile('image')) {
+      if ($request->hasFile('color_image')) {
         // Delete the old image if it exists
-        if (isset($customizerDesign->image) && file_exists(public_path($customizerDesign->image))) {
-          unlink(public_path($customizerDesign->image)); // Delete the old image
+        if (isset($textColor->color_image) && file_exists(public_path($textColor->color_image))) {
+          unlink(public_path($textColor->color_image)); // Delete the old image
         }
-        $file = $request->file('image');
+        $file = $request->file('color_image');
 
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $extension = $file->getClientOriginalExtension();
@@ -151,7 +154,7 @@ class CustomizerColorController extends Controller
         $shortName = Str::limit(Str::slug($originalName, '-'), 20, '');
         $filename = $shortName . '.' . $extension;
 
-        $destinationPath = 'storage/designs';
+        $destinationPath = 'storage/text_colors';
         $file->move(public_path($destinationPath), $filename);
 
         // Overwrite old image path
@@ -159,13 +162,14 @@ class CustomizerColorController extends Controller
       }
 
       // Update record
-      $customizerDesign->update([
-        'name' => $validated['name'],
-        'design_category_id' => $validated['design_category_id'],
-        'image' => $imagePath,
+      $textColor->update([
+        'color_name' => $validated['color_name'],
+        'text_color_code' => $validated['text_color_code'],
+        'color_image' => $imagePath,
       ]);
 
-      return redirect()->back()->with('success', 'Design updated successfully!');
+      return redirect()->route(Auth::user()->role . '.customizer-colors.list')->with('success', 'Color updated successfully!');
+      // return redirect()->back()->with('success', 'Color updated successfully!');
     } catch (\Throwable $th) {
       Log::error($th->getMessage());
       return redirect()->back()->with('error', 'Something went wrong. Please try again!')->withInput();
@@ -179,12 +183,12 @@ class CustomizerColorController extends Controller
   public function destroy(string $id)
   {
     try {
-      $customizerDesign = CustomizerDesign::findOrFail($id);
-      if (isset($customizerDesign->image) && file_exists(public_path($customizerDesign->image))) {
-        unlink(public_path($customizerDesign->image)); // Delete the image
+      $textColor = TextColor::findOrFail($id);
+      if (isset($textColor->color_image) && file_exists(public_path($textColor->color_image))) {
+        unlink(public_path($textColor->color_image)); // Delete the image
       }
-      $customizerDesign->delete();
-      return redirect()->back()->with('success', 'Design Deleted Successfully!');
+      $textColor->delete();
+      return redirect()->back()->with('success', 'Color Deleted Successfully!');
     } catch (\Throwable $th) {
       //throw $th;
       return redirect()->back()->with('error', 'Something went wrong. Please try again!');

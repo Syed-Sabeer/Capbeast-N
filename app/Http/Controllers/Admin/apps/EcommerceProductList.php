@@ -31,12 +31,12 @@ class EcommerceProductList extends Controller
 
   public function updateVisibility($id, Request $request)
   {
-   
+
     $request->validate([
       'visibility' => 'required|boolean',
     ]);
 
-    
+
     $product = Product::findOrFail($id);
     $product->update(['visibility' => $request->visibility]);
 
@@ -91,11 +91,12 @@ class EcommerceProductList extends Controller
       $brands = Brand::all();
       return view('admin.content.apps.app-ecommerce-product-edit', compact('product', 'mlbs','categories', 'brands'));
   }
-  
+
 
 
   public function update($id, Request $request)
   {
+    // dd($request->all());
       try {
           $request->validate([
               'title' => 'required|string|max:255',
@@ -112,11 +113,11 @@ class EcommerceProductList extends Controller
               'left_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
               'discount.*' => 'nullable|numeric',
           ]);
-  
+
           DB::beginTransaction();
-  
+
           $product = Product::findOrFail($id);
-  
+
           $product->update([
               'brand_id' => $request->brand_id,
               'mlb_id' => $request->mlb_id,
@@ -126,7 +127,7 @@ class EcommerceProductList extends Controller
               'cost_price' => $request->cost_price,
               'selling_price' => $request->selling_price,
           ]);
-  
+
           ProductSEO::updateOrCreate(
               ['product_id' => $product->id],
               [
@@ -135,7 +136,7 @@ class EcommerceProductList extends Controller
                   'metakeywords' => $request->metakeywords,
               ]
           );
-  
+
           // Update categories: Remove old ones if not present in request
           ProductCategory::where('product_id', $product->id)->delete();
           if (!empty($request->category_ids)) {
@@ -146,7 +147,7 @@ class EcommerceProductList extends Controller
                   ]);
               }
           }
-  
+
           ProductVolumeDiscount::where('product_id', $product->id)->delete();
           if (isset($request->quantity) && count($request->quantity) > 0) {
               foreach ($request->quantity as $index => $qty) {
@@ -173,6 +174,12 @@ class EcommerceProductList extends Controller
           $rightImagePath = $request->hasFile("rightimage.$index") ? $request->file("rightimage")[$index]->store('ProductImages/RightImage', 'public') : null;
           $leftImagePath = $request->hasFile("leftimage.$index") ? $request->file("leftimage")[$index]->store('ProductImages/LeftImage', 'public') : null;
 
+          // Get checkbox values for this color entry
+          $isFront = isset($request->is_front[$index]) && $request->is_front[$index] === 'on' ? '1' : '0';
+          $isBack = isset($request->is_back[$index]) && $request->is_back[$index] === 'on' ? '1' : '0';
+          $isRight = isset($request->is_right[$index]) && $request->is_right[$index] === 'on' ? '1' : '0';
+          $isLeft = isset($request->is_left[$index]) && $request->is_left[$index] === 'on' ? '1' : '0';
+
           Log::info("Image paths", compact('frontImagePath', 'backImagePath', 'rightImagePath', 'leftImagePath'));
 
           // Create the product color entry if any image or color exists
@@ -187,6 +194,11 @@ class EcommerceProductList extends Controller
               'back_image' => $backImagePath,
               'right_image' => $rightImagePath,
               'left_image' => $leftImagePath,
+                // Add checkbox values
+              'is_front' => $isFront,
+              'is_back' => $isBack,
+              'is_right' => $isRight,
+              'is_left' => $isLeft,
             ]);
 
             if ($productColor) {
@@ -201,9 +213,9 @@ class EcommerceProductList extends Controller
       } else {
         Log::error("colorname1 is not an array", ['colorname1' => $request->colorname1]);
       }
-  
+
           DB::commit();
-  
+
           return redirect()->back()->with('success', 'Product updated successfully!');
       } catch (\Exception $e) {
           DB::rollBack();

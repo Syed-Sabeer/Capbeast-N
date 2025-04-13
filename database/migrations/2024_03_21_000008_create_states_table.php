@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('states', function (Blueprint $table) {
             $table->id();
-            $table->string('country_code', 2);
-            $table->string('code', 3);
+            $table->string('country_code', 4);
+            $table->string('code', 6);
             $table->string('name');
             $table->timestamps();
         });

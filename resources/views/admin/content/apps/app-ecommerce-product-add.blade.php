@@ -54,9 +54,9 @@
                                 <input type="text" name="title" class="form-control" placeholder="Product title"
                                     required>
                             </div>
-                           
-                           
-                            
+
+
+
                         </div>
 
                         <div class="row">
@@ -64,7 +64,7 @@
                             <div class="mb-3 col-6">
                                 <label for="select2Category" class="form-label">Select Categories (Optional)</label>
                                 <select name="category_ids[]" id="select2Category" class="select2 form-select form-select-lg" multiple>
-                                    
+
                                     @foreach ($categories as $category)
                                         <option value="{{ $category->id }}">{{ $category->title }}</option>
                                     @endforeach
@@ -80,7 +80,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            
+
                             <div class="mb-3 col-3">
                                 <label for="select2Mlb" class="form-label">Select MLB (Optional)</label>
                                 <select name="mlb_id" id="select2Mlb" class="select2 form-select form-select-lg">
@@ -90,7 +90,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                           
+
 
                         </div>
 
@@ -111,10 +111,10 @@
                                 <input type="text" name="selling_price" class="form-control"
                                     placeholder="Product Selling Price" required>
                             </div>
-                            
+
                         </div>
 
-                       
+
 
                         <div class="mb-3">
                             <label class="form-label">Description</label>
@@ -176,18 +176,37 @@
                             <div class="col-3 mt-4">
                                 <label class="form-label">Front Image</label>
                                 <input type="file" name="frontimage[]" class="form-control" multiple>
+                                <!-- Front -->
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" name="is_front[0]" checked>
+                                    <label class="form-check-label">Allow Customization</label>
+                                </div>
                             </div>
                             <div class="col-3 mt-4">
                                 <label class="form-label">Back Image</label>
                                 <input type="file" name="backimage[]" class="form-control" multiple>
+                                <!-- Back -->
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" name="is_back[0]" checked>
+                                    <label class="form-check-label">Allow Customization</label>
+                                </div>
                             </div>
                             <div class="col-3 mt-4">
                                 <label class="form-label">Right Image</label>
                                 <input type="file" name="rightimage[]" class="form-control" multiple>
+                                <!-- Right -->
+                                <div class="form-check mt-2">
+                                  <input class="form-check-input" type="checkbox" name="is_right[0]" checked>
+                                  <label class="form-check-label">Allow Customization</label>
+                              </div>
                             </div>
                             <div class="col-3 mt-4">
                                 <label class="form-label">Left Image</label>
                                 <input type="file" name="leftimage[]" class="form-control" multiple>
+                                <div class="form-check mt-2">
+                                  <input class="form-check-input" type="checkbox" name="is_left[0]" checked>
+                                  <label class="form-check-label">Allow Customization</label>
+                              </div>
                             </div>
                         </div>
                     </div>
@@ -221,29 +240,98 @@
         <button type="submit" class="btn btn-success">Save Product</button>
     </form>
     <script>
+        // document.getElementById('add-color').addEventListener('click', () => {
+        //     const colorSection = document.getElementById('color-section');
+        //     const newColorItem = colorSection.firstElementChild.cloneNode(true);
+
+        //     newColorItem.querySelectorAll('input').forEach(input => {
+        //         input.value = ''; // Clear input values
+        //     });
+
+        //     // Add a remove button
+        //     const removeBtn = document.createElement('button');
+        //     removeBtn.type = 'button';
+        //     removeBtn.classList.add('btn', 'btn-danger', 'mt-2');
+        //     removeBtn.textContent = 'Remove';
+        //     removeBtn.onclick = function() {
+        //         this.parentElement.remove();
+        //     };
+
+        //     const wrapper = document.createElement('div');
+        //     wrapper.classList.add('color-item');
+        //     wrapper.appendChild(newColorItem);
+        //     wrapper.appendChild(removeBtn);
+
+        //     colorSection.appendChild(wrapper);
+        // });
+        let colorIndex = 1;
         document.getElementById('add-color').addEventListener('click', () => {
             const colorSection = document.getElementById('color-section');
-            const newColorItem = colorSection.firstElementChild.cloneNode(true);
 
-            newColorItem.querySelectorAll('input').forEach(input => {
-                input.value = ''; // Clear input values
-            });
+            const html = `
+            <div class="color-item">
+                <div class="row mb-3">
+                    <div class="col-3">
+                        <label class="form-label">Color Name 1</label>
+                        <input type="text" name="colorname1[]" class="form-control">
+                    </div>
+                    <div class="col-3">
+                        <label class="form-label">Color Code 1</label>
+                        <input type="color" name="colorcode1[]" class="form-control">
+                    </div>
+                    <div class="col-3">
+                        <label class="form-label">Color Name 2 (Optional)</label>
+                        <input type="text" name="colorname2[]" class="form-control">
+                    </div>
+                    <div class="col-3">
+                        <label class="form-label">Color Code 2 (Optional)</label>
+                        <input type="color" name="colorcode2[]" class="form-control">
+                    </div>
 
-            // Add a remove button
-            const removeBtn = document.createElement('button');
-            removeBtn.type = 'button';
-            removeBtn.classList.add('btn', 'btn-danger', 'mt-2');
-            removeBtn.textContent = 'Remove';
-            removeBtn.onclick = function() {
-                this.parentElement.remove();
-            };
+                    <div class="col-3 mt-4">
+                        <label class="form-label">Front Image</label>
+                        <input type="file" name="frontimage[]" class="form-control" multiple>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" name="is_front[${colorIndex}]" checked>
+                            <label class="form-check-label">Allow Customization</label>
+                        </div>
+                    </div>
+                    <div class="col-3 mt-4">
+                        <label class="form-label">Back Image</label>
+                        <input type="file" name="backimage[]" class="form-control" multiple>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" name="is_back[${colorIndex}]" checked>
+                            <label class="form-check-label">Allow Customization</label>
+                        </div>
+                    </div>
+                    <div class="col-3 mt-4">
+                        <label class="form-label">Right Image</label>
+                        <input type="file" name="rightimage[]" class="form-control" multiple>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" name="is_right[${colorIndex}]" checked>
+                            <label class="form-check-label">Allow Customization</label>
+                        </div>
+                    </div>
+                    <div class="col-3 mt-4">
+                        <label class="form-label">Left Image</label>
+                        <input type="file" name="leftimage[]" class="form-control" multiple>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" name="is_left[${colorIndex}]" checked>
+                            <label class="form-check-label">Allow Customization</label>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-danger mt-2 remove-color-btn">Remove</button>
+            </div>
+            `;
+            colorIndex++;
+            colorSection.insertAdjacentHTML('beforeend', html);
+        });
 
-            const wrapper = document.createElement('div');
-            wrapper.classList.add('color-item');
-            wrapper.appendChild(newColorItem);
-            wrapper.appendChild(removeBtn);
-
-            colorSection.appendChild(wrapper);
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-color-btn')) {
+                e.target.closest('.color-item').remove();
+            }
         });
 
 
@@ -270,7 +358,7 @@
             pricingSection.appendChild(wrapper);
         });
 
-        
+
     </script>
     <x-c-k-editor  />
 

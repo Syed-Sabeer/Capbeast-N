@@ -33,12 +33,12 @@ class CustomizerController extends Controller
       // $customizerDesigns = CustomizerDesign::paginate(6);
       $query = CustomizerDesign::query()->where('status', '1');
 
-        if (request()->has('search')) {
-            $searchTerm = request()->input('search');
-            $query->where('name', 'like', '%' . $searchTerm . '%');
-        }
+      if (request()->has('search')) {
+        $searchTerm = request()->input('search');
+        $query->where('name', 'like', '%' . $searchTerm . '%');
+      }
 
-        $customizerDesigns = $query->paginate(6)->withQueryString();
+      $customizerDesigns = $query->paginate(6)->withQueryString();
       if (request()->ajax()) {
         return view('main.pages.customizer.designs', compact('customizerDesigns'))->render();
       }
@@ -82,33 +82,64 @@ class CustomizerController extends Controller
         $userCustomization->size = $request->size;
 
         // Image fields from product_color table
-        $imageFields = ['front_image', 'back_image', 'left_image', 'right_image'];
-        foreach ($imageFields as $imageField) {
-          // Check if the productColor has an image path for the current field
-          if ($productColor->$imageField) {
-            // Get the full path to the current image (storage path)
+        // $imageFields = ['front_image', 'back_image', 'left_image', 'right_image'];
+        // foreach ($imageFields as $imageField) {
+        //   // Check if the productColor has an image path for the current field
+        //   if ($productColor->$imageField) {
+        //     // Get the full path to the current image (storage path)
+        //     $currentImagePath = public_path('storage/' . $productColor->$imageField);
+
+        //     // If the image exists, copy it to the 'customizations' folder
+        //     if (file_exists($currentImagePath)) {
+        //       $newImageName = time() . '_' . basename($productColor->$imageField);
+        //       $customizationDirectory = public_path('storage/customizations');
+
+        //       // Ensure the customizations directory exists
+        //       if (!is_dir($customizationDirectory)) {
+        //         mkdir($customizationDirectory, 0755, true);
+        //       }
+
+        //       // Copy the file to the customizations folder
+        //       copy($currentImagePath, $customizationDirectory . '/' . $newImageName);
+
+        //       // Save the new path to the user_customizations table
+        //       $userCustomization->$imageField = 'storage/customizations/' . $newImageName;
+        //     } else {
+        //       throw new \Exception("Image file does not exist at the specified path: " . $currentImagePath);
+        //     }
+        //   }
+        // }
+
+        $imageFields = [
+          'front_image' => 'is_front',
+          'back_image' => 'is_back',
+          'left_image' => 'is_left',
+          'right_image' => 'is_right',
+        ];
+
+        foreach ($imageFields as $imageField => $flagField) {
+          // Only proceed if the flag is '1' and the image exists
+          if ($productColor->$flagField === '1' && $productColor->$imageField) {
             $currentImagePath = public_path('storage/' . $productColor->$imageField);
 
-            // If the image exists, copy it to the 'customizations' folder
             if (file_exists($currentImagePath)) {
               $newImageName = time() . '_' . basename($productColor->$imageField);
               $customizationDirectory = public_path('storage/customizations');
 
-              // Ensure the customizations directory exists
               if (!is_dir($customizationDirectory)) {
                 mkdir($customizationDirectory, 0755, true);
               }
 
-              // Copy the file to the customizations folder
               copy($currentImagePath, $customizationDirectory . '/' . $newImageName);
 
-              // Save the new path to the user_customizations table
               $userCustomization->$imageField = 'storage/customizations/' . $newImageName;
             } else {
               throw new \Exception("Image file does not exist at the specified path: " . $currentImagePath);
             }
           }
         }
+
+
 
         // Save the IP address
         $userCustomization->ipaddress = $request->ip();
@@ -225,19 +256,19 @@ class CustomizerController extends Controller
 
   public function uploadImage(Request $request)
   {
-      $request->validate(['image' => 'required|image']);
+    $request->validate(['image' => 'required|image']);
 
-      $imagePath = $request->file('image')->store('customizerUploads', 'public');
+    $imagePath = $request->file('image')->store('customizerUploads', 'public');
 
-      $image = CustomizerUpload::create([
-        'user_customization_id' => $request->user_customization_id,
-        'image' => $imagePath,
-      ]);
+    $image = CustomizerUpload::create([
+      'user_customization_id' => $request->user_customization_id,
+      'image' => $imagePath,
+    ]);
 
-      return response()->json([
-        'image_url' => asset("storage/{$imagePath}"),
-        'image_id' => $image->id
-      ]);
+    return response()->json([
+      'image_url' => asset("storage/{$imagePath}"),
+      'image_id' => $image->id
+    ]);
   }
 
   // In CustomizerController.php

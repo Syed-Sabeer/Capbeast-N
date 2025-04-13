@@ -39,7 +39,13 @@
                             $subtotal += $itemTotal;
                         @endphp
 
-                        <div class="card product">
+                        <div class="price-data d-none"
+                          data-cart-id="{{ $cart->id }}"
+                          data-selling-price="{{ $cart->product->selling_price }}"
+                          data-customization-price="{{ $customizationPrice }}">
+                        </div>
+
+                        <div class="card product" data-cart-id="{{ $cart->id }}">
                             <div class="card-body p-4">
                                 <div class="row gy-3">
                                     <div class="col-sm-auto">

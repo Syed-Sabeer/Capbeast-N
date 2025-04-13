@@ -136,9 +136,8 @@
                 </a>
             </li>
 
-            <li class="menu-item">
+            {{-- <li class="menu-item">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
-                    {{-- <i class="menu-icon tf-icons ti ti-users"></i> --}}
                     <div>{{ __('Customizer') }}</div>
                 </a>
                 <ul class="menu-sub">
@@ -153,12 +152,36 @@
                         </a>
                     </li>
                     <li class="menu-item ">
-                        <a href="#" class="menu-link">
+                        <a href="{{ url("backend/$prefix/customizer/price/edit") }}" class="menu-link">
                             <div>{{ __('Price Setup') }}</div>
                         </a>
                     </li>
                 </ul>
-            </li>
+            </li> --}}
+
+            <li class="menu-item {{ Request::is("backend/$prefix/customizer/*") ? 'open' : '' }}">
+              <a href="javascript:void(0);" class="menu-link menu-toggle {{ Request::is("backend/$prefix/customizer/*") ? 'active' : '' }}">
+                  <div>{{ __('Customizer') }}</div>
+              </a>
+              <ul class="menu-sub">
+                  <li class="menu-item {{ Request::is("backend/$prefix/customizer/designs/*") ? 'active' : '' }}">
+                      <a href="{{ url("backend/$prefix/customizer/designs/list") }}" class="menu-link">
+                          <div>{{ __('Designs') }}</div>
+                      </a>
+                  </li>
+                  <li class="menu-item {{ Request::is("backend/$prefix/customizer/colors/*") ? 'active' : '' }}">
+                      <a href="{{ url("backend/$prefix/customizer/colors/list") }}" class="menu-link">
+                          <div>{{ __('Colors') }}</div>
+                      </a>
+                  </li>
+                  <li class="menu-item {{ Request::is("backend/$prefix/customizer/price/*") ? 'active' : '' }}">
+                      <a href="{{ url("backend/$prefix/customizer/price/edit") }}" class="menu-link">
+                          <div>{{ __('Price Setup') }}</div>
+                      </a>
+                  </li>
+              </ul>
+          </li>
+
 
             {{-- Order --}}
             <li

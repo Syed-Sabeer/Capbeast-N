@@ -46,16 +46,16 @@
 
                         {{-- Image Upload --}}
                         <div class="mb-3">
-                            <label for="image" class="form-label">Design Image <span class="text-danger">*</span></label>
-                            <input type="file" class="form-control @error('image') is-invalid @enderror" id="image"
-                                name="image" accept="image/*" required>
-                            @error('image')
+                            <label for="color_image" class="form-label">Color Image <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control @error('color_image') is-invalid @enderror" id="color_image"
+                                name="color_image" accept="image/*" required>
+                            @error('color_image')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
 
                         {{-- Submit Button --}}
-                        <button type="submit" class="btn btn-primary">Add Design</button>
+                        <button type="submit" class="btn btn-primary">Add Color</button>
                     </form>
                 </div>
             </div>
@@ -72,12 +72,4 @@
             });
         </script>
     @endif
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            $('#select2DesignCategory').select2();
-        });
-    </script>
-
-
-
 @endsection

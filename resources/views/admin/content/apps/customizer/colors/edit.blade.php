@@ -1,6 +1,6 @@
 @extends('admin.layouts/layoutMaster')
 
-@section('title', 'Edit Design')
+@section('title', 'Edit Color')
 
 @section('vendor-style')
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/select2/select2.css') }}" />
@@ -11,70 +11,60 @@
 @endsection
 
 @section('content')
-    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Customizer /</span> Edit Design</h4>
+    <h4 class="py-3 mb-4"><span class="text-muted fw-light">Customizer /</span> Edit Color</h4>
 
     <div class="row">
         <div class="col-xxl">
             <div class="card mb-4">
                 <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="mb-0">Edit Design</h5>
+                    <h5 class="mb-0">Edit Color</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route($prefix . '.customizer-designs.update', $customizerDesign->id) }}" method="POST"
+                    <form action="{{ route($prefix . '.customizer-colors.update', $textColor->id) }}" method="POST"
                         enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
-                        {{-- Design Name --}}
+                        {{-- Color Name --}}
                         <div class="mb-3">
-                            <label for="name" class="form-label">Design Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
-                                name="name" value="{{ old('name', $customizerDesign->name) }}" required>
-                            @error('name')
+                            <label for="color_name" class="form-label">Color Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('color_name') is-invalid @enderror" id="color_name"
+                                name="color_name" value="{{ old('color_name', $textColor->color_name) }}" required>
+                            @error('color_name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
-                        {{-- Category Select --}}
+                        {{-- Color Code --}}
                         <div class="mb-3">
-                            <label for="select2DesignCategory" class="form-label">Select Category <span
-                                    class="text-danger">*</span></label>
-                            <select name="design_category_id" id="select2DesignCategory"
-                                class="select2 form-select form-select-lg @error('design_category_id') is-invalid @enderror"
-                                required>
-                                <option value="">Select Category</option>
-                                @foreach ($designCategories as $category)
-                                    <option value="{{ $category->id }}"
-                                        {{ old('design_category_id', $customizerDesign->design_category_id) == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('design_category_id')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            <label for="text_color_code" class="form-label">Color Code <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('text_color_code') is-invalid @enderror" id="text_color_code"
+                                name="text_color_code" value="{{ old('text_color_code', $textColor->text_color_code) }}" required>
+                            @error('text_color_code')
+                                <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
                         {{-- Image Upload --}}
                         <div class="mb-3">
-                            <label for="image" class="form-label">Design Image</label>
-                            <input type="file" class="form-control @error('image') is-invalid @enderror" id="image"
-                                name="image" accept="image/*">
-                            @error('image')
+                            <label for="color_image" class="form-label">Color Image</label>
+                            <input type="file" class="form-control @error('color_image') is-invalid @enderror" id="color_image"
+                                name="color_image" accept="image/*">
+                            @error('color_image')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
 
                             {{-- Show Current Image --}}
-                            @if ($customizerDesign->image)
+                            @if ($textColor->color_image)
                                 <div class="mt-2">
-                                    <img src="{{ asset($customizerDesign->image) }}" alt="Current Image" width="150"
+                                    <img src="{{ asset($textColor->color_image) }}" alt="Current Image" width="150"
                                         class="img-thumbnail">
                                 </div>
                             @endif
                         </div>
 
                         {{-- Submit Button --}}
-                        <button type="submit" class="btn btn-primary">Update Design</button>
+                        <button type="submit" class="btn btn-primary">Update Color</button>
                     </form>
                 </div>
             </div>
@@ -92,12 +82,4 @@
             });
         </script>
     @endif
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            $('#select2DesignCategory').select2();
-        });
-    </script>
-
-
-
 @endsection
