@@ -13,6 +13,7 @@ use App\Http\Controllers\Main\ProductDetailController;
 use App\Http\Controllers\Main\ProductController;
 use App\Http\Controllers\Main\AboutController;
 use App\Http\Controllers\Main\HomeController;
+use App\Http\Controllers\Main\WishlistController;
 
 
 use App\Http\Controllers\Main\ContactController;
@@ -94,6 +95,8 @@ Route::middleware(['web'])->group(function () {
 
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
     Route::delete('/cart/remove/{itemId}', [CartController::class, 'remove'])->name('cart.remove');
+
+    Route::get('/add/user/wishlist/{id}', [WishlistController::class, 'addToWishlist'])->name('add.user-wishlist');
 
     Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
     Route::get('/checkout', [OrderController::class, 'index'])->name('checkout');

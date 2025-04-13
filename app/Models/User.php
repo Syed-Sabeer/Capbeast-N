@@ -13,14 +13,14 @@ class User extends Authenticatable
 
     protected $fillable = [
         'first_name',
-        'last_name',        
+        'last_name',
         'contact_number',
         'country',
         'email',
         'password',
         'status',
     ];
-    
+
     protected $hidden = [
         'password',
         'remember_token',
@@ -37,5 +37,9 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+    public function userWishlist()
+    {
+      return $this->hasMany(UserWishlist::class, 'user_id');
     }
 }

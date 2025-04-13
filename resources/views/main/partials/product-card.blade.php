@@ -2,20 +2,18 @@
                     class="card ecommerce-product-widgets border-0 rounded-0 shadow-none overflow-hidden product-card-widget">
                     <div class="bg-light bg-opacity-50 rounded py-4 position-relative">
                         <img src="{{ asset('storage/' . (
-                            $product->productColors->first()->front_image 
-                            ?? $product->productColors->first()->right_image 
-                            ?? $product->productColors->first()->left_image 
-                            ?? $product->productColors->first()->back_image 
+                            $product->productColors->first()->front_image
+                            ?? $product->productColors->first()->right_image
+                            ?? $product->productColors->first()->left_image
+                            ?? $product->productColors->first()->back_image
                             ?? 'ProductImages/default.jpg'
                         )) }}" alt=""
                             style="max-height: 200px;max-width: 100%;" class="mx-auto d-block rounded-2">
                         <div class="action vstack gap-2">
-                            <button
-                                class="btn btn-danger avatar-xs p-0 btn-soft-warning custom-toggle product-action"
-                                data-bs-toggle="button">
+                            <a href="{{route('add.user-wishlist', $product->id)}}" class="btn btn-danger avatar-xs p-0 btn-soft-warning custom-toggle product-action">
                                 <span class="icon-on"><i class="ri-heart-line"></i></span>
                                 <span class="icon-off"><i class="ri-heart-fill"></i></span>
-                            </button>
+                            </a>
                         </div>
                         @php
     $maxDiscount = $product->productVolumeDiscount->max('discount');
@@ -36,7 +34,7 @@
                                 <span class="arrow left"><i class="fa-solid fa-circle-chevron-left"></i></span>
                                 <div class="color-slider" id="colorSlider">
 
-                                
+
                                 @if($product->productColors->isNotEmpty())
                                 @foreach($product->productColors as $color)
                                     <div class="color-option" data-image="{{ asset('storage/' . ($color->front_image ?? 'ProductImages/default.jpg')) }}">
@@ -44,7 +42,7 @@
                                     </div>
                                 @endforeach
                             @endif
-                                  
+
 
                                 </div>
                                 <span class="arrow right"><i
@@ -65,7 +63,7 @@
                                     <i class="fa-solid fa-pen-to-square"></i> &nbsp;&nbsp; Customize
                                 </a>
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>
