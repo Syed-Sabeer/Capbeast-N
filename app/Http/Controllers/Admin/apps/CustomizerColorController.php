@@ -3,15 +3,10 @@
 namespace App\Http\Controllers\Admin\apps;
 
 use App\Http\Controllers\Controller;
-use App\Models\CustomizerDesign;
-use App\Models\DesignCategory;
-use Auth;
+use App\Models\TextColor;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
-use Log;
 
-class CustomizerDesignController extends Controller
+class CustomizerColorController extends Controller
 {
   /**
    * Display a listing of the resource.
@@ -19,8 +14,8 @@ class CustomizerDesignController extends Controller
   public function index()
   {
     try {
-      $customizerDesigns = CustomizerDesign::with('designCategory')->paginate(10);
-      return view('admin.content.apps.customizer.designs.index', compact('customizerDesigns'));
+      $textColors = TextColor::paginate(10);
+      return view('admin.content.apps.customizer.colors.index', compact('textColors'));
     } catch (\Throwable $th) {
       //throw $th;
       return redirect()->back()->with('error', 'Something went wrong. Please try again!');
@@ -33,8 +28,7 @@ class CustomizerDesignController extends Controller
   public function create()
   {
     try {
-      $designCategories = DesignCategory::all();
-      return view('admin.content.apps.customizer.designs.add', compact('designCategories'));
+      return view('admin.content.apps.customizer.colors.add');
     } catch (\Throwable $th) {
       //throw $th;
       return redirect()->back()->with('error', 'Something went wrong. Please try again!');
@@ -87,7 +81,7 @@ class CustomizerDesignController extends Controller
         'image' => $imagePath ?? null,
       ]);
 
-      return redirect()->route(Auth::user()->role.'.customizer-designs.list')->with('success', 'Design added successfully!');
+      return redirect()->route(Auth::user()->role . '.customizer-designs.list')->with('success', 'Design added successfully!');
       // return redirect()->back()->with('success', 'Design added successfully!');
     } catch (\Throwable $th) {
       Log::error($th->getMessage());

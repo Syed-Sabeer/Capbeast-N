@@ -1,6 +1,6 @@
 @extends('admin.layouts/layoutMaster')
 
-@section('title', 'Customizer Designs - Apps')
+@section('title', 'Customizer Colors - Apps')
 
 @section('vendor-style')
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
@@ -18,12 +18,12 @@
 
 @section('content')
     <h4 class="py-3 mb-2">
-        <span class="text-muted fw-light">Customizer /</span> Designs
+        <span class="text-muted fw-light">Customizer /</span> Colors
     </h4>
     <div class="d-flex justify-content-end mb-4">
-        <a href="{{ route($prefix . '.customizer-designs.create') }}" class="btn btn-primary">Add Design</a>
+        <a href="{{ route($prefix . '.customizer-colors.create') }}" class="btn btn-primary">Add Colors</a>
     </div>
-    <!-- Designs List Table -->
+    <!-- Colors List Table -->
     <div class="card">
         <div class="card-datatable table-responsive">
             <table class=" table border-top">
@@ -32,43 +32,29 @@
                         <th></th>
                         <th>Sr.#</th>
                         <th>Name</th>
-                        <th>Category</th>
+                        <th>Color Code</th>
                         <th>Image</th>
-                        {{-- <th>Status</th> --}}
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($customizerDesigns as $key => $design)
+                    @foreach ($textColors as $key => $color)
                         <tr>
                             <td></td>
 
                             <td>{{ $key + 1 }}</td>
-                            <td>{{ $design->name }}</td>
-                            <td>{{ $design->designCategory->name }}</td>
+                            <td>{{ $color->color_name }}</td>
+                            <td>{{ $color->text_color_code }}</td>
                             <td>
-                                @if ($design->image)
-                                    <img src="{{ asset($design->image) }}" alt="Design Image" width="50">
+                                @if ($color->color_image)
+                                    <img src="{{ asset($color->color_image) }}" alt="Color Image" width="50">
                                 @else
                                     No Image
                                 @endif
                             </td>
-                            {{-- <td>
-                                <div class="w-25 d-flex justify-content-end">
-                                    <label class="switch switch-primary switch-sm me-4 pe-2">
-                                        <input type="checkbox" class="switch-input" data-id="{{ $design->id }}"
-                                            {{ $design->status == '1' ? 'checked' : '' }}>
-                                        <span class="switch-toggle-slider">
-                                            <span class="switch-on"></span>
-                                            <span class="switch-off"></span>
-                                        </span>
-                                    </label>
-                                </div>
-                            </td> --}}
-
                             <td>
-                                <a href="{{ route($prefix.'.customizer-designs.edit', $design->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                                <a href="{{ route($prefix.'.customizer-designs.destroy', $design->id) }}" class="btn btn-sm btn-danger delete_confirm">Delete</a>
+                                <a href="{{ route($prefix.'.customizer-colors.edit', $color->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                                <a href="{{ route($prefix.'.customizer-colors.destroy', $color->id) }}" class="btn btn-sm btn-danger delete_confirm">Delete</a>
                             </td>
                         </tr>
                     @endforeach
@@ -78,7 +64,7 @@
         </div>
 
         <div class="d-flex justify-content-end mt-3 me-3">
-            <x-pagination :paginator="$customizerDesigns" />
+            <x-pagination :paginator="$textColors" />
         </div>
 
     </div>

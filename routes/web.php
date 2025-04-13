@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\apps\CustomizerDesignController;
+use App\Http\Controllers\Admin\apps\CustomizerColorController;
 use App\Http\Controllers\Main\TOSDController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
@@ -264,7 +265,14 @@ foreach ($roles as $role => $prefix) {
           Route::post('/designs/store', [CustomizerDesignController::class, 'store'])->name(Route::prefixed($prefix, 'customizer-designs.store'));
           Route::get('/designs/edit/{id}', [CustomizerDesignController::class, 'edit'])->name(Route::prefixed($prefix, 'customizer-designs.edit'));
           Route::put('/designs/update/{id}', [CustomizerDesignController::class, 'update'])->name(Route::prefixed($prefix, 'customizer-designs.update'));
-          Route::delete('/designs/delete/{id}', [CustomizerDesignController::class, 'destroy'])->name(Route::prefixed($prefix, 'customizer-designs.destroy'));
+          Route::get('/designs/delete/{id}', [CustomizerDesignController::class, 'destroy'])->name(Route::prefixed($prefix, 'customizer-designs.destroy'));
+          //colors
+          Route::get('/colors/list', [CustomizerColorController::class, 'index'])->name(Route::prefixed($prefix, 'customizer-colors.list'));
+          Route::get('/colors/add', [CustomizerColorController::class, 'create'])->name(Route::prefixed($prefix, 'customizer-colors.create'));
+          Route::post('/colors/store', [CustomizerColorController::class, 'store'])->name(Route::prefixed($prefix, 'customizer-colors.store'));
+          Route::get('/colors/edit/{id}', [CustomizerColorController::class, 'edit'])->name(Route::prefixed($prefix, 'customizer-colors.edit'));
+          Route::put('/colors/update/{id}', [CustomizerColorController::class, 'update'])->name(Route::prefixed($prefix, 'customizer-colors.update'));
+          Route::get('/colors/delete/{id}', [CustomizerColorController::class, 'destroy'])->name(Route::prefixed($prefix, 'customizer-colors.destroy'));
         });
 
 

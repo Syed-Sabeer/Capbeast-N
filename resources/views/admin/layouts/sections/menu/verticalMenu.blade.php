@@ -148,7 +148,7 @@
                         </a>
                     </li>
                     <li class="menu-item ">
-                        <a href="#" class="menu-link">
+                        <a href="{{ url("backend/$prefix/customizer/colors/list") }}" class="menu-link">
                             <div>{{ __('Colors') }}</div>
                         </a>
                     </li>
