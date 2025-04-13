@@ -27,6 +27,14 @@ class Order extends Model
         'shipping_service',
         'shipping_estimated_days',
         'status',
+        'order_number',
+        'total_amount',
+        'payment_status',
+        'payment_method',
+        'shipping_address',
+        'billing_address',
+        'discount_type',
+        'discount_percentage',
     ];
 
 

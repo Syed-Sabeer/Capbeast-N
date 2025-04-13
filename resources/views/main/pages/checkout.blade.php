@@ -352,6 +352,85 @@
             console.log("Selected country:", selectedCountry);
             updateTaxRowsVisibility();
         });
+
+        function calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts) {
+            let discount = 0;
+            let nextTier = null;
+
+            for (let i = volumeDiscounts.length - 1; i >= 0; i--) {
+                if (quantity >= volumeDiscounts[i].quantity) {
+                    discount = volumeDiscounts[i].discount;
+                    break;
+                }
+                nextTier = volumeDiscounts[i];
+            }
+
+            const discountedPrice = sellingPrice - (sellingPrice * (discount / 100));
+
+            return {
+                discountedPrice,
+                discount,
+                nextTier
+            };
+        }
+
+        function updatePriceDisplay(itemId, quantity) {
+            const $discountInfo = $(`#discount-info-${itemId}`);
+            const $nextTierInfo = $(`#next-tier-info-${itemId}`);
+            const $itemTotalPrice = $(`.item-total-price[data-item-id="${itemId}"]`);
+            const $originalPrice = $(`.original-price[data-item-id="${itemId}"]`);
+            const $discountedPrice = $(`.discounted-price[data-item-id="${itemId}"]`);
+
+            const result = calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts);
+            const discountedItemPrice = result.discountedPrice * quantity;
+            const totalItemPrice = discountedItemPrice +
+                (customizationPrice * quantity) +
+                (pompomPrice * quantity) +
+                (printingPrice * quantity) +
+                (deliveryPrice * quantity);
+
+            if (result.discount > 0) {
+                $discountInfo.text(`You're saving ${result.discount}%!`);
+                $originalPrice.show().text(`$${sellingPrice.toFixed(2)}`);
+                $discountedPrice.show().text(`$${result.discountedPrice.toFixed(2)}`);
+            } else {
+                $discountInfo.text('');
+                $originalPrice.hide();
+                $discountedPrice.text(`$${sellingPrice.toFixed(2)}`);
+            }
+
+            $itemTotalPrice.text(`$${totalItemPrice.toFixed(2)}`);
+
+            if (result.nextTier) {
+                const itemsNeeded = result.nextTier.quantity - quantity;
+                $nextTierInfo.text(`Add ${itemsNeeded} more to get ${result.nextTier.discount}% off!`);
+            } else {
+                $nextTierInfo.text('');
+            }
+
+            // Update order summary
+            updateOrderSummary();
+        }
+
+        function updateOrderSummary() {
+            let newSubtotal = 0;
+
+            $('.item-total-price').each(function() {
+                newSubtotal += parseFloat($(this).text().replace('$', ''));
+            });
+
+            $('#subtotal-amount').text(`$${newSubtotal.toFixed(2)}`);
+            $('#final-total-amount').text(`$${newSubtotal.toFixed(2)}`);
+        }
+
+        // Initialize price displays for all items when document is ready
+        $(document).ready(function() {
+            $('.item-total-price').each(function() {
+                const itemId = $(this).data('item-id');
+                const quantity = parseInt($(this).closest('tr').find('td:eq(1)').text());
+                updatePriceDisplay(itemId, quantity);
+            });
+        });
     });
 </script>
 
@@ -473,32 +552,43 @@
                                                 $subtotal += $itemTotal;
                                             @endphp
 
+                                            <script>
+                                                const volumeDiscounts = @json($item->product->productVolumeDiscount->sortBy('quantity')->values());
+                                                const sellingPrice = {{ $item->product->selling_price }};
+                                                const customizationPrice = {{ $customizationPrice }};
+                                                const pompomPrice = {{ $pompomPrice }};
+                                                const printingPrice = {{ $printingPrice }};
+                                                const deliveryPrice = {{ $deliveryPrice }};
+
+                                                // Initialize price display for this item
+                                                $(document).ready(function() {
+                                                    updatePriceDisplay({{ $item->id }}, {{ $item->quantity }});
+                                                });
+                                            </script>
+
                                             <tr>
                                                 <td class="text-start">
                                                     <div class="d-flex align-items-center gap-2">
                                                         <div class="avatar-sm flex-shrink-0">
                                                             <div class="avatar-title  rounded-3">
-                                                                @if ($item->userCustomization)
-                                                                    <img src="{{ asset(
-                                                                        $item->userCustomization->front_image ??
-                                                                            ($item->userCustomization->right_image ??
-                                                                                ($item->userCustomization->left_image ??
-                                                                                    ($item->userCustomization->back_image ?? 'ProductImages/default.jpg'))),
-                                                                    ) }}"
-                                                                        alt="" class="avatar-lg ">
-                                                                @else
-                                                                    <img src="{{ asset(
-                                                                        'storage/' .
-                                                                            ($item->color->front_image ??
-                                                                                ($item->color->right_image ??
-                                                                                    ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg')))),
-                                                                    ) }}"
-                                                                        alt="" class="avatar-lg ">
-                                                                @endif
+                                                                <img src="{{ asset('storage/' . ($item->color->front_image ?? ($item->color->right_image ?? ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg'))))) }}"
+                                                                    alt="" class="avatar-xs">
                                                             </div>
                                                         </div>
                                                         <div class="flex-grow-1">
-                                                            <h6 style="margin-left: 5%">{{ $item->product->title }}</h6>
+                                                            <h6>{{ $item->product->title }}</h6>
+                                                            <p class="text-muted mb-0">
+                                                                <span class="original-price"
+                                                                    data-item-id="{{ $item->id }}"
+                                                                    style="text-decoration: line-through;">${{ number_format($basePrice, 2) }}</span>
+                                                                <span class="discounted-price"
+                                                                    data-item-id="{{ $item->id }}"
+                                                                    style="color: #28a745;"></span>
+                                                            </p>
+                                                            <div id="discount-info-{{ $item->id }}"
+                                                                class="text-success fs-13 fw-medium"></div>
+                                                            <div id="next-tier-info-{{ $item->id }}"
+                                                                class="text-muted fs-12"></div>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -507,7 +597,8 @@
                                                     {{ $item->quantity }}
                                                 </td>
                                                 <td class="text-end">
-                                                    ${{ number_format($basePrice, 2) }}
+                                                    <span class="item-total-price"
+                                                        data-item-id="{{ $item->id }}">${{ number_format($itemTotal, 2) }}</span>
                                                 </td>
                                                 <td class="text-end">
                                                     ${{ number_format($customizationPrice, 2) }}

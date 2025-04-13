@@ -621,4 +621,118 @@ class OrderController extends Controller
 
     return response()->json(['success' => false, 'message' => 'Coupon not applicable for selected products.'], 400);
   }
+
+  public function store(Request $request)
+  {
+    try {
+      DB::beginTransaction();
+
+      $cartItems = Cart::with(['product', 'product.productVolumeDiscount'])
+        ->where('user_id', auth()->id())
+        ->get();
+
+      $totalAmount = 0;
+      $discountType = 'none';
+      $discountPercentage = 0;
+
+      foreach ($cartItems as $item) {
+        // Calculate volume discount
+        $volumeDiscount = $this->calculateVolumeDiscount($item);
+
+        // Get coupon discount if applicable
+        $couponDiscount = $this->getCouponDiscount($item);
+
+        // Determine which discount to apply
+        if ($volumeDiscount['percentage'] > 0 || $couponDiscount['percentage'] > 0) {
+          if ($volumeDiscount['percentage'] >= $couponDiscount['percentage']) {
+            $discountType = 'volume';
+            $discountPercentage = $volumeDiscount['percentage'];
+            $itemPrice = $volumeDiscount['price'];
+          } else {
+            $discountType = 'coupon';
+            $discountPercentage = $couponDiscount['percentage'];
+            $itemPrice = $couponDiscount['price'];
+          }
+        } else {
+          $itemPrice = $item->product->selling_price;
+        }
+
+        // Calculate total for this item
+        $itemTotal = ($itemPrice * $item->quantity) +
+          ($item->userCustomization->price ?? 0) +
+          ($item->pompom_price ?? 0) +
+          ($item->printing_price ?? 0) +
+          ($item->delivery_price ?? 0);
+
+        $totalAmount += $itemTotal;
+      }
+
+      $order = Order::create([
+        'user_id' => auth()->id(),
+        'order_number' => 'ORD-' . strtoupper(uniqid()),
+        'total_amount' => $totalAmount,
+        'status' => 'pending',
+        'payment_status' => 'pending',
+        'payment_method' => $request->payment_method,
+        'shipping_address' => $request->shipping_address,
+        'billing_address' => $request->billing_address,
+        'discount_type' => $discountType,
+        'discount_percentage' => $discountPercentage,
+      ]);
+
+      // Create order items
+      foreach ($cartItems as $item) {
+        $order->items()->create([
+          'product_id' => $item->product_id,
+          'quantity' => $item->quantity,
+          'price' => $item->product->selling_price,
+          'customization_price' => $item->userCustomization->price ?? 0,
+          'pompom_price' => $item->pompom_price ?? 0,
+          'printing_price' => $item->printing_price ?? 0,
+          'delivery_price' => $item->delivery_price ?? 0,
+        ]);
+      }
+
+      // Clear the cart
+      Cart::where('user_id', auth()->id())->delete();
+
+      DB::commit();
+
+      return redirect()->route('order.success', $order->order_number);
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return back()->with('error', 'Something went wrong. Please try again.');
+    }
+  }
+
+  private function calculateVolumeDiscount($cartItem)
+  {
+    $volumeDiscounts = $cartItem->product->productVolumeDiscount->sortBy('quantity');
+    $quantity = $cartItem->quantity;
+    $originalPrice = $cartItem->product->selling_price;
+    $discountPercentage = 0;
+
+    foreach ($volumeDiscounts as $discount) {
+      if ($quantity >= $discount->quantity) {
+        $discountPercentage = $discount->discount;
+      }
+    }
+
+    $discountedPrice = $originalPrice - ($originalPrice * ($discountPercentage / 100));
+
+    return [
+      'percentage' => $discountPercentage,
+      'price' => $discountedPrice
+    ];
+  }
+
+  private function getCouponDiscount($cartItem)
+  {
+    // Implement your coupon discount logic here
+    // This is a placeholder - replace with your actual coupon logic
+    return [
+      'percentage' => 0,
+      'price' => $cartItem->product->selling_price
+    ];
+  }
 }

@@ -32,14 +32,10 @@
                     @endphp
 
                     @foreach ($carts as $cart)
-                        {{-- @php
-                            $itemTotal = ($cart->product->selling_price * $cart->quantity) + ($cart->userCustomization->price * $cart->quantity);
-                            $subtotal += $itemTotal;
-                        @endphp --}}
-
                         @php
                             $customizationPrice = isset($cart->userCustomization) ? $cart->userCustomization->price : 0;
-                            $itemTotal = ($cart->product->selling_price * $cart->quantity) + ($customizationPrice * $cart->quantity);
+                            $itemTotal =
+                                $cart->product->selling_price * $cart->quantity + $customizationPrice * $cart->quantity;
                             $subtotal += $itemTotal;
                         @endphp
 
@@ -49,20 +45,23 @@
                                     <div class="col-sm-auto">
                                         <div class="avatar-lg h-100">
                                             <div class="avatar-title rounded py-3">
-                                              @if ($cart->userCustomization)
-                                                <img src="{{ asset(
-                                                        ($cart->userCustomization->front_image ??
+                                                @if ($cart->userCustomization)
+                                                    <img src="{{ asset(
+                                                        $cart->userCustomization->front_image ??
                                                             ($cart->userCustomization->right_image ??
-                                                                ($cart->userCustomization->left_image ?? ($cart->userCustomization->back_image ?? 'ProductImages/default.jpg')))),
-                                                ) }}" alt="" class="avatar-lg ">
-                                              @else
-                                                <img src="{{ asset(
-                                                    'storage/' .
-                                                        ($cart->color->front_image ??
-                                                            ($cart->color->right_image ??
-                                                                ($cart->color->left_image ?? ($cart->color->back_image ?? 'ProductImages/default.jpg')))),
-                                                ) }}" alt="" class="avatar-lg ">
-                                              @endif
+                                                                ($cart->userCustomization->left_image ??
+                                                                    ($cart->userCustomization->back_image ?? 'ProductImages/default.jpg'))),
+                                                    ) }}"
+                                                        alt="" class="avatar-lg ">
+                                                @else
+                                                    <img src="{{ asset(
+                                                        'storage/' .
+                                                            ($cart->color->front_image ??
+                                                                ($cart->color->right_image ??
+                                                                    ($cart->color->left_image ?? ($cart->color->back_image ?? 'ProductImages/default.jpg')))),
+                                                    ) }}"
+                                                        alt="" class="avatar-lg ">
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -85,16 +84,24 @@
                                             <button type="button" class="plus"
                                                 data-cart-id="{{ $cart->id }}">+</button>
                                         </div>
-
+                                        <div id="discount-info-{{ $cart->id }}"
+                                            class="mt-2 text-success fs-13 fw-medium"></div>
+                                        <div id="next-tier-info-{{ $cart->id }}" class="text-muted fs-12"></div>
                                     </div>
                                     <div class="col-sm-auto">
                                         <div class="text-lg-end">
-                                            <p class="text-muted mb-1 fs-12">Item Price: <span
-                                              class="product-line-price fs-16" style="color: #000; font-weight:500;">${{ number_format($cart->product->selling_price, 2) }}</span></p>
+                                            <p class="text-muted mb-1 fs-12">Item Price:
+                                                <span class="original-price fs-16"
+                                                    style="color: #000; font-weight:500; text-decoration: line-through;"
+                                                    data-cart-id="{{ $cart->id }}">${{ number_format($cart->product->selling_price, 2) }}</span>
+                                                <span class="discounted-price fs-16"
+                                                    style="color: #28a745; font-weight:500;"
+                                                    data-cart-id="{{ $cart->id }}"></span>
+                                            </p>
                                             <p class="text-muted mb-1 fs-12">Customization Price: <span
-                                              class="product-line-price fs-16" style="color: #000; font-weight:500;">${{ number_format($customizationPrice, 2) }}</span></p>
-                                            {{-- <p class="text-muted mb-1 fs-12">Customization Price:</p>
-                                            <h5 class="fs-16">${{ number_format($cart->userCustomization->price, 2) }}</h5> --}}
+                                                    class="customization-price fs-16"
+                                                    style="color: #000; font-weight:500;">${{ number_format($customizationPrice, 2) }}</span>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -121,8 +128,9 @@
                                     <div class="col-sm-auto">
                                         <div class="d-flex align-items-center gap-2 text-muted">
                                             <div>Total :</div>
-                                            <h5 class="fs-14 mb-0">$<span
-                                                    class="product-line-price">{{ $itemTotal }}</span></h5>
+                                            <h5 class="fs-14 mb-0">$<span class="item-total-price"
+                                                    data-cart-id="{{ $cart->id }}">{{ number_format($itemTotal, 2) }}</span>
+                                            </h5>
                                         </div>
                                     </div>
                                 </div>
@@ -162,13 +170,6 @@
                                                 </td>
                                             </tr>
 
-                                            <tr>
-                                                <td>Discount <span class="text-muted"></span>:</td>
-                                                <td class="text-end cart-discount">
-                                                    <span id="discount-amount">0.00</span>
-                                                </td>
-                                            </tr>
-
                                             <tr class="table-active">
                                                 <th>Total (USD) :</th>
                                                 <td class="text-end">
@@ -176,11 +177,9 @@
                                                         id="final-total-amount"><span>$</span>{{ number_format($subtotal, 2) }}</span>
                                                 </td>
                                             </tr>
-
                                         </tbody>
                                     </table>
                                 </div>
-                                <!-- end table-responsive -->
                             </div>
                         </div>
                         <div class="hstack gap-2 justify-content-end">
@@ -272,13 +271,82 @@
 
     <script>
         $(document).ready(function() {
-            let isUpdating = false; // Prevent multiple simultaneous updates
+            let isUpdating = false;
+
+            const volumeDiscounts = @json($cart->product->productVolumeDiscount->sortBy('quantity')->values());
+            const sellingPrice = {{ $cart->product->selling_price }};
+            const customizationPrice = {{ $customizationPrice }};
+
+            function calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts) {
+                let discount = 0;
+                let nextTier = null;
+
+                for (let i = volumeDiscounts.length - 1; i >= 0; i--) {
+                    if (quantity >= volumeDiscounts[i].quantity) {
+                        discount = volumeDiscounts[i].discount;
+                        break;
+                    }
+                    nextTier = volumeDiscounts[i];
+                }
+
+                const discountedPrice = sellingPrice - (sellingPrice * (discount / 100));
+
+                return {
+                    discountedPrice,
+                    discount,
+                    nextTier
+                };
+            }
+
+            function updatePriceDisplay(cartId, quantity) {
+                const $discountInfo = $(`#discount-info-${cartId}`);
+                const $nextTierInfo = $(`#next-tier-info-${cartId}`);
+                const $itemTotalPrice = $(`.item-total-price[data-cart-id="${cartId}"]`);
+                const $originalPrice = $(`.original-price[data-cart-id="${cartId}"]`);
+                const $discountedPrice = $(`.discounted-price[data-cart-id="${cartId}"]`);
+
+                const result = calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts);
+                const discountedItemPrice = result.discountedPrice * quantity;
+                const totalItemPrice = discountedItemPrice + (customizationPrice * quantity);
+
+                if (result.discount > 0) {
+                    $discountInfo.text(`You're saving ${result.discount}%!`);
+                    $originalPrice.show();
+                    $discountedPrice.text(`$${result.discountedPrice.toFixed(2)}`);
+                } else {
+                    $discountInfo.text('');
+                    $originalPrice.hide();
+                    $discountedPrice.text(`$${sellingPrice.toFixed(2)}`);
+                }
+
+                $itemTotalPrice.text(totalItemPrice.toFixed(2));
+
+                if (result.nextTier) {
+                    const itemsNeeded = result.nextTier.quantity - quantity;
+                    $nextTierInfo.text(`Add ${itemsNeeded} more to get ${result.nextTier.discount}% off!`);
+                } else {
+                    $nextTierInfo.text('');
+                }
+
+                // Update order summary
+                updateOrderSummary();
+            }
+
+            function updateOrderSummary() {
+                let newSubtotal = 0;
+
+                $('.item-total-price').each(function() {
+                    newSubtotal += parseFloat($(this).text());
+                });
+
+                $('#subtotal-amount').text(`$${newSubtotal.toFixed(2)}`);
+                $('#final-total-amount').text(`$${newSubtotal.toFixed(2)}`);
+            }
 
             $(".plus, .minus").click(function() {
-                if (isUpdating) return; // Ignore clicks if an update is in progress
+                if (isUpdating) return;
 
                 isUpdating = true;
-
                 let cartId = $(this).data("cart-id");
                 let $input = $(`.product-quantity[data-cart-id="${cartId}"]`);
                 let currentQuantity = parseInt($input.val());
@@ -291,10 +359,18 @@
                 }
 
                 $input.val(currentQuantity);
+                updatePriceDisplay(cartId, currentQuantity);
 
                 updateCartQuantity(cartId, currentQuantity, function() {
-                    isUpdating = false; // Reset after request completes
+                    isUpdating = false;
                 });
+            });
+
+            // Initialize price displays for all items
+            $('.product-quantity').each(function() {
+                const cartId = $(this).data('cart-id');
+                const quantity = parseInt($(this).val());
+                updatePriceDisplay(cartId, quantity);
             });
 
             function updateCartQuantity(cartId, newQuantity, callback) {
@@ -308,23 +384,14 @@
                     },
                     success: function(response) {
                         if (response.success) {
-                            let itemPrice = parseFloat(
-                                $(`.product[data-cart-id="${cartId}"]`).find(".fs-16").text()
-                                .replace("$", "")
-                            );
-                            let totalItemPrice = (itemPrice * newQuantity).toFixed(2);
-                            $(`.product-line-price[data-cart-id="${cartId}"]`).text(
-                                `$${totalItemPrice}`);
-
-                            $("#subtotal-amount").text(`$${response.subtotal}`);
-                            $("#final-total-amount").text(`$${response.total}`);
+                            if (callback) callback();
+                        } else {
+                            alert("Failed to update quantity");
                         }
                     },
                     error: function() {
                         alert("Failed to update cart. Try again.");
-                    },
-                    complete: function() {
-                        if (callback) callback(); // Unlock clicking when request finishes
+                        if (callback) callback();
                     }
                 });
             }
