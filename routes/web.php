@@ -73,10 +73,13 @@ Route::middleware(['web'])->group(function () {
     Route::get('/delete/customizer-image/{id}', [CustomizerController::class, 'deleteImage'])->name('customizer.delete-image');
     // routes/web.php
     Route::post('/shipping/calculate', [ShippingController::class, 'calculate'])->name('shipping.calculate');
+<<<<<<< HEAD
 
     // Shipment routes
     Route::get('/shipments', [ShipmentController::class, 'getShipments'])->name('shipments.index');
     Route::post('/shipments/create', [ShipmentController::class, 'createShipment'])->name('shipments.create');
+=======
+>>>>>>> c5cd6c1 (added states for canada)
 
     Route::get('/countries', [OrderController::class, 'getCountries'])->name('countries.index');
     Route::get('/countries/{code}/states', [OrderController::class, 'getStates'])->name('countries.states');

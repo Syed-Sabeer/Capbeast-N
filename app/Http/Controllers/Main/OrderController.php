@@ -61,6 +61,7 @@ class OrderController extends Controller
 
   public function getStates($code)
   {
+<<<<<<< HEAD
     try {
       $states = State::where('country_code', $code)->get(['code', 'name']);
       return response()->json($states);
@@ -70,6 +71,17 @@ class OrderController extends Controller
     }
   }
 
+=======
+      try {
+          $states = State::where('country_code', $code)->get(['code', 'name']);
+          return response()->json($states);
+      } catch (\Exception $e) {
+          \Log::error('Error in getStates: ' . $e->getMessage());
+          return response()->json(['error' => 'Failed to load states'], 500);
+      }
+  }
+  
+>>>>>>> c5cd6c1 (added states for canada)
 
   public function PostPaymentWithPaypal($totalPrice)
   {

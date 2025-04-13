@@ -78,6 +78,7 @@ class StateSeeder extends Seeder
             ['country_code' => 'US', 'code' => 'WY', 'name' => 'Wyoming']
         ];
 
+<<<<<<< HEAD
         $ukRegions = [
             ['country_code' => 'GB', 'code' => 'ENG', 'name' => 'England'],
             ['country_code' => 'GB', 'code' => 'SCT', 'name' => 'Scotland'],
@@ -292,6 +293,13 @@ class StateSeeder extends Seeder
         );
 
         foreach ($states as $state) {
+=======
+        foreach ($canadianProvinces as $province) {
+            State::create($province);
+        }
+
+        foreach ($usStates as $state) {
+>>>>>>> c5cd6c1 (added states for canada)
             State::create($state);
         }
     }
