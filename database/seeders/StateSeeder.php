@@ -78,11 +78,220 @@ class StateSeeder extends Seeder
             ['country_code' => 'US', 'code' => 'WY', 'name' => 'Wyoming']
         ];
 
-        foreach ($canadianProvinces as $province) {
-            State::create($province);
-        }
+        $ukRegions = [
+            ['country_code' => 'GB', 'code' => 'ENG', 'name' => 'England'],
+            ['country_code' => 'GB', 'code' => 'SCT', 'name' => 'Scotland'],
+            ['country_code' => 'GB', 'code' => 'WLS', 'name' => 'Wales'],
+            ['country_code' => 'GB', 'code' => 'NIR', 'name' => 'Northern Ireland']
+        ];
 
-        foreach ($usStates as $state) {
+        $australianStates = [
+            ['country_code' => 'AU', 'code' => 'NSW', 'name' => 'New South Wales'],
+            ['country_code' => 'AU', 'code' => 'QLD', 'name' => 'Queensland'],
+            ['country_code' => 'AU', 'code' => 'SA', 'name' => 'South Australia'],
+            ['country_code' => 'AU', 'code' => 'TAS', 'name' => 'Tasmania'],
+            ['country_code' => 'AU', 'code' => 'VIC', 'name' => 'Victoria'],
+            ['country_code' => 'AU', 'code' => 'WA', 'name' => 'Western Australia'],
+            ['country_code' => 'AU', 'code' => 'ACT', 'name' => 'Australian Capital Territory'],
+            ['country_code' => 'AU', 'code' => 'NT', 'name' => 'Northern Territory']
+        ];
+
+        $indianStates = [
+            ['country_code' => 'IN', 'code' => 'AP', 'name' => 'Andhra Pradesh'],
+            ['country_code' => 'IN', 'code' => 'AR', 'name' => 'Arunachal Pradesh'],
+            ['country_code' => 'IN', 'code' => 'AS', 'name' => 'Assam'],
+            ['country_code' => 'IN', 'code' => 'BR', 'name' => 'Bihar'],
+            ['country_code' => 'IN', 'code' => 'CT', 'name' => 'Chhattisgarh'],
+            ['country_code' => 'IN', 'code' => 'GA', 'name' => 'Goa'],
+            ['country_code' => 'IN', 'code' => 'GJ', 'name' => 'Gujarat'],
+            ['country_code' => 'IN', 'code' => 'HR', 'name' => 'Haryana'],
+            ['country_code' => 'IN', 'code' => 'HP', 'name' => 'Himachal Pradesh'],
+            ['country_code' => 'IN', 'code' => 'JK', 'name' => 'Jammu and Kashmir'],
+            ['country_code' => 'IN', 'code' => 'JH', 'name' => 'Jharkhand'],
+            ['country_code' => 'IN', 'code' => 'KA', 'name' => 'Karnataka'],
+            ['country_code' => 'IN', 'code' => 'KL', 'name' => 'Kerala'],
+            ['country_code' => 'IN', 'code' => 'MP', 'name' => 'Madhya Pradesh'],
+            ['country_code' => 'IN', 'code' => 'MH', 'name' => 'Maharashtra'],
+            ['country_code' => 'IN', 'code' => 'MN', 'name' => 'Manipur'],
+            ['country_code' => 'IN', 'code' => 'ML', 'name' => 'Meghalaya'],
+            ['country_code' => 'IN', 'code' => 'MZ', 'name' => 'Mizoram'],
+            ['country_code' => 'IN', 'code' => 'NL', 'name' => 'Nagaland'],
+            ['country_code' => 'IN', 'code' => 'OR', 'name' => 'Odisha'],
+            ['country_code' => 'IN', 'code' => 'PB', 'name' => 'Punjab'],
+            ['country_code' => 'IN', 'code' => 'RJ', 'name' => 'Rajasthan'],
+            ['country_code' => 'IN', 'code' => 'SK', 'name' => 'Sikkim'],
+            ['country_code' => 'IN', 'code' => 'TN', 'name' => 'Tamil Nadu'],
+            ['country_code' => 'IN', 'code' => 'TG', 'name' => 'Telangana'],
+            ['country_code' => 'IN', 'code' => 'TR', 'name' => 'Tripura'],
+            ['country_code' => 'IN', 'code' => 'UP', 'name' => 'Uttar Pradesh'],
+            ['country_code' => 'IN', 'code' => 'UT', 'name' => 'Uttarakhand'],
+            ['country_code' => 'IN', 'code' => 'WB', 'name' => 'West Bengal']
+        ];
+
+        $brazilianStates = [
+            ['country_code' => 'BR', 'code' => 'AC', 'name' => 'Acre'],
+            ['country_code' => 'BR', 'code' => 'AL', 'name' => 'Alagoas'],
+            ['country_code' => 'BR', 'code' => 'AP', 'name' => 'Amapá'],
+            ['country_code' => 'BR', 'code' => 'AM', 'name' => 'Amazonas'],
+            ['country_code' => 'BR', 'code' => 'BA', 'name' => 'Bahia'],
+            ['country_code' => 'BR', 'code' => 'CE', 'name' => 'Ceará'],
+            ['country_code' => 'BR', 'code' => 'DF', 'name' => 'Distrito Federal'],
+            ['country_code' => 'BR', 'code' => 'ES', 'name' => 'Espírito Santo'],
+            ['country_code' => 'BR', 'code' => 'GO', 'name' => 'Goiás'],
+            ['country_code' => 'BR', 'code' => 'MA', 'name' => 'Maranhão'],
+            ['country_code' => 'BR', 'code' => 'MT', 'name' => 'Mato Grosso'],
+            ['country_code' => 'BR', 'code' => 'MS', 'name' => 'Mato Grosso do Sul'],
+            ['country_code' => 'BR', 'code' => 'MG', 'name' => 'Minas Gerais'],
+            ['country_code' => 'BR', 'code' => 'PA', 'name' => 'Pará'],
+            ['country_code' => 'BR', 'code' => 'PB', 'name' => 'Paraíba'],
+            ['country_code' => 'BR', 'code' => 'PR', 'name' => 'Paraná'],
+            ['country_code' => 'BR', 'code' => 'PE', 'name' => 'Pernambuco'],
+            ['country_code' => 'BR', 'code' => 'PI', 'name' => 'Piauí'],
+            ['country_code' => 'BR', 'code' => 'RJ', 'name' => 'Rio de Janeiro'],
+            ['country_code' => 'BR', 'code' => 'RN', 'name' => 'Rio Grande do Norte'],
+            ['country_code' => 'BR', 'code' => 'RS', 'name' => 'Rio Grande do Sul'],
+            ['country_code' => 'BR', 'code' => 'RO', 'name' => 'Rondônia'],
+            ['country_code' => 'BR', 'code' => 'RR', 'name' => 'Roraima'],
+            ['country_code' => 'BR', 'code' => 'SC', 'name' => 'Santa Catarina'],
+            ['country_code' => 'BR', 'code' => 'SP', 'name' => 'São Paulo'],
+            ['country_code' => 'BR', 'code' => 'SE', 'name' => 'Sergipe'],
+            ['country_code' => 'BR', 'code' => 'TO', 'name' => 'Tocantins']
+        ];
+
+        $mexicanStates = [
+            ['country_code' => 'MX', 'code' => 'AGU', 'name' => 'Aguascalientes'],
+            ['country_code' => 'MX', 'code' => 'BCN', 'name' => 'Baja California'],
+            ['country_code' => 'MX', 'code' => 'BCS', 'name' => 'Baja California Sur'],
+            ['country_code' => 'MX', 'code' => 'CAM', 'name' => 'Campeche'],
+            ['country_code' => 'MX', 'code' => 'CHP', 'name' => 'Chiapas'],
+            ['country_code' => 'MX', 'code' => 'CHH', 'name' => 'Chihuahua'],
+            ['country_code' => 'MX', 'code' => 'CMX', 'name' => 'Ciudad de México'],
+            ['country_code' => 'MX', 'code' => 'COA', 'name' => 'Coahuila'],
+            ['country_code' => 'MX', 'code' => 'COL', 'name' => 'Colima'],
+            ['country_code' => 'MX', 'code' => 'DUR', 'name' => 'Durango'],
+            ['country_code' => 'MX', 'code' => 'GUA', 'name' => 'Guanajuato'],
+            ['country_code' => 'MX', 'code' => 'GRO', 'name' => 'Guerrero'],
+            ['country_code' => 'MX', 'code' => 'HID', 'name' => 'Hidalgo'],
+            ['country_code' => 'MX', 'code' => 'JAL', 'name' => 'Jalisco'],
+            ['country_code' => 'MX', 'code' => 'MEX', 'name' => 'Estado de México'],
+            ['country_code' => 'MX', 'code' => 'MIC', 'name' => 'Michoacán'],
+            ['country_code' => 'MX', 'code' => 'MOR', 'name' => 'Morelos'],
+            ['country_code' => 'MX', 'code' => 'NAY', 'name' => 'Nayarit'],
+            ['country_code' => 'MX', 'code' => 'NLE', 'name' => 'Nuevo León'],
+            ['country_code' => 'MX', 'code' => 'OAX', 'name' => 'Oaxaca'],
+            ['country_code' => 'MX', 'code' => 'PUE', 'name' => 'Puebla'],
+            ['country_code' => 'MX', 'code' => 'QUE', 'name' => 'Querétaro'],
+            ['country_code' => 'MX', 'code' => 'ROO', 'name' => 'Quintana Roo'],
+            ['country_code' => 'MX', 'code' => 'SLP', 'name' => 'San Luis Potosí'],
+            ['country_code' => 'MX', 'code' => 'SIN', 'name' => 'Sinaloa'],
+            ['country_code' => 'MX', 'code' => 'SON', 'name' => 'Sonora'],
+            ['country_code' => 'MX', 'code' => 'TAB', 'name' => 'Tabasco'],
+            ['country_code' => 'MX', 'code' => 'TAM', 'name' => 'Tamaulipas'],
+            ['country_code' => 'MX', 'code' => 'TLA', 'name' => 'Tlaxcala'],
+            ['country_code' => 'MX', 'code' => 'VER', 'name' => 'Veracruz'],
+            ['country_code' => 'MX', 'code' => 'YUC', 'name' => 'Yucatán'],
+            ['country_code' => 'MX', 'code' => 'ZAC', 'name' => 'Zacatecas']
+        ];
+
+        $germanStates = [
+            ['country_code' => 'DE', 'code' => 'BW', 'name' => 'Baden-Württemberg'],
+            ['country_code' => 'DE', 'code' => 'BY', 'name' => 'Bavaria'],
+            ['country_code' => 'DE', 'code' => 'BE', 'name' => 'Berlin'],
+            ['country_code' => 'DE', 'code' => 'BB', 'name' => 'Brandenburg'],
+            ['country_code' => 'DE', 'code' => 'HB', 'name' => 'Bremen'],
+            ['country_code' => 'DE', 'code' => 'HH', 'name' => 'Hamburg'],
+            ['country_code' => 'DE', 'code' => 'HE', 'name' => 'Hesse'],
+            ['country_code' => 'DE', 'code' => 'MV', 'name' => 'Mecklenburg-Vorpommern'],
+            ['country_code' => 'DE', 'code' => 'NI', 'name' => 'Lower Saxony'],
+            ['country_code' => 'DE', 'code' => 'NW', 'name' => 'North Rhine-Westphalia'],
+            ['country_code' => 'DE', 'code' => 'RP', 'name' => 'Rhineland-Palatinate'],
+            ['country_code' => 'DE', 'code' => 'SL', 'name' => 'Saarland'],
+            ['country_code' => 'DE', 'code' => 'SN', 'name' => 'Saxony'],
+            ['country_code' => 'DE', 'code' => 'ST', 'name' => 'Saxony-Anhalt'],
+            ['country_code' => 'DE', 'code' => 'SH', 'name' => 'Schleswig-Holstein'],
+            ['country_code' => 'DE', 'code' => 'TH', 'name' => 'Thuringia']
+        ];
+
+        $frenchRegions = [
+            ['country_code' => 'FR', 'code' => 'ARA', 'name' => 'Auvergne-Rhône-Alpes'],
+            ['country_code' => 'FR', 'code' => 'BFC', 'name' => 'Bourgogne-Franche-Comté'],
+            ['country_code' => 'FR', 'code' => 'BRE', 'name' => 'Brittany'],
+            ['country_code' => 'FR', 'code' => 'CVL', 'name' => 'Centre-Val de Loire'],
+            ['country_code' => 'FR', 'code' => 'COR', 'name' => 'Corsica'],
+            ['country_code' => 'FR', 'code' => 'GES', 'name' => 'Grand Est'],
+            ['country_code' => 'FR', 'code' => 'HDF', 'name' => 'Hauts-de-France'],
+            ['country_code' => 'FR', 'code' => 'IDF', 'name' => 'Île-de-France'],
+            ['country_code' => 'FR', 'code' => 'NOR', 'name' => 'Normandy'],
+            ['country_code' => 'FR', 'code' => 'NAQ', 'name' => 'Nouvelle-Aquitaine'],
+            ['country_code' => 'FR', 'code' => 'OCC', 'name' => 'Occitanie'],
+            ['country_code' => 'FR', 'code' => 'PDL', 'name' => 'Pays de la Loire'],
+            ['country_code' => 'FR', 'code' => 'PAC', 'name' => 'Provence-Alpes-Côte d\'Azur']
+        ];
+
+        $japanesePrefectures = [
+            ['country_code' => 'JP', 'code' => 'HOK', 'name' => 'Hokkaido'],
+            ['country_code' => 'JP', 'code' => 'AOM', 'name' => 'Aomori'],
+            ['country_code' => 'JP', 'code' => 'IWA', 'name' => 'Iwate'],
+            ['country_code' => 'JP', 'code' => 'MIY', 'name' => 'Miyagi'],
+            ['country_code' => 'JP', 'code' => 'AKI', 'name' => 'Akita'],
+            ['country_code' => 'JP', 'code' => 'YAM', 'name' => 'Yamagata'],
+            ['country_code' => 'JP', 'code' => 'FUK', 'name' => 'Fukushima'],
+            ['country_code' => 'JP', 'code' => 'IBR', 'name' => 'Ibaraki'],
+            ['country_code' => 'JP', 'code' => 'TOCH', 'name' => 'Tochigi'],
+            ['country_code' => 'JP', 'code' => 'GUN', 'name' => 'Gunma'],
+            ['country_code' => 'JP', 'code' => 'SAI', 'name' => 'Saitama'],
+            ['country_code' => 'JP', 'code' => 'CHI', 'name' => 'Chiba'],
+            ['country_code' => 'JP', 'code' => 'TOK', 'name' => 'Tokyo'],
+            ['country_code' => 'JP', 'code' => 'KAN', 'name' => 'Kanagawa'],
+            ['country_code' => 'JP', 'code' => 'NII', 'name' => 'Niigata'],
+            ['country_code' => 'JP', 'code' => 'TOY', 'name' => 'Toyama'],
+            ['country_code' => 'JP', 'code' => 'ISH', 'name' => 'Ishikawa'],
+            ['country_code' => 'JP', 'code' => 'FUKI', 'name' => 'Fukui'],
+            ['country_code' => 'JP', 'code' => 'YAMN', 'name' => 'Yamanashi'],
+            ['country_code' => 'JP', 'code' => 'NAG', 'name' => 'Nagano'],
+            ['country_code' => 'JP', 'code' => 'GIF', 'name' => 'Gifu'],
+            ['country_code' => 'JP', 'code' => 'SHI', 'name' => 'Shizuoka'],
+            ['country_code' => 'JP', 'code' => 'AIC', 'name' => 'Aichi'],
+            ['country_code' => 'JP', 'code' => 'MIE', 'name' => 'Mie'],
+            ['country_code' => 'JP', 'code' => 'SHI', 'name' => 'Shiga'],
+            ['country_code' => 'JP', 'code' => 'KYO', 'name' => 'Kyoto'],
+            ['country_code' => 'JP', 'code' => 'OSA', 'name' => 'Osaka'],
+            ['country_code' => 'JP', 'code' => 'HYO', 'name' => 'Hyogo'],
+            ['country_code' => 'JP', 'code' => 'NAR', 'name' => 'Nara'],
+            ['country_code' => 'JP', 'code' => 'WAK', 'name' => 'Wakayama'],
+            ['country_code' => 'JP', 'code' => 'TOT', 'name' => 'Tottori'],
+            ['country_code' => 'JP', 'code' => 'SHI', 'name' => 'Shimane'],
+            ['country_code' => 'JP', 'code' => 'OKA', 'name' => 'Okayama'],
+            ['country_code' => 'JP', 'code' => 'HIR', 'name' => 'Hiroshima'],
+            ['country_code' => 'JP', 'code' => 'YAM', 'name' => 'Yamaguchi'],
+            ['country_code' => 'JP', 'code' => 'TOK', 'name' => 'Tokushima'],
+            ['country_code' => 'JP', 'code' => 'KAG', 'name' => 'Kagawa'],
+            ['country_code' => 'JP', 'code' => 'EHI', 'name' => 'Ehime'],
+            ['country_code' => 'JP', 'code' => 'KOC', 'name' => 'Kochi'],
+            ['country_code' => 'JP', 'code' => 'FUK', 'name' => 'Fukuoka'],
+            ['country_code' => 'JP', 'code' => 'SAG', 'name' => 'Saga'],
+            ['country_code' => 'JP', 'code' => 'NAG', 'name' => 'Nagasaki'],
+            ['country_code' => 'JP', 'code' => 'KUM', 'name' => 'Kumamoto'],
+            ['country_code' => 'JP', 'code' => 'OIT', 'name' => 'Oita'],
+            ['country_code' => 'JP', 'code' => 'MIY', 'name' => 'Miyazaki'],
+            ['country_code' => 'JP', 'code' => 'KAG', 'name' => 'Kagoshima'],
+            ['country_code' => 'JP', 'code' => 'OKI', 'name' => 'Okinawa']
+        ];
+
+        $states = array_merge(
+            $canadianProvinces,
+            $usStates,
+            $ukRegions,
+            $australianStates,
+            $indianStates,
+            $brazilianStates,
+            $mexicanStates,
+            $germanStates,
+            $frenchRegions,
+            $japanesePrefectures
+        );
+
+        foreach ($states as $state) {
             State::create($state);
         }
     }
