@@ -29,6 +29,7 @@ class ShippingController extends Controller
             'destination.state' => 'required|string',
             'destination.postal_code' => 'required|string',
             'destination.address' => 'nullable|string',
+            'destination.city' => 'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -51,10 +52,10 @@ class ShippingController extends Controller
             'to_address' => [
                 'name' => 'Customer',
                 'company' => '',
-                'address1' => $destination['address'],
+                'address1' => $destination['address'] ?? '',
                 'address2' => '',
-                'city' => 'Rock Springs',
-                'province_code' => $destination['state'] ?? '',
+                'city' => $destination['city'] ?? 'Montreal',
+                'province_code' => $destination['state'],
                 'postal_code' => $destination['postal_code'],
                 'country_code' => strtoupper($destination['country']),
                 'phone' => '5145618019',
@@ -75,13 +76,19 @@ class ShippingController extends Controller
                 'is_residential' => false
             ],
             'is_return' => false,
-            'weight_unit' => 'kg',
-            'weight' => array_sum(array_map(function ($product) {
+            'weight_unit' => 'lbs',
+            'weight' => min(array_sum(array_map(function ($product) {
                 return floatval($product['weight']) * (intval($product['quantity'] ?? 1));
-            }, $products)),
-            'length' => 3,
-            'width' => 3,
-            'height' => 3,
+            }, $products)) * 2.20462, 30),
+            'length' => min(max(array_map(function ($product) {
+                return floatval($product['length']);
+            }, $products)), 100),
+            'width' => min(max(array_map(function ($product) {
+                return floatval($product['width']);
+            }, $products)), 100),
+            'height' => min(max(array_map(function ($product) {
+                return floatval($product['height']);
+            }, $products)), 100),
             'size_unit' => 'cm',
             'items' => array_map(function ($product) {
                 return [
@@ -90,7 +97,7 @@ class ShippingController extends Controller
                     'quantity' => intval($product['quantity'] ?? 1),
                     'value' => 100,
                     'currency' => 'CAD',
-                    'country_of_origin' => 'CA',
+                    'country_of_origin' => 'CN',
                     'hs_code' => '123456',
                     'manufacturer_name' => 'Beast Group Inc.',
                     'manufacturer_address1' => 'Unit 5 - 2045 Niagara Falls Blvd',
@@ -103,19 +110,23 @@ class ShippingController extends Controller
             'package_type' => 'Parcel',
             'postage_types' => [],
             'signature_confirmation' => true,
-            'insured' => true
+            'insured' => true,
+            'region' => null,
+            'tax_identifier' => [
+                'tax_type' => 'IOSS',
+                'number' => 'IM1234567890',
+                'issuing_authority' => 'GB'
+            ]
         ];
 
         Log::info('Sending shipping rate request to Stallion Express', $payload);
 
         try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer lyuIwPalBwOrRYIMkFRaCbhLK81cYQUOuu6IGF2naZlzQIpdSQduK5faXfB7',
-                'Content-Type' => 'application/json'
-            ])->post('https://sandbox.stallionexpress.ca/api/v4/rates', $payload);
+            $stallionService = new \App\Services\StallionExpressService();
+            $response = $stallionService->getRates($payload);
 
-            if ($response->successful()) {
-                $rates = $response->json();
+            if (isset($response['success']) && $response['success']) {
+                $rates = $response;
                 Log::info('Stallion Express response received', $rates);
 
                 // Convert rates to USD if needed
@@ -134,15 +145,15 @@ class ShippingController extends Controller
                 ]);
             } else {
                 Log::error('Stallion Express shipping API error', [
-                    'status' => $response->status(),
-                    'response_body' => $response->body()
+                    'status' => 500,
+                    'response_body' => $response
                 ]);
 
                 return response()->json([
                     'success' => false,
                     'message' => 'Failed to fetch shipping rate.',
-                    'details' => $response->json()
-                ], $response->status());
+                    'details' => $response
+                ], 500);
             }
         } catch (\Exception $e) {
             Log::critical('Exception during shipping rate calculation', [
@@ -153,6 +164,192 @@ class ShippingController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'An error occurred while calculating shipping.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function createShipment(Request $request)
+    {
+        Log::info('Shipment creation request received', $request->all());
+
+        // Validate request
+        $validator = Validator::make($request->all(), [
+            'order_id' => 'required|exists:orders,id',
+            'shipping_method' => 'required|string',
+            'shipping_price' => 'required|numeric',
+            'shipping_service' => 'required|string',
+            'shipping_estimated_days' => 'required|string',
+            'customer' => 'required|array',
+            'customer.name' => 'required|string',
+            'customer.email' => 'required|email',
+            'customer.phone' => 'required|string',
+            'customer.address' => 'required|array',
+            'customer.address.address1' => 'required|string',
+            'customer.address.city' => 'required|string',
+            'customer.address.state' => 'required|string',
+            'customer.address.postal_code' => 'required|string',
+            'customer.address.country' => 'required|string',
+            'items' => 'required|array',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.weight' => 'required|numeric',
+            'items.*.length' => 'required|numeric',
+            'items.*.width' => 'required|numeric',
+            'items.*.height' => 'required|numeric'
+        ]);
+
+        if ($validator->fails()) {
+            Log::error('Validation failed for shipment creation', [
+                'errors' => $validator->errors()->all()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $validated = $validator->validated();
+        $customer = $validated['customer'];
+        $address = $customer['address'];
+        $items = $validated['items'];
+
+        // Calculate total package dimensions
+        $totalWeight = 0;
+        $maxLength = 0;
+        $maxWidth = 0;
+        $maxHeight = 0;
+
+        foreach ($items as $item) {
+            $totalWeight += $item['weight'] * $item['quantity'];
+            $maxLength = max($maxLength, $item['length']);
+            $maxWidth = max($maxWidth, $item['width']);
+            $maxHeight = max($maxHeight, $item['height']);
+        }
+
+        // Convert weight to lbs if needed
+        $weightInLbs = $totalWeight;
+        if ($request->input('weight_unit', 'kg') === 'kg') {
+            $weightInLbs = $totalWeight * 2.20462;
+        }
+
+        // Prepare the shipment payload
+        $payload = [
+            'to_address' => [
+                'name' => $customer['name'],
+                'company' => '',
+                'address1' => $address['address1'],
+                'address2' => '',
+                'city' => $address['city'],
+                'province_code' => $address['state'],
+                'postal_code' => $address['postal_code'],
+                'country_code' => strtoupper($address['country']),
+                'phone' => $customer['phone'],
+                'email' => $customer['email'],
+                'is_residential' => true
+            ],
+            'return_address' => [
+                'name' => 'Beast Group Inc.',
+                'company' => 'Beast Group Inc.',
+                'address1' => 'Unit 5 - 2045 Niagara Falls Blvd',
+                'address2' => 'SE #100085',
+                'city' => 'Niagara Falls',
+                'province_code' => 'NY',
+                'postal_code' => '14304',
+                'country_code' => 'US',
+                'phone' => '5145618019',
+                'email' => 'info@capbeast.com',
+                'is_residential' => false
+            ],
+            'is_return' => false,
+            'weight_unit' => 'lbs',
+            'weight' => $weightInLbs,
+            'length' => $maxLength,
+            'width' => $maxWidth,
+            'height' => $maxHeight,
+            'size_unit' => 'cm',
+            'items' => array_map(function ($item) {
+                return [
+                    'description' => 'Product',
+                    'sku' => 'SKU123',
+                    'quantity' => $item['quantity'],
+                    'value' => 100,
+                    'currency' => 'CAD',
+                    'country_of_origin' => 'CN',
+                    'hs_code' => '123456',
+                    'manufacturer_name' => 'Beast Group Inc.',
+                    'manufacturer_address1' => 'Unit 5 - 2045 Niagara Falls Blvd',
+                    'manufacturer_city' => 'Niagara Falls',
+                    'manufacturer_province_code' => 'NY',
+                    'manufacturer_postal_code' => '14304',
+                    'manufacturer_country_code' => 'US'
+                ];
+            }, $items),
+            'package_type' => 'Parcel',
+            'signature_confirmation' => true,
+            'postage_type' => $validated['shipping_service'],
+            'label_format' => 'pdf',
+            'is_fba' => false,
+            'is_draft' => false,
+            'insured' => true,
+            'region' => null,
+            'tax_identifier' => [
+                'tax_type' => 'IOSS',
+                'number' => 'IM1234567890',
+                'issuing_authority' => 'GB'
+            ]
+        ];
+
+        Log::info('Sending shipment creation request to Stallion Express', $payload);
+
+        try {
+            $stallionService = new \App\Services\StallionExpressService();
+            $response = $stallionService->createShipment($payload);
+
+            if (isset($response['success']) && $response['success']) {
+                // Save shipment details to database
+                $shipment = new \App\Models\Shipment([
+                    'order_id' => $validated['order_id'],
+                    'tracking_code' => $response['tracking_code'],
+                    'label' => $response['label'],
+                    'shipping_method' => $validated['shipping_method'],
+                    'shipping_price' => $validated['shipping_price'],
+                    'shipping_service' => $validated['shipping_service'],
+                    'estimated_delivery_days' => $validated['shipping_estimated_days'],
+                    'status' => 'created'
+                ]);
+                $shipment->save();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Shipment created successfully',
+                    'shipment' => $shipment,
+                    'tracking_code' => $response['tracking_code'],
+                    'label' => $response['label']
+                ]);
+            } else {
+                Log::error('Stallion Express shipment creation error', [
+                    'status' => 500,
+                    'response_body' => $response
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to create shipment.',
+                    'details' => $response
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            Log::critical('Exception during shipment creation', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while creating the shipment.',
                 'error' => $e->getMessage()
             ], 500);
         }

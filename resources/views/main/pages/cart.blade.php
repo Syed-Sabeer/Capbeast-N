@@ -39,10 +39,9 @@
                             $subtotal += $itemTotal;
                         @endphp
 
-                        <div class="price-data d-none"
-                          data-cart-id="{{ $cart->id }}"
-                          data-selling-price="{{ $cart->product->selling_price }}"
-                          data-customization-price="{{ $customizationPrice }}">
+                        <div class="price-data d-none" data-cart-id="{{ $cart->id }}"
+                            data-selling-price="{{ $cart->product->selling_price }}"
+                            data-customization-price="{{ $customizationPrice }}">
                         </div>
 
                         <div class="card product" data-cart-id="{{ $cart->id }}">

@@ -17,6 +17,10 @@
 
 <script>
     $(document).ready(function() {
+        let shippingCalculationInProgress = false;
+        let lastValidState = '';
+        let debounceTimer;
+
         // Initialize Select2 for country dropdown
         $('#country').select2({
             placeholder: 'Select Country',
@@ -25,7 +29,9 @@
         }).on('select2:select', function(e) {
             const countryCode = $(this).val();
             loadStates(countryCode);
-            calculateShipping();
+            if (countryCode) {
+                debounceShippingCalculation();
+            }
             updateTaxRowsVisibility();
         });
 
@@ -34,7 +40,39 @@
             placeholder: 'Select State/Province',
             width: '100%',
             theme: 'classic'
+        }).on('select2:select', function(e) {
+            lastValidState = $(this).val();
+            if (lastValidState) {
+                debounceShippingCalculation();
+            }
         });
+
+        // Function to debounce shipping calculation
+        function debounceShippingCalculation() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function() {
+                if (validateShippingFields()) {
+                    calculateShipping();
+                }
+            }, 500);
+        }
+
+        // Function to validate shipping fields
+        function validateShippingFields() {
+            const country = $('#country').val();
+            const state = $('#state').val();
+            const postalCode = $('#postal_code').val();
+            const address = $('#address').val();
+            const city = $('#city').val();
+
+            if (!country || !state || !postalCode || !address || !city) {
+                $('#shipping-methods-container').html(
+                    '<div class="alert alert-warning">Please fill in all required shipping fields</div>');
+                $('#shipping-amount').text('0.00');
+                return false;
+            }
+            return true;
+        }
 
         // Function to load states based on country
         function loadStates(countryCode) {
@@ -62,20 +100,23 @@
             });
         }
 
-
         // Function to calculate shipping
         function calculateShipping() {
+            if (shippingCalculationInProgress) {
+                return;
+            }
+
+            if (!validateShippingFields()) {
+                return;
+            }
+
+            shippingCalculationInProgress = true;
+
             const country = $('#country').val();
             const state = $('#state').val();
             const postalCode = $('#postal_code').val();
             const address = $('#address').val();
-
-            if (!country || !state || !postalCode || !address) {
-                $('#shipping-methods-container').html(
-                    '<div class="alert alert-warning">Please fill in all address fields</div>');
-                $('#shipping-amount').text('0.00');
-                return;
-            }
+            const city = $('#city').val();
 
             // Show loading in shipping method section
             $('#shipping-methods-container').html(
@@ -86,50 +127,136 @@
             const cartItems = @json($cart);
             const products = cartItems.map(item => {
                 const product = item.product;
+
+                // Get dimensions from product model
+                const length = parseFloat(product.length) || 0;
+                const width = parseFloat(product.width) || 0;
+                const height = parseFloat(product.height) || 0;
+                const weight = parseFloat(product.weight) || 0;
+                const weightUnit = product.weight_unit || 'lbs';
+                const sizeUnit = product.size_unit || 'cm';
+
+                // Convert weight to kg if needed
+                let weightInKg = weight;
+                if (weightUnit === 'lbs') {
+                    weightInKg = weight * 0.453592; // Convert lbs to kg
+                }
+
                 return {
-                    weight: parseFloat(product.weight) || 0,
-                    weight_unit: product.weight_unit || 'kg',
-                    length: parseInt(product.length) || 0,
-                    width: parseInt(product.width) || 0,
-                    height: parseInt(product.height) || 0,
-                    size_unit: product.size_unit || 'cm',
+                    weight: weightInKg.toFixed(2),
+                    weight_unit: 'kg',
+                    length: length,
+                    width: width,
+                    height: height,
+                    size_unit: sizeUnit,
                     quantity: parseInt(item.quantity) || 1
                 };
-            }).filter(product =>
-                product.weight > 0 &&
-                product.length > 0 &&
-                product.width > 0 &&
-                product.height > 0
-            );
+            });
 
-            if (products.length === 0) {
-                $('#shipping-methods-container').html(
-                    '<div class="alert alert-danger">Unable to calculate shipping: No valid products found. Please ensure all products have valid dimensions.</div>'
-                );
-                $('#shipping-amount').text('0.00');
-                return;
-            }
+            // Calculate total weight and package dimensions
+            let totalWeight = 0;
+            let maxLength = 0;
+            let maxWidth = 0;
+            let totalHeight = 0;
+
+            products.forEach(product => {
+                totalWeight += parseFloat(product.weight) * product.quantity;
+                maxLength = Math.max(maxLength, product.length);
+                maxWidth = Math.max(maxWidth, product.width);
+                totalHeight += product.height * product.quantity;
+            });
+
+            // Prepare the shipping request payload
+            const payload = {
+                destination: {
+                    country: country,
+                    state: state,
+                    postal_code: postalCode,
+                    address: address,
+                    city: city
+                },
+                products: products,
+                package: {
+                    weight: totalWeight.toFixed(2),
+                    weight_unit: 'kg',
+                    length: maxLength,
+                    width: maxWidth,
+                    height: totalHeight,
+                    size_unit: 'cm'
+                }
+            };
+
+            console.log('Shipping payload:', payload); // Debug log
+
+            // Prepare Stallion Express API request
+            const stallionPayload = {
+                to_address: {
+                    name: "Customer",
+                    company: "",
+                    address1: address,
+                    address2: "",
+                    city: "Rock Springs",
+                    province_code: state,
+                    postal_code: postalCode,
+                    country_code: country,
+                    phone: "5145618019",
+                    email: "customer@example.com",
+                    is_residential: true
+                },
+                return_address: {
+                    name: "Beast Group Inc.",
+                    company: "Beast Group Inc.",
+                    address1: "Unit 5 - 2045 Niagara Falls Blvd",
+                    address2: "SE #100085",
+                    city: "Niagara Falls",
+                    province_code: "NY",
+                    postal_code: "14304",
+                    country_code: "US",
+                    phone: "5145618019",
+                    email: "info@capbeast.com",
+                    is_residential: false
+                },
+                is_return: false,
+                weight_unit: 'kg',
+                weight: totalWeight,
+                length: maxLength,
+                width: maxWidth,
+                height: totalHeight,
+                size_unit: 'cm',
+                items: products.map(product => ({
+                    description: "Product",
+                    sku: "SKU123",
+                    quantity: product.quantity,
+                    value: 100,
+                    currency: "CAD",
+                    country_of_origin: "CA",
+                    hs_code: "123456",
+                    manufacturer_name: "Beast Group Inc.",
+                    manufacturer_address1: "Unit 5 - 2045 Niagara Falls Blvd",
+                    manufacturer_city: "Niagara Falls",
+                    manufacturer_province_code: "NY",
+                    manufacturer_postal_code: "14304",
+                    manufacturer_country_code: "US"
+                })),
+                package_type: "Parcel",
+                postage_types: [],
+                signature_confirmation: true,
+                insured: true
+            };
 
             $.ajax({
                 url: "{{ route('shipping.calculate') }}",
                 method: 'POST',
-                data: {
-                    destination: {
-                        country: country,
-                        state: state,
-                        postal_code: postalCode,
-                        address: address
-                    },
-                    products: products
-                },
+                data: JSON.stringify(payload),
+                contentType: 'application/json',
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(response) {
+                    shippingCalculationInProgress = false;
                     if (response.success && response.shipping.rates) {
                         let shippingHtml = '<div class="shipping-methods-list">';
                         response.shipping.rates.forEach(rate => {
-                            // Always use USD price
                             const rateUSD = rate.price_usd || (rate.total * 0.75);
                             shippingHtml += `
                                 <div class="form-check mb-2">
@@ -154,7 +281,6 @@
                         $('#shipping-methods-container').html(shippingHtml);
 
                         if (response.shipping.rates.length > 0) {
-                            // Select the first shipping method by default
                             const firstRate = response.shipping.rates[0];
                             const firstRateUSD = firstRate.price_usd || (firstRate.total * 0.75);
                             $('input[name="shipping_method"]:first').prop('checked', true).trigger(
@@ -171,6 +297,7 @@
                     }
                 },
                 error: function(xhr) {
+                    shippingCalculationInProgress = false;
                     console.error('Shipping calculation error:', xhr);
                     $('#shipping-methods-container').html(
                         '<div class="alert alert-danger">Error calculating shipping rates</div>'
@@ -181,45 +308,22 @@
             });
         }
 
-        // Handle shipping method selection
-        $(document).on('change', 'input[name="shipping_method"]', function() {
-            const selectedRate = $(this).data('price-usd');
-            const selectedService = $(this).data('service');
-            const selectedDays = $(this).data('days');
-
-            // Update shipping amount in both places
-            $('#shipping-amount').text(selectedRate.toFixed(2));
-
-            window.selectedShipping = {
-                method: $(this).val(),
-                price: selectedRate,
-                service: selectedService,
-                estimated_days: selectedDays
-            };
-
-            updateTaxAndTotal(getSubtotal(), appliedDiscount, selectedRate);
-        });
-
         // Add event listeners for all address fields
-        let typingTimer;
-        $('#state, #postal_code, #address, #country').on('change keyup', function() {
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(calculateShipping, 500);
+        $('#postal_code, #address').on('change keyup', function() {
+            if (lastValidState) {
+                debounceShippingCalculation();
+            }
         });
 
         // Function to update tax and total
         function updateTaxAndTotal(subtotal, appliedDiscount = 0, shipping = 0) {
-        function updateTaxAndTotal(subtotal, appliedDiscount = 0, shipping = 0) {
             let TPStaxElement = document.querySelector('.tps-cart-tax');
             let TVQtaxElement = document.querySelector('.tvq-cart-tax');
-            let totalElement = document.querySelector('.cart-total');
             let totalElement = document.querySelector('.cart-total');
 
             let TPStaxPercentage = parseFloat(TPStaxElement.getAttribute('tps-data-tax')) || 0;
             let TVQtaxPercentage = parseFloat(TVQtaxElement.getAttribute('tvq-data-tax')) || 0;
 
-            // Calculate discounted subtotal
-            let discountedTotal = subtotal - appliedDiscount;
             // Calculate discounted subtotal
             let discountedTotal = subtotal - appliedDiscount;
             if (discountedTotal < 0) discountedTotal = 0;
@@ -230,15 +334,7 @@
             // Calculate taxes based on country
             let TPStaxAmount = userCountry === "CA" ? (discountedTotal * TPStaxPercentage) / 100 : 0;
             let TVQtaxAmount = userCountry === "CA" ? (discountedTotal * TVQtaxPercentage) / 100 : 0;
-            // Get user's country
-            let userCountry = $('#country').val();
 
-            // Calculate taxes based on country
-            let TPStaxAmount = userCountry === "CA" ? (discountedTotal * TPStaxPercentage) / 100 : 0;
-            let TVQtaxAmount = userCountry === "CA" ? (discountedTotal * TVQtaxPercentage) / 100 : 0;
-
-            // Calculate final total including all components
-            let finalTotal = discountedTotal + TPStaxAmount + TVQtaxAmount + shipping;
             // Calculate final total including all components
             let finalTotal = discountedTotal + TPStaxAmount + TVQtaxAmount + shipping;
 
@@ -247,13 +343,8 @@
             document.getElementById('tvq-tax-amount').textContent = TVQtaxAmount.toFixed(2);
             document.getElementById('final-total-amount').textContent = finalTotal.toFixed(2);
 
-<<<<<<< HEAD
             // Store the USD total for PayPal
             window.paypalTotal = finalTotal;
-=======
-            // Store the USD total for PayPal (convert to USD if needed)
-            window.paypalTotal = finalTotal * 0.75;
->>>>>>> e798c5c (working on checkout page need to modify shipping api for canada)
 
             // Debug logging
             console.log("User Country:", userCountry);
@@ -269,8 +360,6 @@
 
         // Function to get subtotal
         function getSubtotal() {
-            let subtotalElement = document.querySelector('.cart-subtotal');
-            return parseFloat(subtotalElement.innerText.replace(/[^0-9.]/g, '')) || 0;
             let subtotalElement = document.querySelector('.cart-subtotal');
             return parseFloat(subtotalElement.innerText.replace(/[^0-9.]/g, '')) || 0;
         }
@@ -361,7 +450,8 @@
             .catch(error => {
                 removeLoading();
                 countrySelect.html(
-                    '<option value="">Failed to load countries. Please refresh the page.</option>');
+                    '<option value="">Failed to load countries. Please refresh the page.</option>'
+                );
                 console.error(error);
             });
 
@@ -371,7 +461,6 @@
             console.log("Selected country:", selectedCountry);
             updateTaxRowsVisibility();
         });
-<<<<<<< HEAD
 
         function calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts) {
             let discount = 0;
@@ -394,20 +483,16 @@
             };
         }
 
-        function updatePriceDisplay(itemId, quantity) {
-            const $discountInfo = $(`#discount-info-${itemId}`);
-            const $nextTierInfo = $(`#next-tier-info-${itemId}`);
-            const $itemTotalPrice = $(`.item-total-price[data-item-id="${itemId}"]`);
+        // Initialize price displays for all items
+        $('.item-total-price').each(function() {
+            const itemId = $(this).data('item-id');
+            const quantity = parseInt($(this).closest('tr').find('td:eq(1)').text());
+            const result = calculateVolumeDiscount(quantity, sellingPrice,
+                volumeDiscounts);
+
             const $originalPrice = $(`.original-price[data-item-id="${itemId}"]`);
             const $discountedPrice = $(`.discounted-price[data-item-id="${itemId}"]`);
-
-            const result = calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts);
-            const discountedItemPrice = result.discountedPrice * quantity;
-            const totalItemPrice = discountedItemPrice +
-                (customizationPrice * quantity) +
-                (pompomPrice * quantity) +
-                (printingPrice * quantity) +
-                (deliveryPrice * quantity);
+            const $discountInfo = $(`#discount-info-${itemId}`);
 
             if (result.discount > 0) {
                 $discountInfo.text(`You're saving ${result.discount}%!`);
@@ -418,41 +503,185 @@
                 $originalPrice.hide();
                 $discountedPrice.text(`$${sellingPrice.toFixed(2)}`);
             }
+        });
 
-            $itemTotalPrice.text(`$${totalItemPrice.toFixed(2)}`);
+        function calculateShippingLive() {
+            const country = $('#country').val();
+            const state = $('#state').val();
+            const postalCode = $('#postal_code').val();
+            const address = $('#address').val();
+            const city = $('#city').val();
 
-            if (result.nextTier) {
-                const itemsNeeded = result.nextTier.quantity - quantity;
-                $nextTierInfo.text(`Add ${itemsNeeded} more to get ${result.nextTier.discount}% off!`);
-            } else {
-                $nextTierInfo.text('');
+            if (!country || !state || !postalCode || !address || !city) {
+                $('#shipping-methods-container').html(
+                    '<div class="alert alert-warning">Please fill in all required shipping fields</div>');
+                $('#shipping-amount').text('0.00');
+                return;
             }
 
-            // Update order summary
-            updateOrderSummary();
-        }
+            // Validate address fields
+            if (address.length < 5 || city.length < 2) {
+                $('#shipping-methods-container').html(
+                    '<div class="alert alert-warning">Please enter a valid address and city</div>');
+                $('#shipping-amount').text('0.00');
+                return;
+            }
 
-        function updateOrderSummary() {
-            let newSubtotal = 0;
+            // Show loading state
+            $('#shipping-methods-container').html(
+                '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Calculating shipping rates...</p></div>'
+                );
 
-            $('.item-total-price').each(function() {
-                newSubtotal += parseFloat($(this).text().replace('$', ''));
+            // Prepare products data
+            const products = cartItems?.map(item => {
+                const product = item.product;
+
+                // Handle missing product data (dimensions or weight)
+                if (!product.weight || !product.length || !product.width || !product.height) {
+                    console.log("Missing product data:", product);
+                    return null;
+                }
+
+                // Validate product dimensions
+                const weight = parseFloat(product.weight) || 0;
+                const length = parseFloat(product.length) || 0;
+                const width = parseFloat(product.width) || 0;
+                const height = parseFloat(product.height) || 0;
+
+                if (weight <= 0 || length <= 0 || width <= 0 || height <= 0) {
+                    console.log("Invalid product dimensions:", product);
+                    return null;
+                }
+
+                // Convert weight to lbs if needed
+                let weightInLbs = weight;
+                if (product.weight_unit === 'kg') {
+                    weightInLbs = weight * 2.20462;
+                }
+
+                return {
+                    weight: weightInLbs.toFixed(2),
+                    weight_unit: 'lbs',
+                    length: length,
+                    width: width,
+                    height: height,
+                    size_unit: 'cm',
+                    quantity: item.quantity
+                };
+            }).filter(item => item !== null);
+
+            if (products.length === 0) {
+                $('#shipping-methods-container').html(
+                    '<div class="alert alert-warning">No valid items in the cart to calculate shipping.</div>'
+                    );
+                $('#shipping-amount').text('0.00');
+                return;
+            }
+
+            // Calculate total package dimensions
+            let totalWeight = 0;
+            let maxLength = 0;
+            let maxWidth = 0;
+            let maxHeight = 0;
+
+            products.forEach(product => {
+                totalWeight += parseFloat(product.weight) * product.quantity;
+                maxLength = Math.max(maxLength, product.length);
+                maxWidth = Math.max(maxWidth, product.width);
+                maxHeight = Math.max(maxHeight, product.height);
             });
 
-            $('#subtotal-amount').text(`$${newSubtotal.toFixed(2)}`);
-            $('#final-total-amount').text(`$${newSubtotal.toFixed(2)}`);
-        }
+            // Validate total package dimensions
+            if (totalWeight > 30) { // 30lbs max weight
+                $('#shipping-methods-container').html(
+                    '<div class="alert alert-warning">Package weight exceeds maximum limit. Please contact support for large orders.</div>'
+                    );
+                $('#shipping-amount').text('0.00');
+                return;
+            }
 
-        // Initialize price displays for all items when document is ready
-        $(document).ready(function() {
-            $('.item-total-price').each(function() {
-                const itemId = $(this).data('item-id');
-                const quantity = parseInt($(this).closest('tr').find('td:eq(1)').text());
-                updatePriceDisplay(itemId, quantity);
-            });
-        });
-=======
->>>>>>> e798c5c (working on checkout page need to modify shipping api for canada)
+            if (maxLength > 100 || maxWidth > 100 || maxHeight > 100) { // 100cm max dimension
+                $('#shipping-methods-container').html(
+                    '<div class="alert alert-warning">Package dimensions exceed maximum limits. Please contact support for large orders.</div>'
+                    );
+                $('#shipping-amount').text('0.00');
+                return;
+            }
+
+            // Prepare the shipping request payload
+            const payload = {
+                destination: {
+                    country: country,
+                    state: state,
+                    postal_code: postalCode,
+                    address: address,
+                    city: city
+                },
+                products: products,
+                package: {
+                    weight: totalWeight.toFixed(2),
+                    weight_unit: 'lbs',
+                    length: maxLength,
+                    width: maxWidth,
+                    height: maxHeight,
+                    size_unit: 'cm'
+                }
+            };
+
+            fetch("{{ route('shipping.calculate') }}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.shipping?.data?.length) {
+                        const shippingAmount = data.shipping.data[0].rate;
+                        document.getElementById('shipping-amount').textContent = shippingAmount.toFixed(2);
+                        updateTaxAndTotal(getSubtotal(), appliedDiscount, shippingAmount);
+
+                        // Display shipping methods
+                        let shippingHtml = '<div class="shipping-methods-list">';
+                        data.shipping.data.forEach(rate => {
+                            shippingHtml += `
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input shipping-method-radio" type="radio"
+                                        name="shipping_method"
+                                        value="${rate.postage_type_id}"
+                                        id="shipping_${rate.postage_type_id}"
+                                        data-price="${rate.price_usd || (rate.total * 0.75)}"
+                                        data-service="${rate.postage_type}"
+                                        data-days="${rate.delivery_days}">
+                                    <label class="form-check-label" for="shipping_${rate.postage_type_id}">
+                                        ${rate.postage_type} - $${(rate.price_usd || (rate.total * 0.75)).toFixed(2)} USD
+                                        <br>
+                                        <small class="text-muted">Estimated delivery: ${rate.delivery_days} days</small>
+                                    </label>
+                                </div>
+                            `;
+                        });
+                        shippingHtml += '</div>';
+                        $('#shipping-methods-container').html(shippingHtml);
+                    } else {
+                        $('#shipping-methods-container').html(
+                            '<div class="alert alert-danger">Unable to calculate shipping rates. Please try again later or contact support.</div>'
+                        );
+                        $('#shipping-amount').text('0.00');
+                        updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
+                    }
+                })
+                .catch(err => {
+                    console.error('Shipping calculation error:', err);
+                    $('#shipping-methods-container').html(
+                        '<div class="alert alert-danger">Error calculating shipping rates. Please try again later or contact support.</div>'
+                    );
+                    $('#shipping-amount').text('0.00');
+                    updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
+                });
+        }
     });
 </script>
 
@@ -581,11 +810,6 @@
                                                 const pompomPrice = {{ $pompomPrice }};
                                                 const printingPrice = {{ $printingPrice }};
                                                 const deliveryPrice = {{ $deliveryPrice }};
-
-                                                // Initialize price display for this item
-                                                $(document).ready(function() {
-                                                    updatePriceDisplay({{ $item->id }}, {{ $item->quantity }});
-                                                });
                                             </script>
 
                                             <tr>
@@ -593,28 +817,8 @@
                                                     <div class="d-flex align-items-center gap-2">
                                                         <div class="avatar-sm flex-shrink-0">
                                                             <div class="avatar-title  rounded-3">
-<<<<<<< HEAD
                                                                 <img src="{{ asset('storage/' . ($item->color->front_image ?? ($item->color->right_image ?? ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg'))))) }}"
                                                                     alt="" class="avatar-xs">
-=======
-                                                                @if ($item->userCustomization)
-                                                                    <img src="{{ asset(
-                                                                        $item->userCustomization->front_image ??
-                                                                            ($item->userCustomization->right_image ??
-                                                                                ($item->userCustomization->left_image ??
-                                                                                    ($item->userCustomization->back_image ?? 'ProductImages/default.jpg'))),
-                                                                    ) }}"
-                                                                        alt="" class="avatar-lg ">
-                                                                @else
-                                                                    <img src="{{ asset(
-                                                                        'storage/' .
-                                                                            ($item->color->front_image ??
-                                                                                ($item->color->right_image ??
-                                                                                    ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg')))),
-                                                                    ) }}"
-                                                                        alt="" class="avatar-lg ">
-                                                                @endif
->>>>>>> e798c5c (working on checkout page need to modify shipping api for canada)
                                                             </div>
                                                         </div>
                                                         <div class="flex-grow-1">
@@ -639,12 +843,8 @@
                                                     {{ $item->quantity }}
                                                 </td>
                                                 <td class="text-end">
-<<<<<<< HEAD
                                                     <span class="item-total-price"
                                                         data-item-id="{{ $item->id }}">${{ number_format($itemTotal, 2) }}</span>
-=======
-                                                    ${{ number_format($basePrice, 2) }}
->>>>>>> e798c5c (working on checkout page need to modify shipping api for canada)
                                                 </td>
                                                 <td class="text-end">
                                                     ${{ number_format($customizationPrice, 2) }}
@@ -701,6 +901,12 @@
                                 <div data-mdb-input-init class="form-outline mb-4">
                                     <label class="form-label" for="address">Address *</label>
                                     <input type="text" id="address" name="address" class="form-control" required />
+                                </div>
+
+                                <!-- City input -->
+                                <div data-mdb-input-init class="form-outline mb-4">
+                                    <label class="form-label" for="city">City *</label>
+                                    <input type="text" id="city" name="city" class="form-control" required />
                                 </div>
 
                                 <div class="row mb-4">
@@ -977,13 +1183,8 @@
             document.getElementById('tvq-tax-amount').textContent = TVQtaxAmount.toFixed(2);
             document.getElementById('final-total-amount').textContent = finalTotal.toFixed(2);
 
-<<<<<<< HEAD
             // Store the USD total for PayPal
             window.paypalTotal = finalTotal;
-=======
-            // Store the USD total for PayPal (convert to USD if needed)
-            window.paypalTotal = finalTotal * 0.75;
->>>>>>> e798c5c (working on checkout page need to modify shipping api for canada)
 
             // Debug logging
             console.log("User Country:", userCountry);
@@ -1002,71 +1203,211 @@
             return parseFloat(subtotalElement.innerText.replace(/[^0-9.]/g, '')) || 0;
         }
 
+        function calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts) {
+            let discount = 0;
+            let nextTier = null;
+
+            for (let i = volumeDiscounts.length - 1; i >= 0; i--) {
+                if (quantity >= volumeDiscounts[i].quantity) {
+                    discount = volumeDiscounts[i].discount;
+                    break;
+                }
+                nextTier = volumeDiscounts[i];
+            }
+
+            const discountedPrice = sellingPrice - (sellingPrice * (discount / 100));
+
+            return {
+                discountedPrice,
+                discount,
+                nextTier
+            };
+        }
+
+        function updatePriceDisplay(itemId, quantity) {
+            const $discountInfo = $(`#discount-info-${itemId}`);
+            const $nextTierInfo = $(`#next-tier-info-${itemId}`);
+            const $itemTotalPrice = $(`.item-total-price[data-item-id="${itemId}"]`);
+            const $originalPrice = $(`.original-price[data-item-id="${itemId}"]`);
+            const $discountedPrice = $(`.discounted-price[data-item-id="${itemId}"]`);
+
+            const result = calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts);
+            const discountedItemPrice = result.discountedPrice * quantity;
+            const totalItemPrice = discountedItemPrice +
+                (customizationPrice * quantity) +
+                (pompomPrice * quantity) +
+                (printingPrice * quantity) +
+                (deliveryPrice * quantity);
+
+            if (result.discount > 0) {
+                $discountInfo.text(`You're saving ${result.discount}%!`);
+                $originalPrice.show().text(`$${sellingPrice.toFixed(2)}`);
+                $discountedPrice.show().text(`$${result.discountedPrice.toFixed(2)}`);
+            } else {
+                $discountInfo.text('');
+                $originalPrice.hide();
+                $discountedPrice.text(`$${sellingPrice.toFixed(2)}`);
+            }
+
+            $itemTotalPrice.text(`$${totalItemPrice.toFixed(2)}`);
+
+            if (result.nextTier) {
+                const itemsNeeded = result.nextTier.quantity - quantity;
+                $nextTierInfo.text(`Add ${itemsNeeded} more to get ${result.nextTier.discount}% off!`);
+            } else {
+                $nextTierInfo.text('');
+            }
+
+            // Update order summary
+            updateOrderSummary();
+        }
+
+        function updateOrderSummary() {
+            let subtotal = 0;
+            $('.item-total-price').each(function() {
+                subtotal += parseFloat($(this).text().replace(/[^0-9.]/g, ''));
+            });
+
+            $('.cart-subtotal').text(subtotal.toFixed(2));
+            updateTaxAndTotal(subtotal, appliedDiscount, parseFloat($('#shipping-amount').text()) || 0);
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize price displays for all items
+            $('.item-total-price').each(function() {
+                const itemId = $(this).data('item-id');
+                const quantity = parseInt($(this).closest('tr').find('td:eq(1)').text());
+                updatePriceDisplay(itemId, quantity);
+            });
+
             // Initial update
             updateTaxAndTotal(getSubtotal(), 0, 0);
 
             // Handle shipping calculation
             $('#address, #country').on('change', calculateShippingLive);
 
-    function calculateShippingLive() {
-        const country = $('#country').val();
-        const postalCode = $('#address').val();
-
-        // Prepare products data
-        const products = cartItems?.map(item => {
-            const product = item.product;
-
-            // Handle missing product data (dimensions or weight)
-            if (!product.weight || !product.length || !product.width || !product.height) {
-                console.log("Missing product data:", product);
-
-                // Default to zero if any product data is missing
-                product.weight = product.weight || 3;
-                product.weight_unit = product.weight_unit || 'kg';
-                product.length = product.length || 3;
-                product.width = product.width || 3;
-                product.height = product.height || 3;
-                product.size_unit = product.size_unit || 'cm';
-                product.quantity = product.quantity || 1;
-
-                alert("Product data was incomplete, using default values.");
-            }
-
-            return {
-                weight: product.weight,
-                weight_unit: 'kg',
-                length: product.length,
-                width: product.width,
-                height: product.height,
-                size_unit: 'cm',
-                quantity: item.quantity
-            };
-                }).filter(item => item !== null); // Filter out null items
             function calculateShippingLive() {
                 const country = $('#country').val();
-                const postalCode = $('#address').val();
+                const state = $('#state').val();
+                const postalCode = $('#postal_code').val();
+                const address = $('#address').val();
+                const city = $('#city').val();
+
+                if (!country || !state || !postalCode || !address || !city) {
+                    $('#shipping-methods-container').html(
+                        '<div class="alert alert-warning">Please fill in all required shipping fields</div>');
+                    $('#shipping-amount').text('0.00');
+                    return;
+                }
+
+                // Validate address fields
+                if (address.length < 5 || city.length < 2) {
+                    $('#shipping-methods-container').html(
+                        '<div class="alert alert-warning">Please enter a valid address and city</div>');
+                    $('#shipping-amount').text('0.00');
+                    return;
+                }
+
+                // Show loading state
+                $('#shipping-methods-container').html(
+                    '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Calculating shipping rates...</p></div>'
+                    );
 
                 // Prepare products data
                 const products = cartItems?.map(item => {
                     const product = item.product;
+
+                    // Handle missing product data (dimensions or weight)
+                    if (!product.weight || !product.length || !product.width || !product.height) {
+                        console.log("Missing product data:", product);
+                        return null;
+                    }
+
+                    // Validate product dimensions
+                    const weight = parseFloat(product.weight) || 0;
+                    const length = parseFloat(product.length) || 0;
+                    const width = parseFloat(product.width) || 0;
+                    const height = parseFloat(product.height) || 0;
+
+                    if (weight <= 0 || length <= 0 || width <= 0 || height <= 0) {
+                        console.log("Invalid product dimensions:", product);
+                        return null;
+                    }
+
+                    // Convert weight to lbs if needed
+                    let weightInLbs = weight;
+                    if (product.weight_unit === 'kg') {
+                        weightInLbs = weight * 2.20462;
+                    }
+
                     return {
-                        weight: product.weight || 3,
-                        weight_unit: 'kg',
-                        length: product.length || 3,
-                        width: product.width || 3,
-                        height: product.height || 3,
+                        weight: weightInLbs.toFixed(2),
+                        weight_unit: 'lbs',
+                        length: length,
+                        width: width,
+                        height: height,
                         size_unit: 'cm',
                         quantity: item.quantity
                     };
                 }).filter(item => item !== null);
 
                 if (products.length === 0) {
-                    alert("No items in the cart to calculate shipping.");
+                    $('#shipping-methods-container').html(
+                        '<div class="alert alert-warning">No valid items in the cart to calculate shipping.</div>'
+                        );
+                    $('#shipping-amount').text('0.00');
                     return;
                 }
 
-                if (!country || !postalCode) return;
+                // Calculate total package dimensions
+                let totalWeight = 0;
+                let maxLength = 0;
+                let maxWidth = 0;
+                let maxHeight = 0;
+
+                products.forEach(product => {
+                    totalWeight += parseFloat(product.weight) * product.quantity;
+                    maxLength = Math.max(maxLength, product.length);
+                    maxWidth = Math.max(maxWidth, product.width);
+                    maxHeight = Math.max(maxHeight, product.height);
+                });
+
+                // Validate total package dimensions
+                if (totalWeight > 30) { // 30lbs max weight
+                    $('#shipping-methods-container').html(
+                        '<div class="alert alert-warning">Package weight exceeds maximum limit. Please contact support for large orders.</div>'
+                        );
+                    $('#shipping-amount').text('0.00');
+                    return;
+                }
+
+                if (maxLength > 100 || maxWidth > 100 || maxHeight > 100) { // 100cm max dimension
+                    $('#shipping-methods-container').html(
+                        '<div class="alert alert-warning">Package dimensions exceed maximum limits. Please contact support for large orders.</div>'
+                        );
+                    $('#shipping-amount').text('0.00');
+                    return;
+                }
+
+                // Prepare the shipping request payload
+                const payload = {
+                    destination: {
+                        country: country,
+                        state: state,
+                        postal_code: postalCode,
+                        address: address,
+                        city: city
+                    },
+                    products: products,
+                    package: {
+                        weight: totalWeight.toFixed(2),
+                        weight_unit: 'lbs',
+                        length: maxLength,
+                        width: maxWidth,
+                        height: maxHeight,
+                        size_unit: 'cm'
+                    }
+                };
 
                 fetch("{{ route('shipping.calculate') }}", {
                         method: "POST",
@@ -1074,13 +1415,7 @@
                             "X-CSRF-TOKEN": "{{ csrf_token() }}",
                             "Content-Type": "application/json"
                         },
-                        body: JSON.stringify({
-                            destination: {
-                                country: country,
-                                postal_code: postalCode
-                            },
-                            products: products
-                        })
+                        body: JSON.stringify(payload)
                     })
                     .then(res => res.json())
                     .then(data => {
@@ -1088,52 +1423,46 @@
                             const shippingAmount = data.shipping.data[0].rate;
                             document.getElementById('shipping-amount').textContent = shippingAmount.toFixed(2);
                             updateTaxAndTotal(getSubtotal(), appliedDiscount, shippingAmount);
+
+                            // Display shipping methods
+                            let shippingHtml = '<div class="shipping-methods-list">';
+                            data.shipping.data.forEach(rate => {
+                                shippingHtml += `
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input shipping-method-radio" type="radio"
+                                            name="shipping_method"
+                                            value="${rate.postage_type_id}"
+                                            id="shipping_${rate.postage_type_id}"
+                                            data-price="${rate.price_usd || (rate.total * 0.75)}"
+                                            data-service="${rate.postage_type}"
+                                            data-days="${rate.delivery_days}">
+                                        <label class="form-check-label" for="shipping_${rate.postage_type_id}">
+                                            ${rate.postage_type} - $${(rate.price_usd || (rate.total * 0.75)).toFixed(2)} USD
+                                            <br>
+                                            <small class="text-muted">Estimated delivery: ${rate.delivery_days} days</small>
+                                        </label>
+                                    </div>
+                                `;
+                            });
+                            shippingHtml += '</div>';
+                            $('#shipping-methods-container').html(shippingHtml);
                         } else {
-                            alert("Shipping rate unavailable for selected address.");
+                            $('#shipping-methods-container').html(
+                                '<div class="alert alert-danger">Unable to calculate shipping rates. Please try again later or contact support.</div>'
+                            );
+                            $('#shipping-amount').text('0.00');
+                            updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
                         }
                     })
                     .catch(err => {
-                        console.error(err);
-                        alert("Error calculating shipping.");
+                        console.error('Shipping calculation error:', err);
+                        $('#shipping-methods-container').html(
+                            '<div class="alert alert-danger">Error calculating shipping rates. Please try again later or contact support.</div>'
+                        );
+                        $('#shipping-amount').text('0.00');
+                        updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
                     });
             }
-
-            function updateTaxAndTotal(subtotal, appliedDiscount = 0, shipping = 0) {
-                let TPStaxElement = document.querySelector('.tps-cart-tax');
-                let TVQtaxElement = document.querySelector('.tvq-cart-tax');
-                let totalElement = document.querySelector('.cart-total');
-
-                let TPStaxPercentage = parseFloat(TPStaxElement.getAttribute('tps-data-tax')) || 0;
-                let TVQtaxPercentage = parseFloat(TVQtaxElement.getAttribute('tvq-data-tax')) || 0;
-
-                let discountedTotal = subtotal - appliedDiscount;
-                if (discountedTotal < 0) discountedTotal = 0;
-
-                let userCountry = $('#country').val();
-
-                let TPStaxAmount = userCountry === "CA" ? (discountedTotal * TPStaxPercentage) / 100 : 0;
-                let TVQtaxAmount = userCountry === "CA" ? (discountedTotal * TVQtaxPercentage) / 100 : 0;
-                let finalTotal = discountedTotal + TPStaxAmount + TVQtaxAmount + shipping;
-
-                document.getElementById('tps-tax-amount').textContent = TPStaxAmount.toFixed(2);
-                document.getElementById('tvq-tax-amount').textContent = TVQtaxAmount.toFixed(2);
-                document.getElementById('final-total-amount').textContent = finalTotal.toFixed(2);
-
-                console.log("User Country:", userCountry);
-                console.log("Discount Id:", discountId);
-                console.log("Subtotal: $" + subtotal.toFixed(2));
-                console.log("Applied Discount: $" + appliedDiscount.toFixed(2));
-                console.log("TPS Tax Amount: $" + TPStaxAmount.toFixed(2));
-                console.log("TVQ Tax Amount: $" + TVQtaxAmount.toFixed(2));
-                console.log("Total after Tax: $" + finalTotal.toFixed(2));
-            }
-
-            function getSubtotal() {
-                let subtotalElement = document.querySelector('.cart-subtotal');
-                return parseFloat(subtotalElement.innerText.replace(/[^0-9.]/g, '')) || 0;
-            }
-
-            updateTaxAndTotal(getSubtotal(), 0, 0);
 
             // Handle coupon application
             document.getElementById('applyCoupon').addEventListener('click', function() {
@@ -1159,8 +1488,6 @@
 
                             document.getElementById('discount-amount').textContent = appliedDiscount
                                 .toFixed(2);
-                            updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(document
-                                .getElementById('shipping-amount').textContent) || 0);
                             updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(document
                                 .getElementById('shipping-amount').textContent) || 0);
                         } else {

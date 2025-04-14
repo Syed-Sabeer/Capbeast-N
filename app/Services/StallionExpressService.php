@@ -14,7 +14,9 @@ class StallionExpressService
 
     public function __construct()
     {
-        $this->baseUrl = 'https://stallionexpress.redocly.app/_mock/stallionexpress-v4';
+        $this->baseUrl = config('services.stallion.sandbox', false)
+            ? 'https://sandbox.stallionexpress.ca/api/v4'
+            : config('services.stallion.base_url', 'https://api.stallionexpress.ca/api/v4');
         $this->token = config('services.stallion.token');
     }
 
@@ -23,6 +25,7 @@ class StallionExpressService
         return [
             'Authorization' => 'Bearer ' . $this->token,
             'Content-Type' => 'application/json',
+            'Accept' => 'application/json'
         ];
     }
 
@@ -44,13 +47,28 @@ class StallionExpressService
                 'response' => json_encode($responseData, JSON_PRETTY_PRINT)
             ]);
 
+            if (!$response->successful()) {
+                Log::error('Stallion Express shipping API error', [
+                    'status' => $response->status(),
+                    'response_body' => $responseData
+                ]);
+                return [
+                    'success' => false,
+                    'message' => $responseData['message'] ?? 'Failed to fetch shipping rates',
+                    'errors' => $responseData['errors'] ?? []
+                ];
+            }
+
             return $responseData;
         } catch (\Exception $e) {
             Log::error('Error in StallionExpressService::getRates', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            throw $e;
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
         }
     }
 

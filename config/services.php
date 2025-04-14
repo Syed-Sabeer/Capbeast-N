@@ -24,10 +24,13 @@ return [
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],
-    
+
     'stallion' => [
-        'base_url' => env('STALLION_API_BASE'), // Corrected base URL key
-        'token' => env('STALLION_API_KEY'),     // API Key from .env
+        'base_url' => env('STALLION_API_BASE', 'https://api.stallionexpress.ca/api/v4'),
+        'sandbox_url' => env('STALLION_SANDBOX_URL', 'https://sandbox.stallionexpress.ca/api/v4'),
+        'token' => env('STALLION_API_KEY'),
+        'sandbox' => env('STALLION_SANDBOX', true),
+        'timeout' => env('STALLION_TIMEOUT', 30)
     ],
 
 

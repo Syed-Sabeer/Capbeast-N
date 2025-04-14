@@ -15,8 +15,8 @@ $payload = array(
     "province_code" => "WY",
     "postal_code" => "82901",
     "country_code" => "US",
-    "phone" => "string",
-    "email" => "string",
+    "phone" => "33434",
+    "email" => "sdsdds@sded.com",
     "is_residential" => true
   ),
   "return_address" => array(
@@ -28,8 +28,8 @@ $payload = array(
     "province_code" => "WY",
     "postal_code" => "82901",
     "country_code" => "US",
-    "phone" => "string",
-    "email" => "string",
+    "phone" => "324324",
+    "email" => "sdsdsa@szdsa.com",
     "is_residential" => true
   ),
   "is_return" => false,
