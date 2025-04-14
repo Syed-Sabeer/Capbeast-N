@@ -32,6 +32,7 @@
                                             data-bs-date="{{ $order->created_at->format('d M, Y') }}"
                                             data-bs-subtotal="{{ number_format($order->subtotal_price, 2) }}"
                                             data-bs-discount="{{ number_format($order->discount_price, 2) }}"
+                                            data-bs-shipping="{{ number_format($order->shipping_price, 2) }}"
                                             data-bs-TVQtax="{{ number_format($order->tvq_tax_price, 2) }}"
                                             data-bs-TPStax="{{ number_format($order->tps_tax_price, 2) }}"
                                             data-bs-total="{{ number_format($order->total_price, 2) }}"
@@ -241,6 +242,11 @@
                                                     <td class="text-end" >-<span id="discount-amount"></span> $</td>
                                                 </tr>
 
+                                                <tr>
+                                                    <td>Shipping <small class="text-muted"></small></td>
+                                                    <td class="text-end" ><span id="shipping-amount"></span> $</td>
+                                                </tr>
+
                                                 <tr class="border-top border-top-dashed fs-15">
                                                     <th scope="row">Total Amount</th>
                                                     <th class="text-end" ><span id="total-amount-summary"></span> $</th>
@@ -326,6 +332,7 @@
             const date = row.getAttribute('data-bs-date');
             const subtotal = row.getAttribute('data-bs-subtotal');
             const discount = row.getAttribute('data-bs-discount');
+            const shipping = row.getAttribute('data-bs-shipping');
             const TVQtax = row.getAttribute('data-bs-TVQtax');
             const TPStax = row.getAttribute('data-bs-TPStax');
             const TPStaxNo = row.getAttribute('data-bs-TPStax-no');
@@ -344,6 +351,7 @@
             document.getElementById('invoice-date').textContent = date;
             
             document.getElementById('discount-amount').textContent = discount;
+            document.getElementById('shipping-amount').textContent = shipping;
             document.getElementById('TVQtax-amount').textContent = TVQtax;
             document.getElementById('TPStax-amount').textContent = TPStax;
             document.getElementById('TPStax-no').textContent = TPStaxNo;

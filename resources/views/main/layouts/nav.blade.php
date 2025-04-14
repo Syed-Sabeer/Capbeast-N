@@ -224,9 +224,9 @@
                 $cartItemCount = Auth::check() ? \App\Models\Cart::where('user_id', Auth::id())->count() : 0;
             @endphp
                 <div class="d-flex align-items-center">
-                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-dark rounded-circle text-muted" data-bs-toggle="modal" data-bs-target="#searchModal">
+                    {{-- <button type="button" class="btn btn-icon btn-topbar btn-ghost-dark rounded-circle text-muted" data-bs-toggle="modal" data-bs-target="#searchModal">
                         <i class="bx bx-search fs-22"></i>
-                    </button>
+                    </button> --}}
                     <div class="topbar-head-dropdown ms-1 header-item">
                         <button type="button" class="btn btn-icon btn-topbar btn-ghost-dark rounded-circle text-muted"
                             data-bs-toggle="offcanvas" data-bs-target="#ecommerceCart" aria-controls="ecommerceCart"

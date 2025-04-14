@@ -10,6 +10,7 @@ app/storage/
 
 public/hot
 public/storage
+public/storage.zip
 
 
 public_html/storage
