@@ -1069,6 +1069,18 @@
                 const scaleX = canvas.width / hatRect.width;
                 const scaleY = canvas.height / hatRect.height;
 
+                // Calculate boundary in canvas coordinates
+                const boundaryX = (boundaryRect.left - hatRect.left) * scaleX;
+                const boundaryY = (boundaryRect.top - hatRect.top) * scaleY;
+                const boundaryWidth = boundaryRect.width * scaleX;
+                const boundaryHeight = boundaryRect.height * scaleY;
+
+                // Apply clipping to the boundary area
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(boundaryX, boundaryY, boundaryWidth, boundaryHeight);
+                ctx.clip();
+
                 // Function to load an image
                 async function loadImage(url) {
                     return new Promise((resolve) => {
@@ -1175,6 +1187,7 @@
                     }
                 }
 
+                ctx.restore();
                 // Convert canvas to image and trigger download
                 const link = document.createElement('a');
                 link.download = 'custom-cap-design.png';
@@ -1327,6 +1340,8 @@
                     // Draw the base hat image
                     ctx.drawImage(hatImg, 0, 0, canvas.width, canvas.height);
 
+
+
                     // Get the design boundary position and size
                     const boundary = $('.design-boundary')[0];
                     const boundaryRect = boundary.getBoundingClientRect();
@@ -1336,6 +1351,17 @@
                     const scaleX = canvas.width / hatRect.width;
                     const scaleY = canvas.height / hatRect.height;
 
+                    // Calculate boundary in canvas coordinates
+                    const boundaryX = (boundaryRect.left - hatRect.left) * scaleX;
+                    const boundaryY = (boundaryRect.top - hatRect.top) * scaleY;
+                    const boundaryWidth = boundaryRect.width * scaleX;
+                    const boundaryHeight = boundaryRect.height * scaleY;
+
+                    // Apply clipping to the boundary area
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.rect(boundaryX, boundaryY, boundaryWidth, boundaryHeight);
+                    ctx.clip();
                     // Function to load an image
                     async function loadImage(url) {
                         return new Promise((resolve) => {
@@ -1442,6 +1468,8 @@
                         }
                     }
 
+
+                    ctx.restore();
                     // Show the preview image
                     previewContent.find('div').remove(); // Remove loading message
                     previewImage.attr('src', canvas.toDataURL('image/png')).css('display', 'block');
@@ -1534,6 +1562,18 @@
                 const scaleX = canvas.width / hatRect.width;
                 const scaleY = canvas.height / hatRect.height;
 
+                // Calculate boundary in canvas coordinates
+                const boundaryX = (boundaryRect.left - hatRect.left) * scaleX;
+                const boundaryY = (boundaryRect.top - hatRect.top) * scaleY;
+                const boundaryWidth = boundaryRect.width * scaleX;
+                const boundaryHeight = boundaryRect.height * scaleY;
+
+                // Apply clipping to the boundary area
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(boundaryX, boundaryY, boundaryWidth, boundaryHeight);
+                ctx.clip();
+
                 async function loadImage(url) {
                     return new Promise((resolve) => {
                         const img = new Image();
@@ -1619,6 +1659,7 @@
                     }
                 }
 
+                ctx.restore(); // Remove clipping after drawing elements
                 return canvas.toDataURL('image/png');
             }
             // DOM elements
