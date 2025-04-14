@@ -257,7 +257,7 @@
                     if (response.success && response.shipping.rates) {
                         let shippingHtml = '<div class="shipping-methods-list">';
                         response.shipping.rates.forEach(rate => {
-                            const rateUSD = rate.price_usd || (rate.total * 0.75);
+                            const rateUSD = (rate.total * 0.75).toFixed(2);
                             shippingHtml += `
                                 <div class="form-check mb-2">
                                     <input class="form-check-input shipping-method-radio" type="radio"
@@ -268,7 +268,7 @@
                                         data-service="${rate.postage_type}"
                                         data-days="${rate.delivery_days}">
                                     <label class="form-check-label" for="shipping_${rate.postage_type_id}">
-                                        ${rate.postage_type} - $${rateUSD.toFixed(2)} USD
+                                        ${rate.postage_type} - $${rateUSD} USD
                                         <br>
                                         <small class="text-muted">Estimated delivery: ${rate.delivery_days} days</small>
                                     </label>
@@ -279,13 +279,36 @@
 
                         $('#shipping-methods-container').html(shippingHtml);
 
+                        // Add event handler for shipping method selection
+                        $('.shipping-method-radio').on('change', function() {
+                            const selectedPrice = $(this).data('price');
+                            const selectedService = $(this).data('service');
+                            const selectedDays = $(this).data('days');
+
+                            // Update shipping amount display
+                            $('#shipping-amount').text(selectedPrice);
+
+                            // Store selected shipping details
+                            window.selectedShipping = {
+                                method: $(this).val(),
+                                price: selectedPrice,
+                                service: selectedService,
+                                estimated_days: selectedDays
+                            };
+
+                            // Update total with new shipping price
+                            updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(
+                                selectedPrice));
+                        });
+
                         if (response.shipping.rates.length > 0) {
                             const firstRate = response.shipping.rates[0];
-                            const firstRateUSD = firstRate.price_usd || (firstRate.total * 0.75);
+                            const firstRateUSD = (firstRate.total * 0.75).toFixed(2);
                             $('input[name="shipping_method"]:first').prop('checked', true).trigger(
                                 'change');
-                            $('#shipping-amount').text(firstRateUSD.toFixed(2));
-                            updateTaxAndTotal(getSubtotal(), appliedDiscount, firstRateUSD);
+                            $('#shipping-amount').text(firstRateUSD);
+                            updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(
+                                firstRateUSD));
                         }
                     } else {
                         $('#shipping-methods-container').html(
@@ -706,7 +729,7 @@
                         // Display shipping methods
                         let shippingHtml = '<div class="shipping-methods-list">';
                         data.shipping.data.forEach(rate => {
-                            const rateUSD = rate.price_usd || (rate.total * 0.75);
+                            const rateUSD = (rate.total * 0.75).toFixed(2);
                             shippingHtml += `
                                 <div class="form-check mb-2">
                                     <input class="form-check-input shipping-method-radio" type="radio"
@@ -717,7 +740,7 @@
                                         data-service="${rate.postage_type}"
                                         data-days="${rate.delivery_days}">
                                     <label class="form-check-label" for="shipping_${rate.postage_type_id}">
-                                        ${rate.postage_type} - $${rateUSD.toFixed(2)} USD
+                                        ${rate.postage_type} - $${rateUSD} USD
                                         <br>
                                         <small class="text-muted">Estimated delivery: ${rate.delivery_days} days</small>
                                     </label>
@@ -727,44 +750,32 @@
                         shippingHtml += '</div>';
                         $('#shipping-methods-container').html(shippingHtml);
 
-                        // Remove any existing event listeners
-                        $('.shipping-method-radio').off('change');
-
-                        // Add new event listener for shipping method selection
+                        // Add event handler for shipping method selection
                         $('.shipping-method-radio').on('change', function() {
-                            const price = parseFloat($(this).data('price'));
-                            const service = $(this).data('service');
-                            const days = $(this).data('days');
-
-                            console.log('Shipping method selected:', {
-                                price: price,
-                                service: service,
-                                days: days
-                            });
+                            const selectedPrice = $(this).data('price');
+                            const selectedService = $(this).data('service');
+                            const selectedDays = $(this).data('days');
 
                             // Update shipping amount display
-                            $('#shipping-amount').text(price.toFixed(2));
-                            console.log('Updated shipping amount:', price.toFixed(2));
+                            $('#shipping-amount').text(selectedPrice);
 
                             // Store selected shipping details
                             window.selectedShipping = {
                                 method: $(this).val(),
-                                price: price,
-                                service: service,
-                                estimated_days: days
+                                price: selectedPrice,
+                                service: selectedService,
+                                estimated_days: selectedDays
                             };
-                            console.log('Stored shipping details:', window.selectedShipping);
 
-                            // Update total with new shipping
-                            const subtotal = getSubtotal();
-                            console.log('Current subtotal:', subtotal);
-                            updateTaxAndTotal(subtotal, appliedDiscount, price);
+                            // Update total with new shipping price
+                            updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(
+                                selectedPrice));
                         });
 
                         // Select the first shipping method by default
                         if (data.shipping.data.length > 0) {
                             const firstRate = data.shipping.data[0];
-                            const firstRateUSD = firstRate.price_usd || (firstRate.total * 0.75);
+                            const firstRateUSD = (firstRate.total * 0.75).toFixed(2);
                             console.log('Selecting first shipping method:', {
                                 rate: firstRate,
                                 price: firstRateUSD
@@ -1547,7 +1558,7 @@
                             // Display shipping methods
                             let shippingHtml = '<div class="shipping-methods-list">';
                             data.shipping.data.forEach(rate => {
-                                const rateUSD = rate.price_usd || (rate.total * 0.75);
+                                const rateUSD = (rate.total * 0.75).toFixed(2);
                                 shippingHtml += `
                                     <div class="form-check mb-2">
                                         <input class="form-check-input shipping-method-radio" type="radio"
@@ -1558,7 +1569,7 @@
                                             data-service="${rate.postage_type}"
                                             data-days="${rate.delivery_days}">
                                         <label class="form-check-label" for="shipping_${rate.postage_type_id}">
-                                            ${rate.postage_type} - $${rateUSD.toFixed(2)} USD
+                                            ${rate.postage_type} - $${rateUSD} USD
                                             <br>
                                             <small class="text-muted">Estimated delivery: ${rate.delivery_days} days</small>
                                         </label>
@@ -1568,44 +1579,32 @@
                             shippingHtml += '</div>';
                             $('#shipping-methods-container').html(shippingHtml);
 
-                            // Remove any existing event listeners
-                            $('.shipping-method-radio').off('change');
-
-                            // Add new event listener for shipping method selection
+                            // Add event handler for shipping method selection
                             $('.shipping-method-radio').on('change', function() {
-                                const price = parseFloat($(this).data('price'));
-                                const service = $(this).data('service');
-                                const days = $(this).data('days');
-
-                                console.log('Shipping method selected:', {
-                                    price: price,
-                                    service: service,
-                                    days: days
-                                });
+                                const selectedPrice = $(this).data('price');
+                                const selectedService = $(this).data('service');
+                                const selectedDays = $(this).data('days');
 
                                 // Update shipping amount display
-                                $('#shipping-amount').text(price.toFixed(2));
-                                console.log('Updated shipping amount:', price.toFixed(2));
+                                $('#shipping-amount').text(selectedPrice);
 
                                 // Store selected shipping details
                                 window.selectedShipping = {
                                     method: $(this).val(),
-                                    price: price,
-                                    service: service,
-                                    estimated_days: days
+                                    price: selectedPrice,
+                                    service: selectedService,
+                                    estimated_days: selectedDays
                                 };
-                                console.log('Stored shipping details:', window.selectedShipping);
 
-                                // Update total with new shipping
-                                const subtotal = getSubtotal();
-                                console.log('Current subtotal:', subtotal);
-                                updateTaxAndTotal(subtotal, appliedDiscount, price);
+                                // Update total with new shipping price
+                                updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(
+                                    selectedPrice));
                             });
 
                             // Select the first shipping method by default
                             if (data.shipping.data.length > 0) {
                                 const firstRate = data.shipping.data[0];
-                                const firstRateUSD = firstRate.price_usd || (firstRate.total * 0.75);
+                                const firstRateUSD = (firstRate.total * 0.75).toFixed(2);
                                 console.log('Selecting first shipping method:', {
                                     rate: firstRate,
                                     price: firstRateUSD
@@ -1667,6 +1666,30 @@
 
             function proceedToCheckout(event) {
                 event?.preventDefault();
+
+                // Validate required fields
+                const requiredFields = ['firstname', 'lastname', 'country', 'state', 'city', 'postal_code',
+                    'address', 'email', 'phone'
+                ];
+                const missingFields = [];
+
+                requiredFields.forEach(field => {
+                    const value = document.getElementById(field).value;
+                    if (!value) {
+                        missingFields.push(field);
+                    }
+                });
+
+                if (missingFields.length > 0) {
+                    alert('Please fill in all required fields: ' + missingFields.join(', '));
+                    return;
+                }
+
+                if (!window.selectedShipping || !window.selectedShipping.method) {
+                    alert('Please select a shipping method before proceeding.');
+                    return;
+                }
+
                 if (confirm('Are you sure you want to proceed to checkout?')) {
                     let checkoutButton = document.getElementById('checkoutButton');
                     checkoutButton.innerHTML =
@@ -1699,6 +1722,9 @@
                         lastname: document.getElementById('lastname').value,
                         companyname: document.getElementById('companyname').value,
                         country: document.getElementById('country').value,
+                        state: document.getElementById('state').value,
+                        city: document.getElementById('city').value,
+                        postal_code: document.getElementById('postal_code').value,
                         address: document.getElementById('address').value,
                         email: document.getElementById('email').value,
                         phone: document.getElementById('phone').value,

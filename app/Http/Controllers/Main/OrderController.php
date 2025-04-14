@@ -229,6 +229,10 @@ class OrderController extends Controller
             ->get();
 
           foreach ($cartItems as $item) {
+            // Calculate volume discount for this item
+            $volumeDiscount = $this->calculateVolumeDiscount($item);
+            $discountedPrice = $volumeDiscount['price'];
+
             OrderItem::create([
               'order_id' => $order->id,
               'product_id' => $item->product_id,
@@ -236,7 +240,9 @@ class OrderController extends Controller
               'user_customization_id' => $item->userCustomization ? $item->userCustomization->id : null,
               'size' => $item->size,
               'quantity' => $item->quantity,
-              'product_price' => $item->product->selling_price,
+              'product_price' => $discountedPrice, // Use the discounted price instead of original price
+              'original_price' => $item->product->selling_price, // Store original price for reference
+              'discount_percentage' => $volumeDiscount['percentage'], // Store the discount percentage
             ]);
           }
 
@@ -494,12 +500,15 @@ class OrderController extends Controller
           'companyname' => $request->input('companyname'),
           'address' => $request->input('address'),
           'country' => $request->input('country'),
+          'state' => $request->input('state'),
+          'city' => $request->input('city'),
+          'postal_code' => $request->input('postal_code'),
           'email' => $request->input('email'),
           'phone' => $request->input('phone'),
           'additional_info' => $request->input('additional_info'),
           'cart_items' => $cartItems,
           'cart_item_ids' => $cartItems->pluck('id')->toArray(),
-          'total_price' => $totalPrice, // Store correct total price
+          'total_price' => $totalPrice,
           'subtotal_price' => $subtotalPrice,
           'discount_amount' => $discountAmount,
           'discount_id' => $discountId,
