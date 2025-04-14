@@ -17,7 +17,7 @@
                             <table class="table fs-15 align-middle table-nowrap">
                                 <thead>
                                     <tr>
-      
+
                                         <th scope="col">Order ID</th>
                                         <th scope="col">Date</th>
                                         <th scope="col">Total Payment</th>
@@ -95,9 +95,9 @@
                                     <th>Quantity</th>
                                     <th>Color</th>
                                     <th>Size</th>
-                                    
-                                    
-                                    
+
+
+
                                 </tr>
                             </thead>
                             <tbody id="viewModal-products-list">
@@ -131,10 +131,11 @@
                                                 class="card-logo card-logo-dark mt-3" alt="logo dark" height="20">
                                             <div class="mt-sm-5 mt-4">
                                                 <h6 class="text-muted text-uppercase fw-semibold fs-14">Address</h6>
-                                                <p class="text-muted mb-1" id="address-details">9955 Av. Lausanne, Montreal-Nord, Qc </p>
+                                                <p class="text-muted mb-1" id="address-details">9955 Av. Lausanne,
+                                                    Montreal-Nord, Qc </p>
                                                 <p class="text-muted mb-0" id="zip-code"> H1H 5A6</p>
-                                                <p class="text-muted mb-0" >Canada</p>
-                                                
+                                                <p class="text-muted mb-0">Canada</p>
+
                                             </div>
                                         </div>
                                         <div class="flex-shrink-0 mt-sm-0 mt-3">
@@ -223,34 +224,37 @@
                                             <tbody>
                                                 <tr>
                                                     <td>Sub Total</td>
-                                                    <td class="text-end" ><span id="sub-total"></span> $</td>
+                                                    <td class="text-end"><span id="sub-total"></span> $</td>
                                                 </tr>
 
                                                 <tr>
-                                                    <td>TVQ Tax <span id="TVQtax-percentage"></span>% (<span id="TVQtax-no"></span>) <small class="text-muted"></small></td>
-                                                    <td class="text-end" ><span id="TVQtax-amount"></span> $</td>
+                                                    <td>TVQ Tax <span id="TVQtax-percentage"></span>% (<span
+                                                            id="TVQtax-no"></span>) <small class="text-muted"></small>
+                                                    </td>
+                                                    <td class="text-end"><span id="TVQtax-amount"></span> $</td>
                                                 </tr>
 
                                                 <tr>
-                                                    <td>TPS Tax <span id="TPStax-percentage"></span>%  (<span id="TPStax-no"></span>)<small class="text-muted"></small></td>
-                                                    <td class="text-end" ><span id="TPStax-amount"></span> $</td>
+                                                    <td>TPS Tax <span id="TPStax-percentage"></span>% (<span
+                                                            id="TPStax-no"></span>)<small class="text-muted"></small></td>
+                                                    <td class="text-end"><span id="TPStax-amount"></span> $</td>
                                                 </tr>
 
-                                           
+
 
                                                 <tr>
                                                     <td>Discount <small class="text-muted"></small></td>
-                                                    <td class="text-end" >-<span id="discount-amount"></span> $</td>
+                                                    <td class="text-end">-<span id="discount-amount"></span> $</td>
                                                 </tr>
 
                                                 <tr>
                                                     <td>Shipping <small class="text-muted"></small></td>
-                                                    <td class="text-end" ><span id="shipping-amount"></span> $</td>
+                                                    <td class="text-end"><span id="shipping-amount"></span> $</td>
                                                 </tr>
 
                                                 <tr class="border-top border-top-dashed fs-15">
                                                     <th scope="row">Total Amount</th>
-                                                    <th class="text-end" ><span id="total-amount-summary"></span> $</th>
+                                                    <th class="text-end"><span id="total-amount-summary"></span> $</th>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -303,7 +307,7 @@
                       <td>${item.product_price}</td>
                     <td>${item.quantity}</td>
                     <td>
-    ${item.color.color_name_1 || 'N/A'} 
+    ${item.color.color_name_1 || 'N/A'}
     ${item.color.color_name_2 ? `& ${item.color.color_name_2}` : ''}
 </td>
 
@@ -311,7 +315,7 @@
                 </tr>
             `;
 
-             
+
                     return productRow;
                 });
 
@@ -350,7 +354,7 @@
             // Populate the invoice modal
             document.getElementById('invoice-no').textContent = orderId;
             document.getElementById('invoice-date').textContent = date;
-            
+
             document.getElementById('discount-amount').textContent = discount;
             document.getElementById('shipping-amount').textContent = shipping;
             document.getElementById('TVQtax-amount').textContent = TVQtax;
@@ -372,19 +376,20 @@
 
             // Populate products in the invoice modal
             products.forEach((item, index) => {
-    console.log('Product Data:', item);
-    const productRow = `
+                console.log('Product Data:', item);
+                const productRow = `
         <tr>
             <td>${index + 1}</td>
             <td>${item.product.title}</td>
             <td>${item.quantity}</td>
-            <td>${item.product_price}</td>
-             <td>${item.order_items.user_customizations.price}</td>
+            <td>$${item.product_price}</td>
+            <td>$${item.user_customization.price}</td>
+
             <td>$${(((parseFloat(item.product_price) || 0) + (parseFloat(item.printing_price) || 0) + (parseFloat(item.pompom_price) || 0)) * (parseInt(item.quantity) || 0) + (parseFloat(item.delivery_price) || 0)).toFixed(2)}</td>
         </tr>
     `;
-    invoiceProductsList.innerHTML += productRow;
-});
+                invoiceProductsList.innerHTML += productRow;
+            });
 
         });
     </script>

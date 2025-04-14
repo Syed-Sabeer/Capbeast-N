@@ -53,7 +53,7 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class, 'order_id')
-            ->with(['product', 'color']);
+            ->with(['product', 'color','userCustomization']);
     }
     public function product()
     {
