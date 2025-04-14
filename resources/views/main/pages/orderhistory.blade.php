@@ -33,8 +33,8 @@
                                             data-bs-subtotal="{{ number_format($order->subtotal_price, 2) }}"
                                             data-bs-discount="{{ number_format($order->discount_price, 2) }}"
                                             data-bs-shipping="{{ number_format($order->shipping_price, 2) }}"
-                                            data-bs-TVQtax="{{ number_format($order->tvq_tax_price, 2) }}"
-                                            data-bs-TPStax="{{ number_format($order->tps_tax_price, 2) }}"
+                                            data-bs-TVQtax="{{ number_format($order->TaxDetails->tvq_tax_price, 2) }}"
+                                            data-bs-TPStax="{{ number_format($order->TaxDetails->tps_tax_price, 2) }}"
                                             data-bs-total="{{ number_format($order->total_price, 2) }}"
                                             data-bs-TPStax-percentage="{{ $order->TaxDetails->tps_tax_percentage ?? 'N/A' }}"
                                             data-bs-TVQtax-percentage="{{ $order->TaxDetails->tvq_tax_percentage ?? 'N/A' }}"
@@ -210,6 +210,7 @@
                                                     {{-- <th scope="col">Rate</th> --}}
                                                     <th scope="col">Quantity</th>
                                                     <th scope="col">Amount</th>
+                                                    <th scope="col">Digitization Fee</th>
                                                     <th scope="col" class="text-end">Total</th>
                                                 </tr>
                                             </thead>
@@ -378,6 +379,7 @@
             <td>${item.product.title}</td>
             <td>${item.quantity}</td>
             <td>${item.product_price}</td>
+             <td>${item.order_items.user_customizations.price}</td>
             <td>$${(((parseFloat(item.product_price) || 0) + (parseFloat(item.printing_price) || 0) + (parseFloat(item.pompom_price) || 0)) * (parseInt(item.quantity) || 0) + (parseFloat(item.delivery_price) || 0)).toFixed(2)}</td>
         </tr>
     `;
