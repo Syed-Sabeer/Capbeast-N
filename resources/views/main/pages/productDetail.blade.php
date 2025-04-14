@@ -157,7 +157,6 @@
                                 @endif
                             </ul>
 
-<<<<<<< HEAD
                             <script>
                                 const volumeDiscounts = @json($product->productVolumeDiscount->sortBy('quantity')->values());
                                 const sellingPrice = {{ $product->selling_price }};
@@ -170,13 +169,6 @@
     <span id="percent-off" class="fs-14 ms-2 text-danger"></span>
 </h5>
                             
-=======
-                            <h5 class="fs-24 mb-4">${{ $product->selling_price }} <span
-                                    class="text-muted fs-14">
-                                    {{-- <del>$280.99</del></span> <span class="fs-14 ms-2 text-danger">
-                                    (50% off)</span> --}}
-                                </h5>
->>>>>>> e798c5c (working on checkout page need to modify shipping api for canada)
 
                         </div>
                         @if ($product->productColors->isNotEmpty())

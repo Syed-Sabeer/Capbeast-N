@@ -265,7 +265,6 @@
                                         value="${rate.postage_type_id}"
                                         id="shipping_${rate.postage_type_id}"
                                         data-price="${rateUSD}"
-                                        data-price-usd="${rateUSD}"
                                         data-service="${rate.postage_type}"
                                         data-days="${rate.delivery_days}">
                                     <label class="form-check-label" for="shipping_${rate.postage_type_id}">
@@ -317,6 +316,12 @@
 
         // Function to update tax and total
         function updateTaxAndTotal(subtotal, appliedDiscount = 0, shipping = 0) {
+            console.log('Updating tax and total:', {
+                subtotal: subtotal,
+                discount: appliedDiscount,
+                shipping: shipping
+            });
+
             let TPStaxElement = document.querySelector('.tps-cart-tax');
             let TVQtaxElement = document.querySelector('.tvq-cart-tax');
             let totalElement = document.querySelector('.cart-total');
@@ -338,30 +343,38 @@
             // Calculate final total including all components
             let finalTotal = discountedTotal + TPStaxAmount + TVQtaxAmount + shipping;
 
+            console.log('Calculated amounts:', {
+                discountedTotal: discountedTotal,
+                TPStaxAmount: TPStaxAmount,
+                TVQtaxAmount: TVQtaxAmount,
+                shipping: shipping,
+                finalTotal: finalTotal
+            });
+
             // Update display values
             document.getElementById('tps-tax-amount').textContent = TPStaxAmount.toFixed(2);
             document.getElementById('tvq-tax-amount').textContent = TVQtaxAmount.toFixed(2);
             document.getElementById('final-total-amount').textContent = finalTotal.toFixed(2);
+            document.querySelector('.cart-subtotal').textContent = discountedTotal.toFixed(2);
+            document.getElementById('discount-amount').textContent = appliedDiscount.toFixed(2);
+            document.getElementById('shipping-amount').textContent = shipping.toFixed(2);
 
             // Store the USD total for PayPal
             window.paypalTotal = finalTotal;
 
-            // Debug logging
-            console.log("User Country:", userCountry);
-            console.log("Subtotal: $" + subtotal.toFixed(2));
-            console.log("Applied Discount: $" + appliedDiscount.toFixed(2));
-            console.log("Discounted Total: $" + discountedTotal.toFixed(2));
-            console.log("TPS Tax Amount: $" + TPStaxAmount.toFixed(2));
-            console.log("TVQ Tax Amount: $" + TVQtaxAmount.toFixed(2));
-            console.log("Shipping: $" + shipping.toFixed(2));
-            console.log("Final Total: $" + finalTotal.toFixed(2));
-            console.log("PayPal Total (USD): $" + window.paypalTotal.toFixed(2));
+            console.log('Updated display values:', {
+                shippingAmount: document.getElementById('shipping-amount').textContent,
+                finalTotal: document.getElementById('final-total-amount').textContent
+            });
         }
 
         // Function to get subtotal
         function getSubtotal() {
-            let subtotalElement = document.querySelector('.cart-subtotal');
-            return parseFloat(subtotalElement.innerText.replace(/[^0-9.]/g, '')) || 0;
+            let subtotal = 0;
+            $('.item-total-price').each(function() {
+                subtotal += parseFloat($(this).text().replace(/[^0-9.]/g, ''));
+            });
+            return subtotal;
         }
 
         // Initial update
@@ -370,11 +383,11 @@
         // Remove the shipping-options-container div from the top of the page
         $('#shipping-options-container').remove();
 
-        // Update the checkout button click handler to include shipping details
+        // Update the checkout button click handler
         $('#checkoutButton').on('click', function(event) {
             event.preventDefault();
 
-            if (!window.selectedShipping) {
+            if (!window.selectedShipping || !window.selectedShipping.method) {
                 alert('Please select a shipping method before proceeding.');
                 return;
             }
@@ -388,9 +401,6 @@
             formData.append('shipping_method', selectedShippingMethod.method);
             formData.append('shipping_service', selectedShippingMethod.service);
             formData.append('shipping_estimated_days', selectedShippingMethod.estimated_days);
-
-            // Add shipping rate details to session
-            sessionStorage.setItem('shipping_rate_details', JSON.stringify(selectedShippingMethod));
 
             // Continue with the checkout process
             proceedToCheckout(formData);
@@ -430,30 +440,75 @@
             countrySelect.prop('disabled', false);
         }
 
-        setLoading();
-        fetch(countriesRoute)
-            .then(response => response.json())
-            .then(data => {
-                removeLoading();
-                for (const [code, name] of Object.entries(data)) {
-                    countrySelect.append(`<option value="${code}">${name}</option>`);
-                }
+        // Fallback countries list
+        const fallbackCountries = {
+            "CA": "Canada",
+            "US": "United States",
+            "GB": "United Kingdom",
+            "AU": "Australia",
+            "DE": "Germany",
+            "FR": "France",
+            "IT": "Italy",
+            "ES": "Spain",
+            "JP": "Japan",
+            "CN": "China",
+            "IN": "India",
+            "BR": "Brazil",
+            "MX": "Mexico"
+        };
 
-                // Set initial country if available
-                const initialCountry = "{{ old('country') }}";
-                if (initialCountry) {
-                    countrySelect.val(initialCountry).trigger('change');
-                }
+        function loadCountries() {
+            setLoading();
 
-                updateTaxRowsVisibility();
-            })
-            .catch(error => {
-                removeLoading();
-                countrySelect.html(
-                    '<option value="">Failed to load countries. Please refresh the page.</option>'
-                );
-                console.error(error);
-            });
+            // Try to fetch from API first
+            fetch(countriesRoute)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    removeLoading();
+                    if (data && Object.keys(data).length > 0) {
+                        // Use API data if available
+                        for (const [code, name] of Object.entries(data)) {
+                            countrySelect.append(`<option value="${code}">${name}</option>`);
+                        }
+                    } else {
+                        // Fallback to static list
+                        for (const [code, name] of Object.entries(fallbackCountries)) {
+                            countrySelect.append(`<option value="${code}">${name}</option>`);
+                        }
+                    }
+
+                    // Set initial country if available
+                    const initialCountry = "{{ old('country') }}";
+                    if (initialCountry) {
+                        countrySelect.val(initialCountry).trigger('change');
+                    }
+
+                    updateTaxRowsVisibility();
+                })
+                .catch(error => {
+                    console.error('Error loading countries:', error);
+                    removeLoading();
+
+                    // Use fallback countries
+                    for (const [code, name] of Object.entries(fallbackCountries)) {
+                        countrySelect.append(`<option value="${code}">${name}</option>`);
+                    }
+
+                    // Show error message but allow user to proceed
+                    const errorMessage = 'Unable to load all countries. Using limited list.';
+                    console.warn(errorMessage);
+
+                    updateTaxRowsVisibility();
+                });
+        }
+
+        // Initialize country loading
+        loadCountries();
 
         // Handle country change
         countrySelect.on('change', function() {
@@ -484,24 +539,29 @@
         }
 
         // Initialize price displays for all items
-        $('.item-total-price').each(function() {
+        $('.item-price, .item-total-price').each(function() {
             const itemId = $(this).data('item-id');
             const quantity = parseInt($(this).closest('tr').find('td:eq(1)').text());
-            const result = calculateVolumeDiscount(quantity, sellingPrice,
-                volumeDiscounts);
+            const result = calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts);
 
             const $originalPrice = $(`.original-price[data-item-id="${itemId}"]`);
             const $discountedPrice = $(`.discounted-price[data-item-id="${itemId}"]`);
             const $discountInfo = $(`#discount-info-${itemId}`);
+            const $itemPrice = $(`.item-price[data-item-id="${itemId}"]`);
+            const $itemTotalPrice = $(`.item-total-price[data-item-id="${itemId}"]`);
 
             if (result.discount > 0) {
                 $discountInfo.text(`You're saving ${result.discount}%!`);
                 $originalPrice.show().text(`$${sellingPrice.toFixed(2)}`);
                 $discountedPrice.show().text(`$${result.discountedPrice.toFixed(2)}`);
+                $itemPrice.text(`$${result.discountedPrice.toFixed(2)}`);
+                $itemTotalPrice.text(`$${(result.discountedPrice * quantity).toFixed(2)}`);
             } else {
                 $discountInfo.text('');
                 $originalPrice.hide();
                 $discountedPrice.text(`$${sellingPrice.toFixed(2)}`);
+                $itemPrice.text(`$${sellingPrice.toFixed(2)}`);
+                $itemTotalPrice.text(`$${(sellingPrice * quantity).toFixed(2)}`);
             }
         });
 
@@ -530,7 +590,7 @@
             // Show loading state
             $('#shipping-methods-container').html(
                 '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Calculating shipping rates...</p></div>'
-                );
+            );
 
             // Prepare products data
             const products = cartItems?.map(item => {
@@ -573,7 +633,7 @@
             if (products.length === 0) {
                 $('#shipping-methods-container').html(
                     '<div class="alert alert-warning">No valid items in the cart to calculate shipping.</div>'
-                    );
+                );
                 $('#shipping-amount').text('0.00');
                 return;
             }
@@ -595,7 +655,7 @@
             if (totalWeight > 30) { // 30lbs max weight
                 $('#shipping-methods-container').html(
                     '<div class="alert alert-warning">Package weight exceeds maximum limit. Please contact support for large orders.</div>'
-                    );
+                );
                 $('#shipping-amount').text('0.00');
                 return;
             }
@@ -603,7 +663,7 @@
             if (maxLength > 100 || maxWidth > 100 || maxHeight > 100) { // 100cm max dimension
                 $('#shipping-methods-container').html(
                     '<div class="alert alert-warning">Package dimensions exceed maximum limits. Please contact support for large orders.</div>'
-                    );
+                );
                 $('#shipping-amount').text('0.00');
                 return;
             }
@@ -646,17 +706,18 @@
                         // Display shipping methods
                         let shippingHtml = '<div class="shipping-methods-list">';
                         data.shipping.data.forEach(rate => {
+                            const rateUSD = rate.price_usd || (rate.total * 0.75);
                             shippingHtml += `
                                 <div class="form-check mb-2">
                                     <input class="form-check-input shipping-method-radio" type="radio"
                                         name="shipping_method"
                                         value="${rate.postage_type_id}"
                                         id="shipping_${rate.postage_type_id}"
-                                        data-price="${rate.price_usd || (rate.total * 0.75)}"
+                                        data-price="${rateUSD}"
                                         data-service="${rate.postage_type}"
                                         data-days="${rate.delivery_days}">
                                     <label class="form-check-label" for="shipping_${rate.postage_type_id}">
-                                        ${rate.postage_type} - $${(rate.price_usd || (rate.total * 0.75)).toFixed(2)} USD
+                                        ${rate.postage_type} - $${rateUSD.toFixed(2)} USD
                                         <br>
                                         <small class="text-muted">Estimated delivery: ${rate.delivery_days} days</small>
                                     </label>
@@ -665,6 +726,52 @@
                         });
                         shippingHtml += '</div>';
                         $('#shipping-methods-container').html(shippingHtml);
+
+                        // Remove any existing event listeners
+                        $('.shipping-method-radio').off('change');
+
+                        // Add new event listener for shipping method selection
+                        $('.shipping-method-radio').on('change', function() {
+                            const price = parseFloat($(this).data('price'));
+                            const service = $(this).data('service');
+                            const days = $(this).data('days');
+
+                            console.log('Shipping method selected:', {
+                                price: price,
+                                service: service,
+                                days: days
+                            });
+
+                            // Update shipping amount display
+                            $('#shipping-amount').text(price.toFixed(2));
+                            console.log('Updated shipping amount:', price.toFixed(2));
+
+                            // Store selected shipping details
+                            window.selectedShipping = {
+                                method: $(this).val(),
+                                price: price,
+                                service: service,
+                                estimated_days: days
+                            };
+                            console.log('Stored shipping details:', window.selectedShipping);
+
+                            // Update total with new shipping
+                            const subtotal = getSubtotal();
+                            console.log('Current subtotal:', subtotal);
+                            updateTaxAndTotal(subtotal, appliedDiscount, price);
+                        });
+
+                        // Select the first shipping method by default
+                        if (data.shipping.data.length > 0) {
+                            const firstRate = data.shipping.data[0];
+                            const firstRateUSD = firstRate.price_usd || (firstRate.total * 0.75);
+                            console.log('Selecting first shipping method:', {
+                                rate: firstRate,
+                                price: firstRateUSD
+                            });
+                            $(`#shipping_${firstRate.postage_type_id}`).prop('checked', true).trigger(
+                                'change');
+                        }
                     } else {
                         $('#shipping-methods-container').html(
                             '<div class="alert alert-danger">Unable to calculate shipping rates. Please try again later or contact support.</div>'
@@ -843,16 +950,15 @@
                                                     {{ $item->quantity }}
                                                 </td>
                                                 <td class="text-end">
-                                                    <span class="item-total-price"
-                                                        data-item-id="{{ $item->id }}">${{ number_format($itemTotal, 2) }}</span>
+                                                    <span class="item-price"
+                                                        data-item-id="{{ $item->id }}">${{ number_format($basePrice, 2) }}</span>
                                                 </td>
                                                 <td class="text-end">
                                                     ${{ number_format($customizationPrice, 2) }}
                                                 </td>
-
-
                                                 <td class="text-end">
-                                                    ${{ number_format($itemTotal, 2) }}
+                                                    <span class="item-total-price"
+                                                        data-item-id="{{ $item->id }}">${{ number_format($itemTotal, 2) }}</span>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -1157,6 +1263,12 @@
         const cartItems = @json($cart);
 
         function updateTaxAndTotal(subtotal, appliedDiscount = 0, shipping = 0) {
+            console.log('Updating tax and total:', {
+                subtotal: subtotal,
+                discount: appliedDiscount,
+                shipping: shipping
+            });
+
             let TPStaxElement = document.querySelector('.tps-cart-tax');
             let TVQtaxElement = document.querySelector('.tvq-cart-tax');
             let totalElement = document.querySelector('.cart-total');
@@ -1178,29 +1290,37 @@
             // Calculate final total including all components
             let finalTotal = discountedTotal + TPStaxAmount + TVQtaxAmount + shipping;
 
+            console.log('Calculated amounts:', {
+                discountedTotal: discountedTotal,
+                TPStaxAmount: TPStaxAmount,
+                TVQtaxAmount: TVQtaxAmount,
+                shipping: shipping,
+                finalTotal: finalTotal
+            });
+
             // Update display values
             document.getElementById('tps-tax-amount').textContent = TPStaxAmount.toFixed(2);
             document.getElementById('tvq-tax-amount').textContent = TVQtaxAmount.toFixed(2);
             document.getElementById('final-total-amount').textContent = finalTotal.toFixed(2);
+            document.querySelector('.cart-subtotal').textContent = discountedTotal.toFixed(2);
+            document.getElementById('discount-amount').textContent = appliedDiscount.toFixed(2);
+            document.getElementById('shipping-amount').textContent = shipping.toFixed(2);
 
             // Store the USD total for PayPal
             window.paypalTotal = finalTotal;
 
-            // Debug logging
-            console.log("User Country:", userCountry);
-            console.log("Subtotal: $" + subtotal.toFixed(2));
-            console.log("Applied Discount: $" + appliedDiscount.toFixed(2));
-            console.log("Discounted Total: $" + discountedTotal.toFixed(2));
-            console.log("TPS Tax Amount: $" + TPStaxAmount.toFixed(2));
-            console.log("TVQ Tax Amount: $" + TVQtaxAmount.toFixed(2));
-            console.log("Shipping: $" + shipping.toFixed(2));
-            console.log("Final Total: $" + finalTotal.toFixed(2));
-            console.log("PayPal Total (USD): $" + window.paypalTotal.toFixed(2));
+            console.log('Updated display values:', {
+                shippingAmount: document.getElementById('shipping-amount').textContent,
+                finalTotal: document.getElementById('final-total-amount').textContent
+            });
         }
 
         function getSubtotal() {
-            let subtotalElement = document.querySelector('.cart-subtotal');
-            return parseFloat(subtotalElement.innerText.replace(/[^0-9.]/g, '')) || 0;
+            let subtotal = 0;
+            $('.item-total-price').each(function() {
+                subtotal += parseFloat($(this).text().replace(/[^0-9.]/g, ''));
+            });
+            return subtotal;
         }
 
         function calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts) {
@@ -1274,7 +1394,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize price displays for all items
-            $('.item-total-price').each(function() {
+            $('.item-price, .item-total-price').each(function() {
                 const itemId = $(this).data('item-id');
                 const quantity = parseInt($(this).closest('tr').find('td:eq(1)').text());
                 updatePriceDisplay(itemId, quantity);
@@ -1311,7 +1431,7 @@
                 // Show loading state
                 $('#shipping-methods-container').html(
                     '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Calculating shipping rates...</p></div>'
-                    );
+                );
 
                 // Prepare products data
                 const products = cartItems?.map(item => {
@@ -1354,7 +1474,7 @@
                 if (products.length === 0) {
                     $('#shipping-methods-container').html(
                         '<div class="alert alert-warning">No valid items in the cart to calculate shipping.</div>'
-                        );
+                    );
                     $('#shipping-amount').text('0.00');
                     return;
                 }
@@ -1376,7 +1496,7 @@
                 if (totalWeight > 30) { // 30lbs max weight
                     $('#shipping-methods-container').html(
                         '<div class="alert alert-warning">Package weight exceeds maximum limit. Please contact support for large orders.</div>'
-                        );
+                    );
                     $('#shipping-amount').text('0.00');
                     return;
                 }
@@ -1384,7 +1504,7 @@
                 if (maxLength > 100 || maxWidth > 100 || maxHeight > 100) { // 100cm max dimension
                     $('#shipping-methods-container').html(
                         '<div class="alert alert-warning">Package dimensions exceed maximum limits. Please contact support for large orders.</div>'
-                        );
+                    );
                     $('#shipping-amount').text('0.00');
                     return;
                 }
@@ -1427,17 +1547,18 @@
                             // Display shipping methods
                             let shippingHtml = '<div class="shipping-methods-list">';
                             data.shipping.data.forEach(rate => {
+                                const rateUSD = rate.price_usd || (rate.total * 0.75);
                                 shippingHtml += `
                                     <div class="form-check mb-2">
                                         <input class="form-check-input shipping-method-radio" type="radio"
                                             name="shipping_method"
                                             value="${rate.postage_type_id}"
                                             id="shipping_${rate.postage_type_id}"
-                                            data-price="${rate.price_usd || (rate.total * 0.75)}"
+                                            data-price="${rateUSD}"
                                             data-service="${rate.postage_type}"
                                             data-days="${rate.delivery_days}">
                                         <label class="form-check-label" for="shipping_${rate.postage_type_id}">
-                                            ${rate.postage_type} - $${(rate.price_usd || (rate.total * 0.75)).toFixed(2)} USD
+                                            ${rate.postage_type} - $${rateUSD.toFixed(2)} USD
                                             <br>
                                             <small class="text-muted">Estimated delivery: ${rate.delivery_days} days</small>
                                         </label>
@@ -1446,6 +1567,52 @@
                             });
                             shippingHtml += '</div>';
                             $('#shipping-methods-container').html(shippingHtml);
+
+                            // Remove any existing event listeners
+                            $('.shipping-method-radio').off('change');
+
+                            // Add new event listener for shipping method selection
+                            $('.shipping-method-radio').on('change', function() {
+                                const price = parseFloat($(this).data('price'));
+                                const service = $(this).data('service');
+                                const days = $(this).data('days');
+
+                                console.log('Shipping method selected:', {
+                                    price: price,
+                                    service: service,
+                                    days: days
+                                });
+
+                                // Update shipping amount display
+                                $('#shipping-amount').text(price.toFixed(2));
+                                console.log('Updated shipping amount:', price.toFixed(2));
+
+                                // Store selected shipping details
+                                window.selectedShipping = {
+                                    method: $(this).val(),
+                                    price: price,
+                                    service: service,
+                                    estimated_days: days
+                                };
+                                console.log('Stored shipping details:', window.selectedShipping);
+
+                                // Update total with new shipping
+                                const subtotal = getSubtotal();
+                                console.log('Current subtotal:', subtotal);
+                                updateTaxAndTotal(subtotal, appliedDiscount, price);
+                            });
+
+                            // Select the first shipping method by default
+                            if (data.shipping.data.length > 0) {
+                                const firstRate = data.shipping.data[0];
+                                const firstRateUSD = firstRate.price_usd || (firstRate.total * 0.75);
+                                console.log('Selecting first shipping method:', {
+                                    rate: firstRate,
+                                    price: firstRateUSD
+                                });
+                                $(`#shipping_${firstRate.postage_type_id}`).prop('checked', true).trigger(
+                                    'change');
+                            }
                         } else {
                             $('#shipping-methods-container').html(
                                 '<div class="alert alert-danger">Unable to calculate shipping rates. Please try again later or contact support.</div>'

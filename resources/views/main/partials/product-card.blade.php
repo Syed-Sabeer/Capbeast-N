@@ -9,12 +9,19 @@
                             ?? 'ProductImages/default.jpg'
                         )) }}" alt=""
                             style="max-height: 200px;max-width: 100%;" class="mx-auto d-block rounded-2">
-                        <div class="action vstack gap-2">
-                            <a href="{{route('add.user-wishlist', $product->id)}}" class="btn btn-danger avatar-xs p-0 btn-soft-warning custom-toggle product-action">
-                                <span class="icon-on"><i class="ri-heart-line"></i></span>
-                                <span class="icon-off"><i class="ri-heart-fill"></i></span>
-                            </a>
-                        </div>
+                            <div class="action vstack gap-2">
+                                <a href="{{ route('add.user-wishlist', $product->id) }}"
+                                   class="btn avatar-xs p-0 custom-toggle product-action"
+                                   style="background-color: #1a2b4c; border: none; border-radius: 6px;">
+                                   
+                                    <!-- Outlined Heart (Inactive) -->
+                                    <span class="icon-on" style="color: #28a745;"><i class="ri-heart-line"></i></span>
+                                    
+                                    <!-- Solid Heart (Active) -->
+                                    <span class="icon-off" style="color: #28a745;"><i class="ri-heart-fill"></i></span>
+                                </a>
+                            </div>
+                            
                         @php
     $maxDiscount = $product->productVolumeDiscount->max('discount');
 @endphp
