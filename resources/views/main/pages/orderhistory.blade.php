@@ -38,6 +38,8 @@
                                             data-bs-total="{{ number_format($order->total_price, 2) }}"
                                             data-bs-TPStax-percentage="{{ $order->TaxDetails->tps_tax_percentage ?? 'N/A' }}"
                                             data-bs-TVQtax-percentage="{{ $order->TaxDetails->tvq_tax_percentage ?? 'N/A' }}"
+                                            data-bs-order-service="{{ $order->shippingRate->service_name ?? 'N/A' }}"
+                                            data-bs-order-tracking="{{ $order->shippingRate->tracking_number ?? 'N/A' }}"
                                             data-bs-TPStax-no="{{ $order->TaxDetails->tps_tax_no ?? 'N/A' }}"
                                             data-bs-TVQtax-no="{{ $order->TaxDetails->tvq_tax_no ?? 'N/A' }}"
                                             data-bs-billing-name="{{ $order->billing_name }}"
@@ -181,23 +183,25 @@
                                 <div class="card-body p-4 border-top border-top-dashed">
                                     <div class="row g-3">
                                         <div class="col-6">
-                                            <h6 class="text-muted text-uppercase fw-semibold fs-14 mb-3">Billing Address
+                                            <h6 class="text-muted text-uppercase fw-semibold fs-14 mb-3">Order Tracking 
                                             </h6>
                                             <p class="fw-medium mb-2 fs-16" id="billing-name"></p>
                                             <p class="text-muted mb-1" id="billing-address-line-1"></p>
-                                            <p class="text-muted mb-1"><span>Phone: +</span><span
-                                                    id="billing-phone-no"></span></p>
-                                            <p class="text-muted mb-0"><span>Tax: </span><span id="billing-tax-no"></span>
+                                            {{-- <p class="text-muted mb-1"><span>Phone: +</span><span
+                                                    id="billing-phone-no"></span></p> --}}
+                                            <p class="text-muted mb-0"><span>Tracking Id: </span>
+                                                <span id="Order-tracking"></span>
+                                                {{-- <span id="billing-tax-no"></span> --}}
                                             </p>
                                         </div>
-                                        <div class="col-6">
+                                        {{-- <div class="col-6">
                                             <h6 class="text-muted text-uppercase fw-semibold fs-14 mb-3">Shipping Address
                                             </h6>
                                             <p class="fw-medium mb-2 fs-16" id="shipping-name"></p>
                                             <p class="text-muted mb-1" id="shipping-address-line-1"></p>
                                             <p class="text-muted mb-1"><span>Phone: +</span><span
                                                     id="shipping-phone-no"></span></p>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                 </div>
                             </div>
@@ -252,7 +256,7 @@
                                                 </tr>
 
                                                 <tr>
-                                                    <td>Shipping <small class="text-muted"></small></td>
+                                                    <td>Shipping (<span id="Order-service"></span>) <small class="text-muted"></small></td>
                                                     <td class="text-end"><span id="shipping-amount"></span> $</td>
                                                 </tr>
 
@@ -346,6 +350,10 @@
                     const TPStaxNo = row.getAttribute('data-bs-TPStax-no');
                     const TVQtaxNo = row.getAttribute('data-bs-TVQtax-no');
                     const TVQtaxPercentage = row.getAttribute('data-bs-TVQtax-percentage');
+                    const OrderService = row.getAttribute('data-bs-order-service');
+                    const OrderTracking = row.getAttribute('data-bs-order-tracking');
+                    
+                    
                     const TPStaxPercentage = row.getAttribute('data-bs-TPStax-percentage');
                     const completetotal = row.getAttribute('data-bs-total');
                     const billingName = row.getAttribute('data-bs-billing-name');
@@ -372,6 +380,10 @@
                     setTextContent('TPStax-no', TPStaxNo);
                     setTextContent('TVQtax-no', TVQtaxNo);
                     setTextContent('TVQtax-percentage', TVQtaxPercentage);
+                    setTextContent('Order-service', OrderService);
+                    setTextContent('Order-tracking', OrderTracking);
+                    
+                    
                     setTextContent('TPStax-percentage', TPStaxPercentage);
                     setTextContent('sub-total', subtotal);
                     setTextContent('total-amount', completetotal);
