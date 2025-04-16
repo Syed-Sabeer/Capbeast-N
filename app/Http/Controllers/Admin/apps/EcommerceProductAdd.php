@@ -53,10 +53,12 @@ class EcommerceProductAdd extends Controller
         'left_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         'quantity.*' => 'nullable|integer',
         'discount.*' => 'nullable|numeric',
+        'size' => 'nullable|array',
       ]);
 
       $slug = $request->slug ? Str::slug($request->slug) : Str::slug($request->title);
-
+      $sizeArray = $request->input('size'); // already an array
+      $sizeJson = json_encode($sizeArray);  // convert to JSON format
       // Create the product
       $product = Product::create([
         'brand_id' => $request->brand_id,
@@ -66,7 +68,14 @@ class EcommerceProductAdd extends Controller
         'description' => $request->description,
         'cost_price' => $request->cost_price,
         'selling_price' => $request->selling_price,
-        'visibility' => $request->visibility,
+        'visibility' => $request->visibility ?? 1,
+        'size' => $sizeJson,
+        'size_unit' => $request->size_unit,
+        'weight_unit' => $request->weight_unit,
+        'height' => $request->height,
+        'width' => $request->width,
+        'length' => $request->length,
+        'weight' => $request->weight,
       ]);
 
       // Check if category_ids exists and is an array before looping

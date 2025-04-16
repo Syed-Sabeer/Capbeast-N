@@ -47,10 +47,11 @@
 
                             <div class="mb-3 col-6">
                                 <label for="select2Category" class="form-label">Select Categories</label>
-                                <select name="category_ids[]" id="select2Category" class="select2 form-select form-select-lg" multiple>
+                                <select name="category_ids[]" id="select2Category"
+                                    class="select2 form-select form-select-lg" multiple>
                                     @foreach ($categories as $category)
                                         <option value="{{ $category->id }}"
-                                            @if(isset($product) && $product->categories && $product->categories->contains($category->id)) selected @endif>
+                                            @if (isset($product) && $product->categories && $product->categories->contains($category->id)) selected @endif>
                                             {{ $category->title }}
                                         </option>
                                     @endforeach
@@ -128,7 +129,7 @@
                         <div class="mb-3">
                             <label class="form-label">Meta Title</label>
                             <input type="text" name="metatitle" class="form-control" placeholder="Meta Title"
-                                value="{{ $product->productSEO->metatitle ?? ''}}">
+                                value="{{ $product->productSEO->metatitle ?? '' }}">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Meta Description</label>
@@ -137,7 +138,78 @@
                         <div class="mb-3">
                             <label class="form-label">Meta Keywords</label>
                             <input type="text" name="metakeywords" class="form-control" placeholder="Meta Title"
-                                value="{{ $product->productSEO->metakeywords ?? ''}}">
+                                value="{{ $product->productSEO->metakeywords ?? '' }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="card mb-4">
+                    <div class="card-header">For Shipment</div>
+                    <div class="card-body row">
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Size Unit</label>
+                            <input type="text" name="size_unit" value="{{ $product->size_unit }}"
+                                class="form-control" placeholder="i.e. cm, mm">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Weight Unit</label>
+                            <input type="text" name="weight_unit" value="{{ $product->weight_unit }}"
+                                class="form-control" placeholder="i.e. lbs">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Height</label>
+                            <input type="number" name="height" value="{{ $product->height }}" class="form-control"
+                                min="0" step="0.1" placeholder="i.e. 10">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Width</label>
+                            <input type="number" name="width" value="{{ $product->width }}" class="form-control"
+                                min="0" step="0.1" placeholder="i.e. 10">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Length</label>
+                            <input type="number" name="length" value="{{ $product->length }}" class="form-control"
+                                min="0" step="0.1" placeholder="i.e. 10">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Weight</label>
+                            <input type="number" name="weight" value="{{ $product->weight }}" class="form-control"
+                                min="0" step="0.1" placeholder="i.e. 10.5">
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <div class="sizeItem">
+                                <div class="form-label d-flex justify-content-between">
+                                    <label>Size</label>
+                                    <div class="addSizeBtn">
+                                        <button type="button" class="btn btn-primary btn-sm" id="addSize">Add
+                                            More</button>
+                                    </div>
+                                </div>
+                                <div class="sizeInputContainer">
+                                    @php
+                                        $sizes = json_decode($product->size ?? '[]', true);
+                                    @endphp
+
+                                    @if (!empty($sizes))
+                                        @foreach ($sizes as $index => $sizeValue)
+                                            <div class="sizeInputItem mb-2 d-flex gap-2">
+                                                <input type="number" name="size[]" value="{{ $sizeValue }}"
+                                                    class="form-control" placeholder="i.e. 10">
+                                                <button type="button"
+                                                    class="btn btn-danger btn-sm removeSize {{ $index == 0 ? 'd-none' : '' }}">Remove</button>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="sizeInputItem mb-2 d-flex gap-2">
+                                            <input type="number" name="size[]" class="form-control"
+                                                placeholder="i.e. 10">
+                                            <button type="button"
+                                                class="btn btn-danger btn-sm removeSize d-none">Remove</button>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -189,11 +261,11 @@
 
                                     @foreach ($images as $key => $info)
                                         <div class="col-3 mt-4">
-                                          @if (!empty($color->{$info['flag']}) && $color->{$info['flag']} == '1')
-                                              <span class="badge bg-success small">Customizable</span>
-                                          @else
-                                              <span class="badge bg-danger small">Non Customizable</span>
-                                          @endif
+                                            @if (!empty($color->{$info['flag']}) && $color->{$info['flag']} == '1')
+                                                <span class="badge bg-success small">Customizable</span>
+                                            @else
+                                                <span class="badge bg-danger small">Non Customizable</span>
+                                            @endif
                                             <label class="form-label">{{ $info['label'] }} Image</label>
                                             @if ($color->$key)
                                                 <img src="{{ asset('storage/' . $color->$key) }}" width="100">
@@ -204,7 +276,8 @@
                                     @endforeach
 
                                     <div class="col-3 mt-4">
-                                        <a href="{{route($prefix . '.delete.product-color', $color->id)}}" type="button" class="delete_confirm btn btn-sm btn-danger mt-2"
+                                        <a href="{{ route($prefix . '.delete.product-color', $color->id) }}"
+                                            type="button" class="delete_confirm btn btn-sm btn-danger mt-2"
                                             data-id="{{ $color->id }}">Remove</a>
                                     </div>
                                 </div>
@@ -399,7 +472,36 @@
             $(document).on("click", ".remove-discount", function() {
                 $(this).closest(".discount-item").remove();
             });
+
+            $('.removeSize').removeClass('waves-effect waves-light');
+
+            function toggleRemoveButtons() {
+                const totalItems = $('.sizeInputItem').length;
+                if (totalItems <= 1) {
+                    $('.removeSize').addClass('d-none');
+                } else {
+                    $('.removeSize').removeClass('d-none');
+                }
+            }
+
+            $('#addSize').on('click', function() {
+                const inputHTML = `
+                <div class="sizeInputItem mb-2 d-flex gap-2">
+                    <input type="number" name="size[]" class="form-control" placeholder="i.e. 10">
+                    <button type="button" class="btn btn-danger btn-sm removeSize">Remove</button>
+                </div>`;
+                $('.sizeInputContainer').append(inputHTML);
+                toggleRemoveButtons();
+            });
+
+            $(document).on('click', '.removeSize', function() {
+                $(this).closest('.sizeInputItem').remove();
+                toggleRemoveButtons();
+            });
+
+            // Initial check on page load
+            toggleRemoveButtons();
         });
     </script>
-    <x-c-k-editor  />
+    <x-c-k-editor />
 @endsection

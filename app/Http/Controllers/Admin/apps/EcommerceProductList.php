@@ -112,11 +112,14 @@ class EcommerceProductList extends Controller
               'right_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
               'left_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
               'discount.*' => 'nullable|numeric',
+              'size' => 'nullable|array',
           ]);
 
           DB::beginTransaction();
 
           $product = Product::findOrFail($id);
+          $sizeArray = $request->input('size'); // already an array
+          $sizeJson = json_encode($sizeArray);  // convert to JSON format
 
           $product->update([
               'brand_id' => $request->brand_id,
@@ -126,6 +129,13 @@ class EcommerceProductList extends Controller
               'description' => $request->description,
               'cost_price' => $request->cost_price,
               'selling_price' => $request->selling_price,
+              'size' => $sizeJson,
+              'size_unit' => $request->size_unit,
+              'weight_unit' => $request->weight_unit,
+              'height' => $request->height,
+              'width' => $request->width,
+              'length' => $request->length,
+              'weight' => $request->weight,
           ]);
 
           ProductSEO::updateOrCreate(

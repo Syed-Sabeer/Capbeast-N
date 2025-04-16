@@ -63,7 +63,8 @@
 
                             <div class="mb-3 col-6">
                                 <label for="select2Category" class="form-label">Select Categories (Optional)</label>
-                                <select name="category_ids[]" id="select2Category" class="select2 form-select form-select-lg" multiple>
+                                <select name="category_ids[]" id="select2Category"
+                                    class="select2 form-select form-select-lg" multiple>
 
                                     @foreach ($categories as $category)
                                         <option value="{{ $category->id }}">{{ $category->title }}</option>
@@ -97,8 +98,7 @@
                         <div class="row">
                             <div class="mb-3 col-6">
                                 <label class="form-label">Slug</label>
-                                <input type="text" name="slug" class="form-control" placeholder="Product slug"
-                                    >
+                                <input type="text" name="slug" class="form-control" placeholder="Product slug">
                             </div>
                             <div class="mb-3 col-3">
                                 <label class="form-label">Cost Price</label>
@@ -142,6 +142,60 @@
                         <div class="mb-3">
                             <label class="form-label">Meta Keywords</label>
                             <input type="text" name="metakeywords" class="form-control" placeholder="Meta Title">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12">
+                <div class="card mb-4">
+                    <div class="card-header">For Shipment</div>
+                    <div class="card-body row">
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Size Unit</label>
+                            <input type="text" name="size_unit" class="form-control" placeholder="i.e. cm, mm">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Weight Unit</label>
+                            <input type="text" name="weight_unit" class="form-control" placeholder="i.e. lbs">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Height</label>
+                            <input type="number" name="height" class="form-control" min="0" step="0.1"
+                                placeholder="i.e. 10">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Width</label>
+                            <input type="number" name="width" class="form-control" min="0" step="0.1"
+                                placeholder="i.e. 10">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Length</label>
+                            <input type="number" name="length" class="form-control" min="0" step="0.1"
+                                placeholder="i.e. 10">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Weight</label>
+                            <input type="number" name="weight" class="form-control" min="0" step="0.1"
+                                placeholder="i.e. 10.5">
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <div class="sizeItem">
+                                <div class="form-label d-flex justify-content-between">
+                                    <label>Size</label>
+                                    <div class="addSizeBtn">
+                                        <button type="button" class="btn btn-primary btn-sm" id="addSize">Add
+                                            More</button>
+                                    </div>
+                                </div>
+                                <div class="sizeInputContainer">
+                                    <div class="sizeInputItem mb-2 d-flex gap-2">
+                                        <input type="number" name="size[]" class="form-control" placeholder="i.e. 10">
+                                        <button type="button"
+                                            class="btn btn-danger btn-sm removeSize d-none">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -196,17 +250,17 @@
                                 <input type="file" name="rightimage[]" class="form-control" multiple>
                                 <!-- Right -->
                                 <div class="form-check mt-2">
-                                  <input class="form-check-input" type="checkbox" name="is_right[0]" checked>
-                                  <label class="form-check-label">Allow Customization</label>
-                              </div>
+                                    <input class="form-check-input" type="checkbox" name="is_right[0]" checked>
+                                    <label class="form-check-label">Allow Customization</label>
+                                </div>
                             </div>
                             <div class="col-3 mt-4">
                                 <label class="form-label">Left Image</label>
                                 <input type="file" name="leftimage[]" class="form-control" multiple>
                                 <div class="form-check mt-2">
-                                  <input class="form-check-input" type="checkbox" name="is_left[0]" checked>
-                                  <label class="form-check-label">Allow Customization</label>
-                              </div>
+                                    <input class="form-check-input" type="checkbox" name="is_left[0]" checked>
+                                    <label class="form-check-label">Allow Customization</label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -239,6 +293,7 @@
         </div>
         <button type="submit" class="btn btn-success">Save Product</button>
     </form>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         // document.getElementById('add-color').addEventListener('click', () => {
         //     const colorSection = document.getElementById('color-section');
@@ -264,6 +319,36 @@
 
         //     colorSection.appendChild(wrapper);
         // });
+        $(document).ready(function() {
+            $('.removeSize').removeClass('waves-effect waves-light');
+
+            function toggleRemoveButtons() {
+                const totalItems = $('.sizeInputItem').length;
+                if (totalItems <= 1) {
+                    $('.removeSize').addClass('d-none');
+                } else {
+                    $('.removeSize').removeClass('d-none');
+                }
+            }
+
+            $('#addSize').on('click', function() {
+                const inputHTML = `
+                <div class="sizeInputItem mb-2 d-flex gap-2">
+                    <input type="number" name="size[]" class="form-control" placeholder="i.e. 10">
+                    <button type="button" class="btn btn-danger btn-sm removeSize">Remove</button>
+                </div>`;
+                $('.sizeInputContainer').append(inputHTML);
+                toggleRemoveButtons();
+            });
+
+            $(document).on('click', '.removeSize', function() {
+                $(this).closest('.sizeInputItem').remove();
+                toggleRemoveButtons();
+            });
+
+            // Initial check on page load
+            toggleRemoveButtons();
+        });
         let colorIndex = 1;
         document.getElementById('add-color').addEventListener('click', () => {
             const colorSection = document.getElementById('color-section');
@@ -357,9 +442,7 @@
 
             pricingSection.appendChild(wrapper);
         });
-
-
     </script>
-    <x-c-k-editor  />
+    <x-c-k-editor />
 
 @endsection
