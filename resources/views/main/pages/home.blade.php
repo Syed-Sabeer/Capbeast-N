@@ -344,9 +344,9 @@ var mixer = mixitup('.row', {
     <div class="row justify-content-center g-0">
       <div class="col-lg-7">
         <div class="text-center">
-          <h3 class="mb-3">Follow Us In Instagram</h3>
+          <h3 class="mb-3">Follow Us On Instagram</h3>
           <p class="text-muted fs-15">
-            The most common approach that peoples use to say follow me on
+            The most common approach that people use to say follow me on
             Instagram is by sending a direct message.
           </p>
         </div>
@@ -356,27 +356,41 @@ var mixer = mixitup('.row', {
 
   <div class="position-relative">
     <div class="row g-0 mt-5">
+      <!-- Replace first image with video -->
       <div class="col">
-        <div class="insta-img">
+        <div class="insta-img position-relative">
           <a href="#!" class="stretched-link">
-            <img
-              src="{{asset('assetsMain/images/ecommerce/instagram/img-1.jpg')}}"
+            <video
               class="img-fluid"
-              alt=""
-            />
+              autoplay
+              muted
+              loop
+              playsinline
+              style="width: 100%; height: auto; object-fit: cover;"
+            >
+              <source src="{{asset('assetsMain/videos/s1.mp4')}}" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
             <i class="ri-instagram-line"></i>
           </a>
         </div>
       </div>
 
+      <!-- Remaining images unchanged -->
       <div class="col">
-        <div class="insta-img">
+        <div class="insta-img position-relative">
           <a href="#!" class="stretched-link">
-            <img
-              src="{{asset('assetsMain/images/ecommerce/instagram/img-2.jpg')}}"
+            <video
               class="img-fluid"
-              alt=""
-            />
+              autoplay
+              muted
+              loop
+              playsinline
+              style="width: 100%; height: auto; object-fit: cover;"
+            >
+              <source src="{{asset('assetsMain/videos/s2.mp4')}}" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
             <i class="ri-instagram-line"></i>
           </a>
         </div>
@@ -435,13 +449,14 @@ var mixer = mixitup('.row', {
 
     <div class="insta-lable text-center">
       <a href="#!" class="btn btn-primary btn-hover">
-        <i class="ph-instagram-logo align-middle me-1"></i> Follow In
+        <i class="ph-instagram-logo align-middle me-1"></i> Follow On
         Instagram
       </a>
     </div>
   </div>
 </section>
 <!-- END INSTAGRAM -->
+
 
 
 
