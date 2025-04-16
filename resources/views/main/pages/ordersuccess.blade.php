@@ -54,6 +54,8 @@
                     </tr>
                 </table>
 
+                <p>Tracking Id: {{$order->OrderShippingRate->tracking_number}}</p>
+
                 <h6
                     style="font-family: 'Inter', sans-serif; font-size: 15px;font-weight: 600; text-decoration-line: underline;margin-bottom: 16px;margin-top: 20px;">
                     Her'e what you ordered:</h6>

@@ -256,8 +256,12 @@ class OrderController extends Controller
           }
           Cart::where('user_id', $userId)->delete();
 
-          // Create shipment after successful order creation
+          // Create shipment with Stallion Express
           try {
+            // Refresh the order to make sure relationships are loaded
+            $order = $order->fresh('items.product');
+
+            // Prepare shipment payload
             $shipmentPayload = [
               'to_address' => [
                 'name' => $shippingDetail->firstname . ' ' . $shippingDetail->lastname,
@@ -287,30 +291,14 @@ class OrderController extends Controller
               ],
               'is_return' => false,
               'weight_unit' => 'lbs',
-              'weight' => 0.6,
+              'weight' => 0.6, // Default weight, consider retrieving from products
               'length' => 9,
               'width' => 12,
               'height' => 1,
               'size_unit' => 'cm',
-              'items' => array_map(function ($item) {
-                return [
-                  'description' => $item->product->name,
-                  'sku' => $item->product->sku ?? 'SKU123',
-                  'quantity' => $item->quantity,
-                  'value' => $item->product_price,
-                  'currency' => 'USD',
-                  'country_of_origin' => 'CN',
-                  'hs_code' => '123456',
-                  'manufacturer_name' => 'Beast Group Inc.',
-                  'manufacturer_address1' => 'Unit 5 - 2045 Niagara Falls Blvd',
-                  'manufacturer_city' => 'Niagara Falls',
-                  'manufacturer_province_code' => 'NY',
-                  'manufacturer_postal_code' => '14304',
-                  'manufacturer_country_code' => 'US'
-                ];
-              }, $cartItems->all()),
+              'items' => [],
               'package_type' => 'Parcel',
-              'signature_confirmation' => true,
+              'signature_confirmation' => false,
               'postage_type' => $shippingService,
               'label_format' => 'pdf',
               'is_fba' => false,
@@ -324,20 +312,63 @@ class OrderController extends Controller
               ]
             ];
 
+            // Add items from order to shipment
+            $orderItems = $order->items; // Get items using the correct relationship name
+            if (!empty($orderItems)) {
+              foreach ($orderItems as $item) {
+                $shipmentPayload['items'][] = [
+                  'description' => $item->product->name ?? 'Product',
+                  'sku' => $item->product->sku ?? 'SKU' . $item->product_id,
+                  'quantity' => $item->quantity,
+                  'value' => $item->product_price,
+                  'currency' => 'CAD',
+                  'country_of_origin' => 'CN',
+                  'hs_code' => '123456',
+                  'manufacturer_name' => 'Beast Group Inc.',
+                  'manufacturer_address1' => 'Unit 5 - 2045 Niagara Falls Blvd',
+                  'manufacturer_city' => 'Niagara Falls',
+                  'manufacturer_province_code' => 'NY',
+                  'manufacturer_postal_code' => '14304',
+                  'manufacturer_country_code' => 'US'
+                ];
+              }
+            } else {
+              // Add a default item if no items are found
+              $shipmentPayload['items'][] = [
+                'description' => 'Two pair of socks',
+                'sku' => 'SKU123',
+                'quantity' => 2,
+                'value' => 10,
+                'currency' => 'CAD',
+                'country_of_origin' => 'CN',
+                'hs_code' => '123456',
+                'manufacturer_name' => 'Beast Group Inc.',
+                'manufacturer_address1' => 'Unit 5 - 2045 Niagara Falls Blvd',
+                'manufacturer_city' => 'Niagara Falls',
+                'manufacturer_province_code' => 'NY',
+                'manufacturer_postal_code' => '14304',
+                'manufacturer_country_code' => 'US'
+              ];
+            }
+
+            // Create shipment
             $shipmentResponse = $this->stallionService->createShipment($shipmentPayload, $order->id);
 
-            // Update order with tracking information
-            if (isset($shipmentResponse['tracking_code'])) {
-              $order->update([
-                'shipping_tracking_id' => $shipmentResponse['tracking_code'],
-                'shipping_carrier' => $shipmentResponse['rate']['postage_type'] ?? null,
-                'shipping_service' => $shipmentResponse['rate']['package_type'] ?? null,
-                'shipping_estimated_days' => $shipmentResponse['rate']['delivery_days'] ?? null,
-              ]);
-            }
+            // Format and log the response in the required format
+            $formattedResponse = $this->stallionService->formatShipmentResponse($shipmentResponse, $order->id);
+
+            // Log the successful shipment creation
+            Log::info('Shipment created successfully for order #' . $order->order_id, [
+              'response' => $formattedResponse,
+              'tracking_code' => $formattedResponse['tracking_code'] ?? null
+            ]);
           } catch (\Exception $e) {
-            Log::error('Shipment creation failed: ' . $e->getMessage());
-            // Don't throw the error, just log it and continue
+            Log::error('Failed to create shipment for order #' . $order->order_id, [
+              'error' => $e->getMessage(),
+              'trace' => $e->getTraceAsString()
+            ]);
+            // Note: We don't rollback the transaction here since the order is already committed
+            // Instead, we just log the error and continue with order success
           }
 
           DB::commit();

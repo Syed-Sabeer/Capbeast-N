@@ -113,7 +113,12 @@ class StallionExpressService
                 'payload' => json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
             ]);
 
-            $response = Http::withHeaders($this->headers())
+            // Generate idempotency key based on order ID
+            $idempotencyKey = 'order-' . $orderId . '-' . time();
+
+            $response = Http::withHeaders(array_merge($this->headers(), [
+                'Idempotency-Key' => $idempotencyKey
+            ]))
                 ->post($this->baseUrl . '/shipments', $payload);
 
             // Log the raw response first
@@ -216,5 +221,44 @@ class StallionExpressService
             ->get("{$this->baseUrl}/shipments/{$ship_code}/void");
 
         return $response->json();
+    }
+
+    /**
+     * Format and log the shipment response
+     *
+     * @param array $responseData The shipment response data
+     * @param int $orderId The order ID
+     * @return array The formatted response
+     */
+    public function formatShipmentResponse($responseData, $orderId)
+    {
+        // Format response similar to the example
+        $formattedResponse = [
+            'success' => $responseData['success'] ?? false,
+            'label' => $responseData['label'] ?? 'base64_label',
+            'tracking_code' => $responseData['tracking_code'] ?? '',
+            'message' => $responseData['message'] ?? 'Shipment processing complete',
+            'shipment' => null,
+            'rate' => [
+                'postage_type' => $responseData['rate']['postage_type'] ?? '',
+                'package_type' => $responseData['rate']['package_type'] ?? '',
+                'trackable' => true,
+                'base_rate' => $responseData['rate']['rate'] ?? 0,
+                'add_ons' => [null],
+                'rate' => $responseData['rate']['rate'] ?? 0,
+                'tax' => $responseData['rate']['tax'] ?? 0,
+                'total' => $responseData['rate']['total'] ?? 0,
+                'currency' => $responseData['rate']['currency'] ?? 'CAD',
+                'delivery_days' => $responseData['rate']['delivery_days'] ?? '2'
+            ]
+        ];
+
+        // Log the formatted response
+        Log::info('Formatted Stallion Express Shipment Response:', [
+            'order_id' => $orderId,
+            'response' => json_encode($formattedResponse, JSON_PRETTY_PRINT)
+        ]);
+
+        return $formattedResponse;
     }
 }
