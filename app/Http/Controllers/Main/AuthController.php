@@ -27,6 +27,62 @@ class AuthController extends Controller
     return view('main.pages.signup', compact('countries'));
   }
 
+  // public function register(Request $request)
+  // {
+  //   Log::info('Register request data', $request->all());
+
+  //   $validator = Validator::make($request->all(), [
+  //     'firstname' => 'required|string|max:255',
+  //     'lastname' => 'required|string|max:255',
+  //     'contact_number' => 'required|string|max:20',
+  //     'email' => 'required|email|unique:users,email',
+  //     'password' => 'required|min:8|confirmed',
+  //     'country' => 'required|string|max:255',
+  //   ]);
+
+  //   if ($validator->fails()) {
+  //     return redirect()->back()->withErrors($validator)->withInput();
+  //   }
+
+  //   $user = User::create([
+  //     'first_name' => $request->firstname,
+  //     'last_name' => $request->lastname,
+  //     'contact_number' => $request->contact_number,
+  //     'email' => $request->email,
+  //     'password' => Hash::make($request->password),
+  //     'status' => 1,
+  //     'country' => $request->country,
+  //   ]);
+
+  //   if ($user) {
+  //     auth()->login($user);
+
+  //     $cartCookie = $request->cookie('cart') ?? $_COOKIE['cart'] ?? null;
+  //     $cartFromLocalStorage = $cartCookie ? json_decode($cartCookie, true) : [];
+
+  //     if (empty($cartFromLocalStorage)) {
+  //       Log::warning('Cart is empty during registration');
+  //       return redirect()->route('cart')->with('error', 'Your cart is empty!');
+  //     }
+
+  //     foreach ($cartFromLocalStorage as $item) {
+  //       $cartItem = Cart::create([
+  //         'user_id' => $user->id,
+  //         'product_id' => $item['productId'],
+  //         'color_id' => $item['colorId'],
+  //         'quantity' => $item['quantity'],
+  //         'size' => $item['size'],
+
+  //       ]);
+  //     }
+
+  //     return redirect()->route('cart')->withCookie(cookie()->forget('cart'));
+
+  //     return redirect()->route('home')->with('success', 'Registration successful!');
+  //   }
+
+  //   return redirect()->route('home')->with('error', 'Registration failed!');
+  // }
   public function register(Request $request)
   {
     Log::info('Register request data', $request->all());
@@ -57,28 +113,59 @@ class AuthController extends Controller
     if ($user) {
       auth()->login($user);
 
-      $cartCookie = $request->cookie('cart') ?? $_COOKIE['cart'] ?? null;
-      $cartFromLocalStorage = $cartCookie ? json_decode($cartCookie, true) : [];
+      $cartCookie = request()->cookie('cart') ?? $_COOKIE['cart'] ?? null;
+      Log::info('Cart cookie received:', ['cartCookie' => $cartCookie]);
 
+      $cartFromLocalStorage = json_decode($cartCookie, true) ?? [];
       if (empty($cartFromLocalStorage)) {
-        Log::warning('Cart is empty during registration');
-        return redirect()->route('cart')->with('error', 'Your cart is empty!');
+        Log::error('Cart cookie is empty or not received properly!');
+        return redirect()->route('home'); // Or wherever appropriate
       }
 
-      foreach ($cartFromLocalStorage as $item) {
-        $cartItem = Cart::create([
-          'user_id' => $user->id,
-          'product_id' => $item['productId'],
-          'color_id' => $item['colorId'],
-          'quantity' => $item['quantity'],
-          'size' => $item['size'],
+      // Only take the first cart item
+      $item = $cartFromLocalStorage[0];
+      Log::info('Processing only the first cart item:', ['item' => $item]);
 
-        ]);
+      try {
+        $product = Product::findOrFail($item['productId']);
+        $productColor = ProductColor::findOrFail($item['colorId']);
+
+        $userCustomization = new UserCustomization();
+        $userCustomization->user_id = auth()->id();
+        $userCustomization->product_color_id = $productColor->id;
+        $userCustomization->product_id = $product->id;
+        $userCustomization->quantity = $item['quantity'];
+        $userCustomization->size = $item['size'];
+
+        // Copy image files
+        $imageFields = ['front_image', 'back_image', 'left_image', 'right_image'];
+        foreach ($imageFields as $imageField) {
+          if ($productColor->$imageField) {
+            $currentImagePath = public_path('storage/' . $productColor->$imageField);
+            if (file_exists($currentImagePath)) {
+              $newImageName = time() . '_' . basename($productColor->$imageField);
+              $customizationDirectory = public_path('storage/customizations');
+              if (!is_dir($customizationDirectory)) {
+                mkdir($customizationDirectory, 0755, true);
+              }
+              copy($currentImagePath, $customizationDirectory . '/' . $newImageName);
+              $userCustomization->$imageField = 'storage/customizations/' . $newImageName;
+            } else {
+              throw new \Exception("Image file does not exist at the specified path: " . $currentImagePath);
+            }
+          }
+        }
+
+        $userCustomization->ipaddress = $request->ip();
+        $userCustomization->save();
+
+        Log::info('First cart item saved, clearing cart cookie.');
+
+        return redirect()->route('customizer.index', $userCustomization->id)->withCookie(cookie()->forget('cart'));
+      } catch (\Exception $e) {
+        Log::error('Error processing first cart item', ['error' => $e->getMessage()]);
+        return back()->with('error', 'There was a problem processing your customization.');
       }
-
-      return redirect()->route('cart')->withCookie(cookie()->forget('cart'));
-
-      return redirect()->route('home')->with('success', 'Registration successful!');
     }
 
     return redirect()->route('home')->with('error', 'Registration failed!');
