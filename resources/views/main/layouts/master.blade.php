@@ -7,7 +7,7 @@
     <title>CapBeast</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="icon" type="image/x-icon" href="{{ asset('assetsCommon/images/favicon.png') }}" />
+    <link rel="icon" type="image/x-icon" href="{{ asset('assetsCommon/images/logo-dark.png') }}" />
     
     <link href="{{ asset('assetsMain/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assetsMain/css/icons.min.css') }}" rel="stylesheet" type="text/css" />

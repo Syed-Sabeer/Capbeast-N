@@ -346,8 +346,7 @@ var mixer = mixitup('.row', {
         <div class="text-center">
           <h3 class="mb-3">Follow Us On Instagram</h3>
           <p class="text-muted fs-15">
-            The most common approach that people use to say follow me on
-            Instagram is by sending a direct message.
+            The most common approach that people use to say follow me on Instagram is by sending a direct message.
           </p>
         </div>
       </div>
@@ -356,106 +355,40 @@ var mixer = mixitup('.row', {
 
   <div class="position-relative">
     <div class="row g-0 mt-5">
-      <!-- Replace first image with video -->
-      <div class="col">
-        <div class="insta-img position-relative">
-          <a href="#!" class="stretched-link">
-            <video
-              class="img-fluid"
-              autoplay
-              muted
-              loop
-              playsinline
-              style="width: 100%; height: auto; object-fit: cover;"
-            >
-              <source src="{{asset('assetsMain/videos/s1.mp4')}}" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-            <i class="ri-instagram-line"></i>
-          </a>
+      @for ($i = 1; $i <= 6; $i++)
+        <div class="col">
+          <div class="insta-img position-relative">
+            <a href="https://www.instagram.com/capbeast" class="stretched-link" target="_blank" rel="noopener noreferrer">
+              <video
+                class="img-fluid"
+                autoplay
+                muted
+                loop
+                playsinline
+                style="width: 100%; height: auto; object-fit: cover;"
+              >
+                <source src="{{ asset('assetsMain/videos/s' . $i . '.mp4') }}" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+              <i class="ri-instagram-line"></i>
+            </a>
+          </div>
         </div>
-      </div>
-
-      <!-- Remaining images unchanged -->
-      <div class="col">
-        <div class="insta-img position-relative">
-          <a href="#!" class="stretched-link">
-            <video
-              class="img-fluid"
-              autoplay
-              muted
-              loop
-              playsinline
-              style="width: 100%; height: auto; object-fit: cover;"
-            >
-              <source src="{{asset('assetsMain/videos/s2.mp4')}}" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-            <i class="ri-instagram-line"></i>
-          </a>
-        </div>
-      </div>
-
-      <div class="col d-none d-md-block">
-        <div class="insta-img">
-          <a href="#!" class="stretched-link">
-            <img
-              src="{{asset('assetsMain/images/ecommerce/instagram/img-3.jpg')}}"
-              class="img-fluid"
-              alt=""
-            />
-            <i class="ri-instagram-line"></i>
-          </a>
-        </div>
-      </div>
-
-      <div class="col d-none d-md-block">
-        <div class="insta-img">
-          <a href="#!" class="stretched-link">
-            <img
-              src="{{asset('assetsMain/images/ecommerce/instagram/img-4.jpg')}}"
-              class="img-fluid"
-              alt=""
-            />
-            <i class="ri-instagram-line"></i>
-          </a>
-        </div>
-      </div>
-      <div class="col d-none d-lg-block">
-        <div class="insta-img">
-          <a href="#!" class="stretched-link">
-            <img
-              src="{{asset('assetsMain/images/ecommerce/instagram/img-5.jpg')}}"
-              class="img-fluid"
-              alt=""
-            />
-            <i class="ri-instagram-line"></i>
-          </a>
-        </div>
-      </div>
-      <div class="col d-none d-lg-block">
-        <div class="insta-img">
-          <a href="#!" class="stretched-link">
-            <img
-              src="{{asset('assetsMain/images/ecommerce/instagram/img-6.jpg')}}"
-              class="img-fluid"
-              alt=""
-            />
-            <i class="ri-instagram-line"></i>
-          </a>
-        </div>
-      </div>
+      @endfor
     </div>
 
-    <div class="insta-lable text-center">
-      <a href="#!" class="btn btn-primary btn-hover">
-        <i class="ph-instagram-logo align-middle me-1"></i> Follow On
-        Instagram
+    <div class="insta-lable text-center mt-4">
+      <a href="https://www.instagram.com/capbeast" 
+         class="btn btn-primary btn-hover" 
+         target="_blank" 
+         rel="noopener noreferrer">
+        <i class="ph-instagram-logo align-middle me-1"></i> Follow On Instagram
       </a>
     </div>
   </div>
 </section>
 <!-- END INSTAGRAM -->
+
 
 
 
