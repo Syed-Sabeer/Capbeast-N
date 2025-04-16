@@ -193,15 +193,19 @@
 
                         <h6 class="fs-14 fw-medium text-muted mt-3">Size :</h6>
                         <div class="d-flex align-items-center flex-wrap gap-2">
-                            <div class="size-option border px-3 py-2" data-size="323">
-                                324
-                            </div>
-                            <div class="size-option border px-3 py-2" data-size="343">
-                                324
-                            </div>
-                            <div class="size-option border px-3 py-2" data-size="454">
-                                324
-                            </div>
+                            @php
+                                $sizes = json_decode($product->size ?? '[]', true);
+                            @endphp
+ 
+                            @if (!empty($sizes))
+                                @foreach ($sizes as $index => $sizeValue)
+                                    <div class="size-option border px-3 py-2" data-size="{{ $sizeValue }}">
+                                        {{ $sizeValue }}
+                                    </div>
+                                @endforeach
+                            @else
+                                No Size Available
+                            @endif
                         </div>
 
                         <script>
