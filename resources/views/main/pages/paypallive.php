@@ -48,3 +48,17 @@ composer require paypal/rest-api-sdk-php -->
         }
         return $ret;
     }
+
+
+
+
+
+
+    MAIL_MAILER=smtp
+MAIL_HOST=capbeast.com
+MAIL_PORT=465
+MAIL_USERNAME=info@capbeast.com
+MAIL_PASSWORD=P@kistan321
+MAIL_ENCRYPTION=ssl
+MAIL_FROM_ADDRESS=info@capbeast.com
+MAIL_FROM_NAME="CapBeast"

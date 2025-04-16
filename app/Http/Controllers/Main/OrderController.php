@@ -430,8 +430,16 @@ class OrderController extends Controller
           session()->forget('checkout_details');
 
           // Send Emails
-          Mail::to(auth()->user()->email)->send(new OrderPlacedMail($order, false));
-          Mail::to('info@capbeast.com')->send(new OrderPlacedMail($order, true));
+          try {
+            Mail::to(auth()->user()->email)->send(new OrderPlacedMail($order, false));
+            Mail::to('info@capbeast.com')->send(new OrderPlacedMail($order, true));
+          } catch (\Exception $e) {
+            // Log email sending error but continue to success page
+            Log::error('Email sending failed: ' . $e->getMessage(), [
+              'order_id' => $order->id,
+              'user_email' => auth()->user()->email
+            ]);
+          }
 
           return redirect()->route('main.pages.success', ['orderId' => $order->id]);
         } catch (\Exception $e) {
