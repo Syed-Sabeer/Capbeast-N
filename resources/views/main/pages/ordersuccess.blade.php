@@ -55,6 +55,7 @@
                 </table>
 
                 <p>Tracking Number: {{ $order->shippingRate->tracking_number ?? 'N/A' }}</p>
+                <p>Delivery Days: {{ $order->shippingRate->delivery_days ?? 'N/A' }}</p>
 
                 @if (!empty($order->shipping_error))
                     <div class="alert alert-warning"
@@ -189,7 +190,7 @@
 
                     <tr>
                         <td colspan="3" style="padding: 12px 8px; font-size: 15px;">
-                            Shipping
+                            Shipping ({{ $order->shippingRate->service_name ?? 'N/A' }})</p>
                         </td>
                         <td style="padding: 12px 8px; font-size: 15px;text-align: end; ">
                             <h6 style="font-size: 15px; margin: 0px;font-weight: 600; font-family: 'Inter', sans-serif;">
