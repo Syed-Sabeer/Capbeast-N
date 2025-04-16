@@ -561,32 +561,86 @@
             };
         }
 
-        // Initialize price displays for all items
-        $('.item-price, .item-total-price').each(function() {
-            const itemId = $(this).data('item-id');
-            const quantity = parseInt($(this).closest('tr').find('td:eq(1)').text());
-            const result = calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize price displays for all items
+            $('.item-price, .item-total-price').each(function() {
+                const itemId = $(this).data('item-id');
+                const quantity = parseInt($(this).closest('tr').find('td:eq(1)').text());
+                const result = calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts);
 
-            const $originalPrice = $(`.original-price[data-item-id="${itemId}"]`);
-            const $discountedPrice = $(`.discounted-price[data-item-id="${itemId}"]`);
-            const $discountInfo = $(`#discount-info-${itemId}`);
-            const $itemPrice = $(`.item-price[data-item-id="${itemId}"]`);
-            const $itemTotalPrice = $(`.item-total-price[data-item-id="${itemId}"]`);
+                const discountedItemPrice = result.discountedPrice * quantity;
+                const totalCustomizationPrice = (customizationPrice * quantity) + (pompomPrice *
+                    quantity) + (printingPrice * quantity) + (deliveryPrice * quantity);
+                const totalItemPrice = discountedItemPrice + totalCustomizationPrice;
+
+                // Update all price displays
+                $(`.item-price[data-item-id="${itemId}"]`).text(
+                    `$${result.discountedPrice.toFixed(2)}`);
+                $(`.cust-price[data-item-id="${itemId}"]`).text(
+                    `$${totalCustomizationPrice.toFixed(2)}`);
+                $(`.item-total-price[data-item-id="${itemId}"]`).text(
+                    `$${totalItemPrice.toFixed(2)}`);
+
+                if (result.discount > 0) {
+                    $(`#discount-info-${itemId}`).text(`You're saving ${result.discount}%!`);
+                    $(`.original-price[data-item-id="${itemId}"]`).show().text(
+                        `$${sellingPrice.toFixed(2)}`);
+                    $(`.discounted-price[data-item-id="${itemId}"]`).show().text(
+                        `$${result.discountedPrice.toFixed(2)}`);
+                } else {
+                    $(`#discount-info-${itemId}`).text('');
+                    $(`.original-price[data-item-id="${itemId}"]`).hide();
+                    $(`.discounted-price[data-item-id="${itemId}"]`).text(
+                        `$${sellingPrice.toFixed(2)}`);
+                }
+            });
+
+            // Calculate initial subtotal
+            let initialSubtotal = 0;
+            $('.item-total-price').each(function() {
+                initialSubtotal += parseFloat($(this).text().replace(/[^0-9.]/g, ''));
+            });
+            $('.cart-subtotal').text(initialSubtotal.toFixed(2));
+
+            // Initial update of tax and total
+            updateTaxAndTotal(initialSubtotal, 0, 0);
+        });
+
+        function updatePriceDisplay(itemId, quantity) {
+            const result = calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts);
+            const discountedItemPrice = result.discountedPrice * quantity;
+            const totalCustomizationPrice = (customizationPrice * quantity) + (pompomPrice * quantity) + (
+                printingPrice * quantity) + (deliveryPrice * quantity);
+            const totalItemPrice = discountedItemPrice + totalCustomizationPrice;
+
+            // Update all price displays
+            $(`.item-price[data-item-id="${itemId}"]`).text(`$${result.discountedPrice.toFixed(2)}`);
+            $(`.cust-price[data-item-id="${itemId}"]`).text(`$${totalCustomizationPrice.toFixed(2)}`);
+            $(`.item-total-price[data-item-id="${itemId}"]`).text(`$${totalItemPrice.toFixed(2)}`);
 
             if (result.discount > 0) {
-                $discountInfo.text(`You're saving ${result.discount}%!`);
-                $originalPrice.show().text(`$${sellingPrice.toFixed(2)}`);
-                $discountedPrice.show().text(`$${result.discountedPrice.toFixed(2)}`);
-                $itemPrice.text(`$${result.discountedPrice.toFixed(2)}`);
-                $itemTotalPrice.text(`$${(result.discountedPrice * quantity).toFixed(2)}`);
+                $(`#discount-info-${itemId}`).text(`You're saving ${result.discount}%!`);
+                $(`.original-price[data-item-id="${itemId}"]`).show().text(`$${sellingPrice.toFixed(2)}`);
+                $(`.discounted-price[data-item-id="${itemId}"]`).show().text(
+                    `$${result.discountedPrice.toFixed(2)}`);
             } else {
-                $discountInfo.text('');
-                $originalPrice.hide();
-                $discountedPrice.text(`$${sellingPrice.toFixed(2)}`);
-                $itemPrice.text(`$${sellingPrice.toFixed(2)}`);
-                $itemTotalPrice.text(`$${(sellingPrice * quantity).toFixed(2)}`);
+                $(`#discount-info-${itemId}`).text('');
+                $(`.original-price[data-item-id="${itemId}"]`).hide();
+                $(`.discounted-price[data-item-id="${itemId}"]`).text(`$${sellingPrice.toFixed(2)}`);
             }
-        });
+
+            // Update order summary
+            updateOrderSummary();
+        }
+
+        function updateOrderSummary() {
+            let subtotal = 0;
+            $('.item-total-price').each(function() {
+                subtotal += parseFloat($(this).text().replace(/[^0-9.]/g, ''));
+            });
+            $('.cart-subtotal').text(subtotal.toFixed(2));
+            updateTaxAndTotal(subtotal, appliedDiscount, parseFloat($('#shipping-amount').text()) || 0);
+        }
 
         function calculateShippingLive() {
             const country = $('#country').val();
@@ -1356,37 +1410,25 @@
         }
 
         function updatePriceDisplay(itemId, quantity) {
-            const $discountInfo = $(`#discount-info-${itemId}`);
-            const $nextTierInfo = $(`#next-tier-info-${itemId}`);
-            const $itemTotalPrice = $(`.item-total-price[data-item-id="${itemId}"]`);
-            const $originalPrice = $(`.original-price[data-item-id="${itemId}"]`);
-            const $discountedPrice = $(`.discounted-price[data-item-id="${itemId}"]`);
-
             const result = calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts);
             const discountedItemPrice = result.discountedPrice * quantity;
-            const totalItemPrice = discountedItemPrice +
-                (customizationPrice * quantity) +
-                (pompomPrice * quantity) +
-                (printingPrice * quantity) +
-                (deliveryPrice * quantity);
+            const totalCustomizationPrice = (customizationPrice * quantity) + (pompomPrice * quantity) + (printingPrice *
+                quantity) + (deliveryPrice * quantity);
+            const totalItemPrice = discountedItemPrice + totalCustomizationPrice;
+
+            // Update all price displays
+            $(`.item-price[data-item-id="${itemId}"]`).text(`$${result.discountedPrice.toFixed(2)}`);
+            $(`.cust-price[data-item-id="${itemId}"]`).text(`$${totalCustomizationPrice.toFixed(2)}`);
+            $(`.item-total-price[data-item-id="${itemId}"]`).text(`$${totalItemPrice.toFixed(2)}`);
 
             if (result.discount > 0) {
-                $discountInfo.text(`You're saving ${result.discount}%!`);
-                $originalPrice.show().text(`$${sellingPrice.toFixed(2)}`);
-                $discountedPrice.show().text(`$${result.discountedPrice.toFixed(2)}`);
+                $(`#discount-info-${itemId}`).text(`You're saving ${result.discount}%!`);
+                $(`.original-price[data-item-id="${itemId}"]`).show().text(`$${sellingPrice.toFixed(2)}`);
+                $(`.discounted-price[data-item-id="${itemId}"]`).show().text(`$${result.discountedPrice.toFixed(2)}`);
             } else {
-                $discountInfo.text('');
-                $originalPrice.hide();
-                $discountedPrice.text(`$${sellingPrice.toFixed(2)}`);
-            }
-
-            $itemTotalPrice.text(`$${totalItemPrice.toFixed(2)}`);
-
-            if (result.nextTier) {
-                const itemsNeeded = result.nextTier.quantity - quantity;
-                $nextTierInfo.text(`Add ${itemsNeeded} more to get ${result.nextTier.discount}% off!`);
-            } else {
-                $nextTierInfo.text('');
+                $(`#discount-info-${itemId}`).text('');
+                $(`.original-price[data-item-id="${itemId}"]`).hide();
+                $(`.discounted-price[data-item-id="${itemId}"]`).text(`$${sellingPrice.toFixed(2)}`);
             }
 
             // Update order summary
@@ -1398,7 +1440,6 @@
             $('.item-total-price').each(function() {
                 subtotal += parseFloat($(this).text().replace(/[^0-9.]/g, ''));
             });
-
             $('.cart-subtotal').text(subtotal.toFixed(2));
             updateTaxAndTotal(subtotal, appliedDiscount, parseFloat($('#shipping-amount').text()) || 0);
         }

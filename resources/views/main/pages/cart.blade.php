@@ -273,133 +273,133 @@
             }
         });
     </script>
+@if (isset($cart) && $cart !== null)
+<script>
+    $(document).ready(function() {
+        let isUpdating = false;
 
-    <script>
-        $(document).ready(function() {
-            let isUpdating = false;
+        const volumeDiscounts = @json($cart->product->productVolumeDiscount->sortBy('quantity')->values());
+        const sellingPrice = {{ $cart->product->selling_price }};
+        const customizationPrice = {{ $customizationPrice }};
 
-            const volumeDiscounts = @json($cart->product->productVolumeDiscount->sortBy('quantity')->values());
-            const sellingPrice = {{ $cart->product->selling_price }};
-            const customizationPrice = {{ $customizationPrice }};
+        function calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts) {
+            let discount = 0;
+            let nextTier = null;
 
-            function calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts) {
-                let discount = 0;
-                let nextTier = null;
-
-                for (let i = volumeDiscounts.length - 1; i >= 0; i--) {
-                    if (quantity >= volumeDiscounts[i].quantity) {
-                        discount = volumeDiscounts[i].discount;
-                        break;
-                    }
-                    nextTier = volumeDiscounts[i];
+            for (let i = volumeDiscounts.length - 1; i >= 0; i--) {
+                if (quantity >= volumeDiscounts[i].quantity) {
+                    discount = volumeDiscounts[i].discount;
+                    break;
                 }
-
-                const discountedPrice = sellingPrice - (sellingPrice * (discount / 100));
-
-                return {
-                    discountedPrice,
-                    discount,
-                    nextTier
-                };
+                nextTier = volumeDiscounts[i];
             }
 
-            function updatePriceDisplay(cartId, quantity) {
-                const $discountInfo = $(`#discount-info-${cartId}`);
-                const $nextTierInfo = $(`#next-tier-info-${cartId}`);
-                const $itemTotalPrice = $(`.item-total-price[data-cart-id="${cartId}"]`);
-                const $originalPrice = $(`.original-price[data-cart-id="${cartId}"]`);
-                const $discountedPrice = $(`.discounted-price[data-cart-id="${cartId}"]`);
+            const discountedPrice = sellingPrice - (sellingPrice * (discount / 100));
 
-                const result = calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts);
-                const discountedItemPrice = result.discountedPrice * quantity;
-                const totalItemPrice = discountedItemPrice + (customizationPrice * quantity);
+            return {
+                discountedPrice,
+                discount,
+                nextTier
+            };
+        }
 
-                if (result.discount > 0) {
-                    $discountInfo.text(`You're saving ${result.discount}%!`);
-                    $originalPrice.show();
-                    $discountedPrice.text(`$${result.discountedPrice.toFixed(2)}`);
-                } else {
-                    $discountInfo.text('');
-                    $originalPrice.hide();
-                    $discountedPrice.text(`$${sellingPrice.toFixed(2)}`);
-                }
+        function updatePriceDisplay(cartId, quantity) {
+            const $discountInfo = $(`#discount-info-${cartId}`);
+            const $nextTierInfo = $(`#next-tier-info-${cartId}`);
+            const $itemTotalPrice = $(`.item-total-price[data-cart-id="${cartId}"]`);
+            const $originalPrice = $(`.original-price[data-cart-id="${cartId}"]`);
+            const $discountedPrice = $(`.discounted-price[data-cart-id="${cartId}"]`);
 
-                $itemTotalPrice.text(totalItemPrice.toFixed(2));
+            const result = calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts);
+            const discountedItemPrice = result.discountedPrice * quantity;
+            const totalItemPrice = discountedItemPrice + (customizationPrice * quantity);
 
-                if (result.nextTier) {
-                    const itemsNeeded = result.nextTier.quantity - quantity;
-                    $nextTierInfo.text(`Add ${itemsNeeded} more to get ${result.nextTier.discount}% off!`);
-                } else {
-                    $nextTierInfo.text('');
-                }
-
-                // Update order summary
-                updateOrderSummary();
+            if (result.discount > 0) {
+                $discountInfo.text(`You're saving ${result.discount}%!`);
+                $originalPrice.show();
+                $discountedPrice.text(`$${result.discountedPrice.toFixed(2)}`);
+            } else {
+                $discountInfo.text('');
+                $originalPrice.hide();
+                $discountedPrice.text(`$${sellingPrice.toFixed(2)}`);
             }
 
-            function updateOrderSummary() {
-                let newSubtotal = 0;
+            $itemTotalPrice.text(totalItemPrice.toFixed(2));
 
-                $('.item-total-price').each(function() {
-                    newSubtotal += parseFloat($(this).text());
-                });
-
-                $('#subtotal-amount').text(`$${newSubtotal.toFixed(2)}`);
-                $('#final-total-amount').text(`$${newSubtotal.toFixed(2)}`);
+            if (result.nextTier) {
+                const itemsNeeded = result.nextTier.quantity - quantity;
+                $nextTierInfo.text(`Add ${itemsNeeded} more to get ${result.nextTier.discount}% off!`);
+            } else {
+                $nextTierInfo.text('');
             }
 
-            $(".plus, .minus").click(function() {
-                if (isUpdating) return;
+            updateOrderSummary();
+        }
 
-                isUpdating = true;
-                let cartId = $(this).data("cart-id");
-                let $input = $(`.product-quantity[data-cart-id="${cartId}"]`);
-                let currentQuantity = parseInt($input.val());
-                let isIncrease = $(this).hasClass("plus");
+        function updateOrderSummary() {
+            let newSubtotal = 0;
 
-                if (isIncrease) {
-                    currentQuantity++;
-                } else {
-                    if (currentQuantity > 1) currentQuantity--;
-                }
-
-                $input.val(currentQuantity);
-                updatePriceDisplay(cartId, currentQuantity);
-
-                updateCartQuantity(cartId, currentQuantity, function() {
-                    isUpdating = false;
-                });
+            $('.item-total-price').each(function() {
+                newSubtotal += parseFloat($(this).text());
             });
 
-            // Initialize price displays for all items
-            $('.product-quantity').each(function() {
-                const cartId = $(this).data('cart-id');
-                const quantity = parseInt($(this).val());
-                updatePriceDisplay(cartId, quantity);
-            });
+            $('#subtotal-amount').text(`$${newSubtotal.toFixed(2)}`);
+            $('#final-total-amount').text(`$${newSubtotal.toFixed(2)}`);
+        }
 
-            function updateCartQuantity(cartId, newQuantity, callback) {
-                $.ajax({
-                    url: "{{ route('cart.update') }}",
-                    type: "POST",
-                    data: {
-                        _token: "{{ csrf_token() }}",
-                        cart_id: cartId,
-                        quantity: newQuantity,
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            if (callback) callback();
-                        } else {
-                            alert("Failed to update quantity");
-                        }
-                    },
-                    error: function() {
-                        alert("Failed to update cart. Try again.");
-                        if (callback) callback();
-                    }
-                });
+        $(".plus, .minus").click(function() {
+            if (isUpdating) return;
+
+            isUpdating = true;
+            let cartId = $(this).data("cart-id");
+            let $input = $(`.product-quantity[data-cart-id="${cartId}"]`);
+            let currentQuantity = parseInt($input.val());
+            let isIncrease = $(this).hasClass("plus");
+
+            if (isIncrease) {
+                currentQuantity++;
+            } else {
+                if (currentQuantity > 1) currentQuantity--;
             }
+
+            $input.val(currentQuantity);
+            updatePriceDisplay(cartId, currentQuantity);
+
+            updateCartQuantity(cartId, currentQuantity, function() {
+                isUpdating = false;
+            });
         });
-    </script>
+
+        $('.product-quantity').each(function() {
+            const cartId = $(this).data('cart-id');
+            const quantity = parseInt($(this).val());
+            updatePriceDisplay(cartId, quantity);
+        });
+
+        function updateCartQuantity(cartId, newQuantity, callback) {
+            $.ajax({
+                url: "{{ route('cart.update') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    cart_id: cartId,
+                    quantity: newQuantity,
+                },
+                success: function(response) {
+                    if (response.success) {
+                        if (callback) callback();
+                    } else {
+                        alert("Failed to update quantity");
+                    }
+                },
+                error: function() {
+                    alert("Failed to update cart. Try again.");
+                    if (callback) callback();
+                }
+            });
+        }
+    });
+</script>
+@endif
+
 @endsection

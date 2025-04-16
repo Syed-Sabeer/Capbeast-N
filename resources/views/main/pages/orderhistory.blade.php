@@ -33,8 +33,8 @@
                                             data-bs-subtotal="{{ number_format($order->subtotal_price, 2) }}"
                                             data-bs-discount="{{ number_format($order->discount_price, 2) }}"
                                             data-bs-shipping="{{ number_format($order->shipping_price, 2) }}"
-                                            data-bs-TVQtax="{{ number_format($order->TaxDetails->tvq_tax_price, 2) }}"
-                                            data-bs-TPStax="{{ number_format($order->TaxDetails->tps_tax_price, 2) }}"
+                                            data-bs-TVQtax="{{ number_format($order->TaxDetails?->tvq_tax_price ?? 0, 2) }}"
+                                            data-bs-TPStax="{{ number_format($order->TaxDetails?->tps_tax_price ?? 0, 2) }}"
                                             data-bs-total="{{ number_format($order->total_price, 2) }}"
                                             data-bs-TPStax-percentage="{{ $order->TaxDetails->tps_tax_percentage ?? 'N/A' }}"
                                             data-bs-TVQtax-percentage="{{ $order->TaxDetails->tvq_tax_percentage ?? 'N/A' }}"
@@ -111,7 +111,8 @@
     </div>
 
     <!-- Modal for Invoice -->
-    <div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+    <div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true"
+        role="dialog">
         <div class="modal-dialog modal-custom-size">
             <div class="modal-content">
                 <div class="modal-header">
@@ -227,20 +228,23 @@
                                                     <td class="text-end"><span id="sub-total"></span> $</td>
                                                 </tr>
 
-                                                <tr>
-                                                    <td>TVQ Tax <span id="TVQtax-percentage"></span>% (<span
-                                                            id="TVQtax-no"></span>) <small class="text-muted"></small>
-                                                    </td>
-                                                    <td class="text-end"><span id="TVQtax-amount"></span> $</td>
-                                                </tr>
+                                                @if ($order->TaxDetails && ($order->TaxDetails->tvq_tax_price > 0 || $order->TaxDetails->tvq_tax_percentage > 0))
+                                                    <tr>
+                                                        <td>TVQ Tax <span id="TVQtax-percentage"></span>% (<span
+                                                                id="TVQtax-no"></span>) <small class="text-muted"></small>
+                                                        </td>
+                                                        <td class="text-end"><span id="TVQtax-amount"></span> $</td>
+                                                    </tr>
+                                                @endif
 
-                                                <tr>
-                                                    <td>TPS Tax <span id="TPStax-percentage"></span>% (<span
-                                                            id="TPStax-no"></span>)<small class="text-muted"></small></td>
-                                                    <td class="text-end"><span id="TPStax-amount"></span> $</td>
-                                                </tr>
-
-
+                                                @if ($order->TaxDetails && ($order->TaxDetails->tps_tax_price > 0 || $order->TaxDetails->tps_tax_percentage > 0))
+                                                    <tr>
+                                                        <td>TPS Tax <span id="TPStax-percentage"></span>% (<span
+                                                                id="TPStax-no"></span>)<small class="text-muted"></small>
+                                                        </td>
+                                                        <td class="text-end"><span id="TPStax-amount"></span> $</td>
+                                                    </tr>
+                                                @endif
 
                                                 <tr>
                                                     <td>Discount <small class="text-muted"></small></td>
@@ -323,74 +327,81 @@
             });
         });
 
+        document.addEventListener('DOMContentLoaded', function() {
+            const invoiceModal = document.getElementById('invoiceModal');
+            if (invoiceModal) {
+                invoiceModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    const row = button.closest('tr');
+                    if (!row) return;
 
+                    // Get data attributes from the table row
+                    const orderId = row.getAttribute('data-bs-order-id');
+                    const date = row.getAttribute('data-bs-date');
+                    const subtotal = row.getAttribute('data-bs-subtotal');
+                    const discount = row.getAttribute('data-bs-discount');
+                    const shipping = row.getAttribute('data-bs-shipping');
+                    const TVQtax = row.getAttribute('data-bs-TVQtax');
+                    const TPStax = row.getAttribute('data-bs-TPStax');
+                    const TPStaxNo = row.getAttribute('data-bs-TPStax-no');
+                    const TVQtaxNo = row.getAttribute('data-bs-TVQtax-no');
+                    const TVQtaxPercentage = row.getAttribute('data-bs-TVQtax-percentage');
+                    const TPStaxPercentage = row.getAttribute('data-bs-TPStax-percentage');
+                    const completetotal = row.getAttribute('data-bs-total');
+                    const billingName = row.getAttribute('data-bs-billing-name');
+                    const billingAddress = row.getAttribute('data-bs-billing-address');
+                    const shippingName = row.getAttribute('data-bs-shipping-name');
+                    const shippingAddress = row.getAttribute('data-bs-shipping-address');
+                    const products = JSON.parse(row.getAttribute('data-bs-products'));
 
+                    // Helper function to safely set text content
+                    function setTextContent(elementId, content) {
+                        const element = document.getElementById(elementId);
+                        if (element) {
+                            element.textContent = content;
+                        }
+                    }
 
-        // Populating the "Invoice" modal with dynamic invoice details
-        const invoiceModal = document.getElementById('invoiceModal');
-        invoiceModal.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
-            const row = button.closest('tr');
+                    // Populate the invoice modal
+                    setTextContent('invoice-no', orderId);
+                    setTextContent('invoice-date', date);
+                    setTextContent('discount-amount', discount);
+                    setTextContent('shipping-amount', shipping);
+                    setTextContent('TVQtax-amount', TVQtax);
+                    setTextContent('TPStax-amount', TPStax);
+                    setTextContent('TPStax-no', TPStaxNo);
+                    setTextContent('TVQtax-no', TVQtaxNo);
+                    setTextContent('TVQtax-percentage', TVQtaxPercentage);
+                    setTextContent('TPStax-percentage', TPStaxPercentage);
+                    setTextContent('sub-total', subtotal);
+                    setTextContent('total-amount', completetotal);
+                    setTextContent('total-amount-summary', completetotal);
+                    setTextContent('billing-name', billingName);
+                    setTextContent('billing-address-line-1', billingAddress);
+                    setTextContent('shipping-name', shippingName);
+                    setTextContent('shipping-address-line-1', shippingAddress);
 
-            // Get data attributes from the table row
-            const orderId = row.getAttribute('data-bs-order-id');
-            const date = row.getAttribute('data-bs-date');
-            const subtotal = row.getAttribute('data-bs-subtotal');
-            const discount = row.getAttribute('data-bs-discount');
-            const shipping = row.getAttribute('data-bs-shipping');
-            const TVQtax = row.getAttribute('data-bs-TVQtax');
-            const TPStax = row.getAttribute('data-bs-TPStax');
-            const TPStaxNo = row.getAttribute('data-bs-TPStax-no');
-            const TVQtaxNo = row.getAttribute('data-bs-TVQtax-no');
-            const TVQtaxPercentage = row.getAttribute('data-bs-TVQtax-percentage');
-            const TPStaxPercentage = row.getAttribute('data-bs-TPStax-percentage');
-            const completetotal = row.getAttribute('data-bs-total');
-            const billingName = row.getAttribute('data-bs-billing-name');
-            const billingAddress = row.getAttribute('data-bs-billing-address');
-            const shippingName = row.getAttribute('data-bs-shipping-name');
-            const shippingAddress = row.getAttribute('data-bs-shipping-address');
-            const products = JSON.parse(row.getAttribute('data-bs-products'));
+                    const invoiceProductsList = document.getElementById('invoice-products-list');
+                    if (invoiceProductsList) {
+                        invoiceProductsList.innerHTML = '';
 
-            // Populate the invoice modal
-            document.getElementById('invoice-no').textContent = orderId;
-            document.getElementById('invoice-date').textContent = date;
-
-            document.getElementById('discount-amount').textContent = discount;
-            document.getElementById('shipping-amount').textContent = shipping;
-            document.getElementById('TVQtax-amount').textContent = TVQtax;
-            document.getElementById('TPStax-amount').textContent = TPStax;
-            document.getElementById('TPStax-no').textContent = TPStaxNo;
-            document.getElementById('TVQtax-no').textContent = TVQtaxNo;
-            document.getElementById('TVQtax-percentage').textContent = TVQtaxPercentage;
-            document.getElementById('TPStax-percentage').textContent = TPStaxPercentage;
-            document.getElementById('sub-total').textContent = subtotal;
-            document.getElementById('total-amount').textContent = completetotal;
-            document.getElementById('total-amount-summary').textContent = completetotal;
-            document.getElementById('billing-name').textContent = billingName;
-            document.getElementById('billing-address-line-1').textContent = billingAddress;
-            document.getElementById('shipping-name').textContent = shippingName;
-            document.getElementById('shipping-address-line-1').textContent = shippingAddress;
-
-            const invoiceProductsList = document.getElementById('invoice-products-list');
-            invoiceProductsList.innerHTML = '';
-
-            // Populate products in the invoice modal
-            products.forEach((item, index) => {
-                console.log('Product Data:', item);
-                const productRow = `
-        <tr>
-            <td>${index + 1}</td>
-            <td>${item.product.title}</td>
-            <td>${item.quantity}</td>
-            <td>$${item.product_price}</td>
-            <td>$${item.user_customization.price}</td>
-
-            <td>$${(((parseFloat(item.product_price) || 0) + (parseFloat(item.printing_price) || 0) + (parseFloat(item.pompom_price) || 0)) * (parseInt(item.quantity) || 0) + (parseFloat(item.delivery_price) || 0)).toFixed(2)}</td>
-        </tr>
-    `;
-                invoiceProductsList.innerHTML += productRow;
-            });
-
+                        // Populate products in the invoice modal
+                        products.forEach((item, index) => {
+                            const productRow = `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${item.product.title}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>$${item.product_price}</td>
+                                    <td>$${item.user_customization.price}</td>
+                                    <td>$${(((parseFloat(item.product_price) || 0) + (parseFloat(item.printing_price) || 0) + (parseFloat(item.pompom_price) || 0)) * (parseInt(item.quantity) || 0) + (parseFloat(item.delivery_price) || 0)).toFixed(2)}</td>
+                                </tr>
+                            `;
+                            invoiceProductsList.innerHTML += productRow;
+                        });
+                    }
+                });
+            }
         });
     </script>
 @endsection
