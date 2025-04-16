@@ -26,6 +26,8 @@ class Order extends Model
         'shipping_carrier',
         'shipping_service',
         'shipping_estimated_days',
+        'shipping_error',
+        'shipping_status',
         'status',
         'order_number',
         'total_amount',
@@ -53,7 +55,7 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class, 'order_id')
-            ->with(['product', 'color','userCustomization']);
+            ->with(['product', 'color', 'userCustomization']);
     }
     public function product()
     {

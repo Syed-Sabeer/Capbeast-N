@@ -221,8 +221,8 @@ class OrderController extends Controller
         if (!$order) {
             return redirect()->route('home')->with('error', 'Order not found.');
         }
-
-        return view('main.pages.ordersuccess', compact('order'));
+$shippingRate = $order->shippingRate;
+        return view('main.pages.ordersuccess', compact('order', 'shippingRate'));
     }
 
     public function orderHistory()

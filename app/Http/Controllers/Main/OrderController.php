@@ -367,6 +367,13 @@ class OrderController extends Controller
               'error' => $e->getMessage(),
               'trace' => $e->getTraceAsString()
             ]);
+
+            // Store shipping error in order
+            $order->update([
+              'shipping_error' => $e->getMessage(),
+              'shipping_status' => 'failed'
+            ]);
+
             // Note: We don't rollback the transaction here since the order is already committed
             // Instead, we just log the error and continue with order success
           }

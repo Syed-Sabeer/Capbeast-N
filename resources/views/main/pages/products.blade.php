@@ -182,7 +182,9 @@
                                             <span class="float-end">4.9 <i
                                                     class="ri-star-half-fill text-warning align-bottom"></i></span>
                                             <h5 class="text-secondary mb-0">${{$product->selling_price}} <span
-                                                    class="text-muted fs-12"><del>$354.99</del></span></h5>
+                                                    class="text-muted fs-12">
+                                                    {{-- <del>$354.99</del> --}}
+                                                </span></h5>
                                         </div>
                                         <div class="tn mt-3">
                                             <a href="{{ url('/product/' . $product->slug) }}" class="btn btn-primary btn-hover w-100 add-btn">

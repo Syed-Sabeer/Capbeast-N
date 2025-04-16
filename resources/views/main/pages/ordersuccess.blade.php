@@ -54,7 +54,15 @@
                     </tr>
                 </table>
 
-                <p>Tracking Id: {{$order->OrderShippingRate->tracking_number}}</p>
+                <p>Tracking Number: {{ $order->shippingRate->tracking_number ?? 'N/A' }}</p>
+
+                @if (!empty($order->shipping_error))
+                    <div class="alert alert-warning"
+                        style="margin-top: 15px; padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 5px;">
+                        <strong>Shipping Notice:</strong> We encountered an issue with shipping creation. Our team has been
+                        notified and will contact you shortly. Error: {{ $order->shipping_error }}
+                    </div>
+                @endif
 
                 <h6
                     style="font-family: 'Inter', sans-serif; font-size: 15px;font-weight: 600; text-decoration-line: underline;margin-bottom: 16px;margin-top: 20px;">
@@ -68,21 +76,19 @@
                         @php
                             // Calculate the total price for each item
                             $itemTotal =
-                                ($item->product_price + $item->printing_price  + $item->pompom_price) *
-                                $item->quantity + ($item->delivery_price);
-                            
+                                ($item->product_price + $item->printing_price + $item->pompom_price) * $item->quantity +
+                                $item->delivery_price;
                         @endphp
                         <tr>
                             <td style="padding: 12px 5px; vertical-align: top;width: 65px;">
                                 <div
                                     style="border: 1px solid #eaeef4;height: 64px;width: 64px;display: flex; align-items: center;justify-content: center;border-radius: 6px;">
-                                    <img src="{{ asset('storage/' . (
-                                        $item->color->front_image
-                                        ?? $item->color->right_image
-                                        ?? $item->color->left_image
-                                        ?? $item->color->back_image
-                                        ?? 'ProductImages/default.jpg'
-                                    )) }}"
+                                    <img src="{{ asset(
+                                        'storage/' .
+                                            ($item->color->front_image ??
+                                                ($item->color->right_image ??
+                                                    ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg')))),
+                                    ) }}"
                                         alt="" class="avatar-xs">
 
 
@@ -99,9 +105,11 @@
                                 </p>
                                 <p
                                     style="color: #878a99 !important; margin-bottom: 0px; font-size: 13px;font-weight: 500;margin-top: 0;">
-                                     <span>Color: {{$item->color->color_name_1}} @if ($item->color->color_name_2)
-                                        & {{$item->color->color_name_2}} @endif</span> 
-                                   
+                                    <span>Color: {{ $item->color->color_name_1 }} @if ($item->color->color_name_2)
+                                            & {{ $item->color->color_name_2 }}
+                                        @endif
+                                    </span>
+
 
                                     <span style="margin-left: 15px;">Size: {{ $item->size ?? 'OSFA' }}</span>
                                 </p>
@@ -135,33 +143,37 @@
 
 
                     @if ($order->TaxDetails && $order->TaxDetails->tvq_tax_percentage)
-                    <tr>
-                        <td colspan="3" style="padding: 12px 8px; font-size: 15px;">
-                            TVQ Tax {{$order->TaxDetails->tvq_tax_percentage}}% ({{$order->TaxDetails->tvq_tax_no}})
-                        </td>
-                        <td style="padding: 12px 8px; font-size: 15px;text-align: end;">
-                            <h6 style="font-size: 15px; margin: 0px; font-weight: 600; font-family: 'Inter', sans-serif;">
-                                ${{ number_format($order->TaxDetails->tvq_tax_price, 2) ?? 0 }}
-                            </h6>
-                        </td>
-                    </tr>
-                @endif
-                
-                @if ($order->TaxDetails && $order->TaxDetails->tps_tax_percentage)
-                    <tr>
-                        <td colspan="3" style="padding: 12px 8px; font-size: 15px;">
-                            TPS Tax {{$order->TaxDetails->tps_tax_percentage}}% ({{$order->TaxDetails->tps_tax_no}})
-                        </td>
-                        <td style="padding: 12px 8px; font-size: 15px;text-align: end;">
-                            <h6 style="font-size: 15px; margin: 0px; font-weight: 600; font-family: 'Inter', sans-serif;">
-                                ${{ number_format($order->TaxDetails->tps_tax_price, 2) ?? 0 }}
-                            </h6>
-                        </td>
-                    </tr>
-                @endif
-                
+                        <tr>
+                            <td colspan="3" style="padding: 12px 8px; font-size: 15px;">
+                                TVQ Tax {{ $order->TaxDetails->tvq_tax_percentage }}%
+                                ({{ $order->TaxDetails->tvq_tax_no }})
+                            </td>
+                            <td style="padding: 12px 8px; font-size: 15px;text-align: end;">
+                                <h6
+                                    style="font-size: 15px; margin: 0px; font-weight: 600; font-family: 'Inter', sans-serif;">
+                                    ${{ number_format($order->TaxDetails->tvq_tax_price, 2) ?? 0 }}
+                                </h6>
+                            </td>
+                        </tr>
+                    @endif
 
-                    
+                    @if ($order->TaxDetails && $order->TaxDetails->tps_tax_percentage)
+                        <tr>
+                            <td colspan="3" style="padding: 12px 8px; font-size: 15px;">
+                                TPS Tax {{ $order->TaxDetails->tps_tax_percentage }}%
+                                ({{ $order->TaxDetails->tps_tax_no }})
+                            </td>
+                            <td style="padding: 12px 8px; font-size: 15px;text-align: end;">
+                                <h6
+                                    style="font-size: 15px; margin: 0px; font-weight: 600; font-family: 'Inter', sans-serif;">
+                                    ${{ number_format($order->TaxDetails->tps_tax_price, 2) ?? 0 }}
+                                </h6>
+                            </td>
+                        </tr>
+                    @endif
+
+
+
 
                     <tr>
                         <td colspan="3" style="padding: 12px 8px; font-size: 15px;">
@@ -169,7 +181,7 @@
                         </td>
                         <td style="padding: 12px 8px; font-size: 15px;text-align: end; ">
                             <h6 style="font-size: 15px; margin: 0px;font-weight: 600; font-family: 'Inter', sans-serif;">
-                               - ${{ number_format($order->discount_price, 2) ?? 0 }}
+                                - ${{ number_format($order->discount_price, 2) ?? 0 }}
                             </h6>
                             </th>
                     </tr>
@@ -177,16 +189,16 @@
 
                     <tr>
                         <td colspan="3" style="padding: 12px 8px; font-size: 15px;">
-                            Shipping 
+                            Shipping
                         </td>
                         <td style="padding: 12px 8px; font-size: 15px;text-align: end; ">
                             <h6 style="font-size: 15px; margin: 0px;font-weight: 600; font-family: 'Inter', sans-serif;">
-                            ${{ number_format($order->shipping_price, 2) ?? 0 }}
+                                ${{ number_format($order->shipping_price, 2) ?? 0 }}
                             </h6>
                             </th>
                     </tr>
 
-                    
+
 
                     <tr>
                         <td colspan="3" style="padding: 12px 8px; font-size: 15px;border-top: 1px solid #e9ebec;">
