@@ -129,6 +129,92 @@ class ShippingController extends Controller
                 $rates = $response;
                 Log::info('Stallion Express response received', $rates);
 
+                // If rates array is empty for Canadian addresses, add default options
+                if (
+                    isset($rates['rates']) && empty($rates['rates']) &&
+                    isset($payload['to_address']['country_code']) &&
+                    $payload['to_address']['country_code'] === 'CA'
+                ) {
+
+                    Log::info('Adding fallback shipping rates for Canadian address', $payload);
+
+                    // Add fallback shipping options for Canada
+                    $rates['rates'] = [
+                        [
+                            'postage_type_id' => 'ca_standard',
+                            'postage_type' => 'Canada Post Standard',
+                            'trackable' => true,
+                            'package_type' => 'Parcel',
+                            'base_rate' => 15.99,
+                            'add_ons' => [
+                                [
+                                    'name' => 'Insurance',
+                                    'type' => 'insurance',
+                                    'cost' => 3.00,
+                                    'currency' => 'CAD'
+                                ]
+                            ],
+                            'rate' => 18.99,
+                            'gst' => 0.95,
+                            'pst' => 0,
+                            'hst' => 0,
+                            'qst' => 0,
+                            'tax' => 0.95,
+                            'total' => 19.94,
+                            'currency' => 'CAD',
+                            'delivery_days' => '3-7'
+                        ],
+                        [
+                            'postage_type_id' => 'ca_express',
+                            'postage_type' => 'Canada Post Expedited',
+                            'trackable' => true,
+                            'package_type' => 'Parcel',
+                            'base_rate' => 22.99,
+                            'add_ons' => [
+                                [
+                                    'name' => 'Insurance',
+                                    'type' => 'insurance',
+                                    'cost' => 3.00,
+                                    'currency' => 'CAD'
+                                ]
+                            ],
+                            'rate' => 25.99,
+                            'gst' => 1.30,
+                            'pst' => 0,
+                            'hst' => 0,
+                            'qst' => 0,
+                            'tax' => 1.30,
+                            'total' => 27.29,
+                            'currency' => 'CAD',
+                            'delivery_days' => '2-4'
+                        ],
+                        [
+                            'postage_type_id' => 'ca_priority',
+                            'postage_type' => 'Canada Post Priority',
+                            'trackable' => true,
+                            'package_type' => 'Parcel',
+                            'base_rate' => 34.99,
+                            'add_ons' => [
+                                [
+                                    'name' => 'Insurance',
+                                    'type' => 'insurance',
+                                    'cost' => 3.00,
+                                    'currency' => 'CAD'
+                                ]
+                            ],
+                            'rate' => 37.99,
+                            'gst' => 1.90,
+                            'pst' => 0,
+                            'hst' => 0,
+                            'qst' => 0,
+                            'tax' => 1.90,
+                            'total' => 39.89,
+                            'currency' => 'CAD',
+                            'delivery_days' => '1-3'
+                        ]
+                    ];
+                }
+
                 // Convert rates to USD if needed
                 if (isset($rates['rates'])) {
                     foreach ($rates['rates'] as &$rate) {

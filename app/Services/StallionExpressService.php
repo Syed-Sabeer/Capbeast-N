@@ -121,6 +121,22 @@ class StallionExpressService
                 }
             }
 
+            // Format and validate Canadian postal code
+            if (data_get($payload, 'to_address.country_code') === 'CA') {
+                $postalCode = data_get($payload, 'to_address.postal_code');
+                $formattedPostalCode = $this->formatCanadianPostalCode($postalCode);
+
+                if (!$formattedPostalCode) {
+                    Log::error('Invalid Canadian postal code:', [
+                        'postal_code' => $postalCode
+                    ]);
+                    throw new \Exception("The postal code {$postalCode} is not a valid Canadian postal code format (A1A 1A1).");
+                }
+
+                // Update the payload with the formatted postal code
+                data_set($payload, 'to_address.postal_code', $formattedPostalCode);
+            }
+
             // Log the complete request payload
             Log::info('Stallion Express Shipment Request:', [
                 'url' => $this->baseUrl . '/shipments',
@@ -361,5 +377,35 @@ class StallionExpressService
         // Check if ZIP code prefix matches any in the state's list
         $zipPrefix = substr($zipCode, 0, 2);
         return in_array($zipPrefix, $stateZipMap[$stateCode]);
+    }
+
+    /**
+     * Format and validate a Canadian postal code
+     *
+     * @param string $postalCode The postal code to format
+     * @return string|false The formatted postal code or false if invalid
+     */
+    private function formatCanadianPostalCode($postalCode)
+    {
+        // Remove all spaces and convert to uppercase
+        $postalCode = strtoupper(preg_replace('/\s+/', '', $postalCode));
+
+        // Basic format check: A1A1A1 or A1A 1A1
+        if (!preg_match('/^[A-Z][0-9][A-Z][0-9][A-Z][0-9]$/', $postalCode)) {
+            // Try to format it if it's at least 6 characters
+            if (strlen($postalCode) >= 6) {
+                $postalCode = substr($postalCode, 0, 6);
+
+                // Make sure it follows the pattern A1A1A1
+                if (!preg_match('/^[A-Z][0-9][A-Z][0-9][A-Z][0-9]$/', $postalCode)) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+
+        // Format as A1A 1A1
+        return substr($postalCode, 0, 3) . ' ' . substr($postalCode, 3);
     }
 }

@@ -71,6 +71,27 @@
                 $('#shipping-amount').text('0.00');
                 return false;
             }
+
+            // Format Canadian postal codes (A1A 1A1)
+            if (country === 'CA' && postalCode) {
+                // Remove spaces and format as A1A 1A1
+                let formatted = postalCode.toUpperCase().replace(/\s+/g, '');
+                if (formatted.length > 0) {
+                    // Insert a space in the middle if length is at least 4
+                    if (formatted.length >= 4) {
+                        formatted = formatted.substring(0, 3) + ' ' + formatted.substring(3);
+                    }
+
+                    // Truncate if too long
+                    if (formatted.length > 7) {
+                        formatted = formatted.substring(0, 7);
+                    }
+
+                    // Update field value
+                    $('#postal_code').val(formatted);
+                }
+            }
+
             return true;
         }
 
@@ -1424,7 +1445,8 @@
             if (result.discount > 0) {
                 $(`#discount-info-${itemId}`).text(`You're saving ${result.discount}%!`);
                 $(`.original-price[data-item-id="${itemId}"]`).show().text(`$${sellingPrice.toFixed(2)}`);
-                $(`.discounted-price[data-item-id="${itemId}"]`).show().text(`$${result.discountedPrice.toFixed(2)}`);
+                $(`.discounted-price[data-item-id="${itemId}"]`).show().text(
+                    `$${result.discountedPrice.toFixed(2)}`);
             } else {
                 $(`#discount-info-${itemId}`).text('');
                 $(`.original-price[data-item-id="${itemId}"]`).hide();
