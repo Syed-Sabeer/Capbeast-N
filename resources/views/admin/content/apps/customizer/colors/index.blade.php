@@ -17,12 +17,17 @@
 @endsection
 
 @section('content')
-    <h4 class="py-3 mb-2">
+
+<div class="d-flex align-items-center justify-content-between py-3 mb-4">
+    <h4 class="mb-0">
         <span class="text-muted fw-light">Customizer /</span> Colors
     </h4>
-    <div class="d-flex justify-content-end mb-4">
-        <a href="{{ route($prefix . '.customizer-colors.create') }}" class="btn btn-primary">Add Colors</a>
-    </div>
+    <a href="{{ route($prefix . '.customizer-colors.create') }}" class="btn btn-primary">Add Colors</a>
+  </div>
+
+
+
+    
     <!-- Colors List Table -->
     <div class="card">
         <div class="card-datatable table-responsive">

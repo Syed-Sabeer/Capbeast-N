@@ -83,9 +83,9 @@
                         <div class="mt-lg-0 mt-4">
                             <h5 class="footer-title">Information</h5>
                             <ul class="list-unstyled footer-link mt-3">
-                                <li><a href="tel:18559326752"><i class="fa-solid fa-phone white-color">&nbsp; </i> +1
-                                        (855)
-                                        932-6752</a></li>
+                                <li><a href="tel:18888822780"><i class="fa-solid fa-phone white-color">&nbsp; </i> +1
+                                        (888)
+                                        882-2780</a></li>
                                 <li><a href="mailto:support@capbeast.com" style="font-size: 13px"><i
                                             class="white-color fa-solid fa-envelope">&nbsp;&nbsp;</i>support@capbeast.com</a></li>
                             </ul>

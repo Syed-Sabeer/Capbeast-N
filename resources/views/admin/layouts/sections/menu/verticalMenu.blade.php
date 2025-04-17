@@ -159,28 +159,55 @@
                 </ul>
             </li> --}}
 
-            <li class="menu-item {{ Request::is("backend/$prefix/customizer/*") ? 'open' : '' }}">
-              <a href="javascript:void(0);" class="menu-link menu-toggle {{ Request::is("backend/$prefix/customizer/*") ? 'active' : '' }}">
-                  <div>{{ __('Customizer') }}</div>
-              </a>
-              <ul class="menu-sub">
-                  <li class="menu-item {{ Request::is("backend/$prefix/customizer/designs/*") ? 'active' : '' }}">
-                      <a href="{{ url("backend/$prefix/customizer/designs/list") }}" class="menu-link">
-                          <div>{{ __('Designs') }}</div>
-                      </a>
-                  </li>
-                  <li class="menu-item {{ Request::is("backend/$prefix/customizer/colors/*") ? 'active' : '' }}">
-                      <a href="{{ url("backend/$prefix/customizer/colors/list") }}" class="menu-link">
-                          <div>{{ __('Colors') }}</div>
-                      </a>
-                  </li>
-                  <li class="menu-item {{ Request::is("backend/$prefix/customizer/price/*") ? 'active' : '' }}">
-                      <a href="{{ url("backend/$prefix/customizer/price/edit") }}" class="menu-link">
-                          <div>{{ __('Price Setup') }}</div>
-                      </a>
-                  </li>
-              </ul>
-          </li>
+            {{-- Customizer --}}
+<li class="menu-item {{ in_array($currentRouteName, [
+    Route::prefixed($prefix, 'customizer-designs.list'),
+    Route::prefixed($prefix, 'customizer-designs.create'),
+    Route::prefixed($prefix, 'customizer-designs.edit'),
+    Route::prefixed($prefix, 'customizer-colors.list'),
+    Route::prefixed($prefix, 'customizer-colors.create'),
+    Route::prefixed($prefix, 'customizer-colors.edit'),
+    Route::prefixed($prefix, 'customizer-price.edit'),
+]) ? 'open active' : '' }}">
+    <a href="javascript:void(0);" class="menu-link menu-toggle {{ in_array($currentRouteName, [
+        Route::prefixed($prefix, 'customizer-designs.list'),
+        Route::prefixed($prefix, 'customizer-designs.create'),
+        Route::prefixed($prefix, 'customizer-designs.edit'),
+        Route::prefixed($prefix, 'customizer-colors.list'),
+        Route::prefixed($prefix, 'customizer-colors.create'),
+        Route::prefixed($prefix, 'customizer-colors.edit'),
+        Route::prefixed($prefix, 'customizer-price.edit'),
+    ]) ? 'active' : '' }}">
+        <div>{{ __('Customizer') }}</div>
+    </a>
+    <ul class="menu-sub">
+        <li class="menu-item {{ in_array($currentRouteName, [
+            Route::prefixed($prefix, 'customizer-designs.list'),
+            Route::prefixed($prefix, 'customizer-designs.create'),
+            Route::prefixed($prefix, 'customizer-designs.edit'),
+        ]) ? 'active' : '' }}">
+            <a href="{{ url("backend/$prefix/customizer/designs/list") }}" class="menu-link">
+                <div>{{ __('Designs') }}</div>
+            </a>
+        </li>
+        <li class="menu-item {{ in_array($currentRouteName, [
+            Route::prefixed($prefix, 'customizer-colors.list'),
+            Route::prefixed($prefix, 'customizer-colors.create'),
+            Route::prefixed($prefix, 'customizer-colors.edit'),
+        ]) ? 'active' : '' }}">
+            <a href="{{ url("backend/$prefix/customizer/colors/list") }}" class="menu-link">
+                <div>{{ __('Colors') }}</div>
+            </a>
+        </li>
+        <li class="menu-item {{ in_array($currentRouteName, [
+            Route::prefixed($prefix, 'customizer-price.edit'),
+        ]) ? 'active' : '' }}">
+            <a href="{{ url("backend/$prefix/customizer/price/edit") }}" class="menu-link">
+                <div>{{ __('Price Setup') }}</div>
+            </a>
+        </li>
+    </ul>
+</li>
 
 
             {{-- Order --}}
@@ -193,6 +220,18 @@
                     : '' }}">
                 <a href="{{ url("backend/$prefix/order/list") }}" class="menu-link">
                     <div>Orders</div>
+                </a>
+            </li>
+
+            <li
+                class="menu-item {{ in_array($currentRouteName, [
+                    Route::prefixed($prefix, 'app-ecommerce-abandon-cart-list'),
+                    Route::prefixed($prefix, 'app-ecommerce-abandon-cart-detail'),
+                ])
+                    ? 'active open'
+                    : '' }}">
+                <a href="{{ url("backend/$prefix/abandoncart/list") }}" class="menu-link">
+                    <div>Abandon Cart</div>
                 </a>
             </li>
 

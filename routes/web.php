@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\apps\CustomizerDesignController;
 use App\Http\Controllers\Admin\apps\CustomizerColorController;
 use App\Http\Controllers\Admin\apps\CustomizerPriceController;
+use App\Http\Controllers\Admin\Apps\EcommerceAbandonCartController;
 use App\Http\Controllers\Main\TOSDController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
@@ -190,6 +191,12 @@ foreach ($roles as $role => $prefix) {
     Route::prefix("backend/{$prefix}")->group(function () use ($prefix) {  // Apply backend prefix
 
       if ($prefix == 'superadmin') {
+
+        Route::get('/abandoncart/list', [EcommerceAbandonCartController::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-abandon-cart-list'));
+        Route::get('/abandoncart/detail/{cartId}', [EcommerceAbandonCartController::class, 'view'])->name(Route::prefixed($prefix, 'app-ecommerce-abandon-cart-detail'));
+        // Route::post('/order/upload-file/{id}', [EcommerceOrderDetails::class, 'orderfileupload'])->name(Route::prefixed($prefix, 'order.file.upload'));
+        // Route::post('/order/{orderId}/update-status', [EcommerceOrderDetails::class, 'updateOrderStatus'])->name(Route::prefixed($prefix, 'order-status.update'));
+
 
 
         Route::get('/category', [EcommerceProductCategory::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-product-category'));

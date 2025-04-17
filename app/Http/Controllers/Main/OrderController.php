@@ -648,15 +648,15 @@ class OrderController extends Controller
     }
   }
 
-
   private function generateOrderId()
   {
-    do {
-      $orderId = strtoupper(Str::random(6)); // Generate a random string of 6 characters
-    } while (Order::where('order_id', $orderId)->exists());
-
-    return $orderId;
+      do {
+          $orderId = 'CB' . strtoupper(Str::random(6));
+      } while (Order::where('order_id', $orderId)->exists());
+  
+      return $orderId;
   }
+  
 
   public function applyDiscount(Request $request)
   {
