@@ -1096,10 +1096,7 @@
                                 </div>
 
                                 <!-- City input -->
-                                <div data-mdb-input-init class="form-outline mb-4">
-                                    <label class="form-label" for="city">City *</label>
-                                    <input type="text" id="city" name="city" class="form-control" required />
-                                </div>
+                              
 
                                 <div class="row mb-4">
                                     <div class="col-md-6">
@@ -1122,6 +1119,13 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="row">
+                                <div class="col-md-6">
+                                <div data-mdb-input-init class="form-outline mb-4">
+                                    <label class="form-label" for="city">City *</label>
+                                    <input type="text" id="city" name="city" class="form-control" required />
+                                </div>
+                            </div>
                                 <div class="col-md-6">
                                     <div data-mdb-input-init class="form-outline">
                                         <label class="form-label" for="postal_code">Postal Code *</label>
@@ -1130,10 +1134,25 @@
                                     </div>
                                 </div>
 
+                            </div>
                                 <div id="shipping-methods-container" class="mb-4">
                                     <!-- Shipping methods will be loaded here -->
                                 </div>
 
+                                <div class="alert alert-warning"
+     style="margin-top: 15px; padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 5px;">
+    <strong>Shipping Notice:</strong> 
+    If you receive the message <em>"Error calculating shipping rates"</em>, please try the following steps:
+    <ul style="margin-top: 5px; padding-left: 20px;">
+        <li>Double-check your shipping details to ensure all required fields are filled correctly.</li>
+        <li>Retype the postal code carefully, or try removing and re-entering one character.</li>
+        <li>Make sure all location fields (country, province, city, etc.) are selected properly.</li>
+    </ul>
+    If the issue persists, please contact our support team for assistance.
+</div>
+
+
+                             
                                 <!-- Email input -->
                                 <div data-mdb-input-init class="form-outline mb-4">
                                     <label class="form-label" for="form6Example5">Email *</label>
