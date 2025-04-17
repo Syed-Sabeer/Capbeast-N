@@ -5,10 +5,10 @@
 
     <meta charset="utf-8">
     <title>CapBeast</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
     <link rel="icon" type="image/x-icon" href="{{ asset('assetsCommon/images/logo-dark.png') }}" />
-    
+
     <link href="{{ asset('assetsMain/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assetsMain/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assetsMain/css/app.min.css') }}" rel="stylesheet" type="text/css" />
@@ -30,7 +30,7 @@
 
 
 
-    
+
 </head>
 
 <body>
@@ -51,7 +51,7 @@
     <button onclick="topFunction()" class="btn btn-info btn-icon" style="bottom: 50px;" id="back-to-top">
         <i class="ri-arrow-up-line"></i>
     </button>
-    
+
 
 
 
@@ -72,10 +72,10 @@
 
     <!--Swiper slider js-->
     <script src="{{ asset('assets/libs/swiper/swiper-bundle.min.js')}}"></script>
-    
+
     <!-- Countdown js -->
     <script src="{{ asset('assets/js/pages/coming-soon.init.js')}}"></script>
-    
+
     <script src="{{ asset('assets/js/frontend/landing-index.init.js')}}"></script>
 
     <script src="{{ asset('assets/js/frontend/menu.init.js')}}"></script>
