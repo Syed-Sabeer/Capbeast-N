@@ -116,28 +116,51 @@ class StallionExpressService
                 throw new \Exception('Missing required fields: ' . implode(', ', $missingFields));
             }
 
-            // Validate US ZIP code against state
+            // Auto-correct DC ZIP codes
             if (data_get($payload, 'to_address.country_code') === 'US') {
                 $stateCode = data_get($payload, 'to_address.province_code');
                 $zipCode = data_get($payload, 'to_address.postal_code');
 
-                if (!$this->validateUsZipCodeState($zipCode, $stateCode)) {
-                    Log::error('ZIP code validation failed:', [
-                        'zip_code' => $zipCode,
-                        'state_code' => $stateCode
-                    ]);
+                // Clean up ZIP code
+                $zipCode = preg_replace('/[^0-9]/', '', $zipCode);
 
-                    // Get the expected state for this ZIP code (if possible)
-                    $expectedState = $this->getStateFromZipCode($zipCode);
-                    $errorMessage = "The ZIP code {$zipCode} does not match the state {$stateCode}.";
+                // Use only first 5 digits for validation
+                if (strlen($zipCode) >= 5) {
+                    $zipCode = substr($zipCode, 0, 5);
+                }
 
-                    if ($expectedState) {
-                        $errorMessage .= " ZIP code {$zipCode} appears to be in {$expectedState}.";
+                // Check for DC ZIP codes (20001-20599)
+                if ($zipCode >= '20001' && $zipCode <= '20599') {
+                    // Automatically correct the state code to DC
+                    $expectedState = 'DC';
+                    if ($stateCode !== $expectedState) {
+                        Log::info('Auto-correcting state code for DC ZIP code', [
+                            'zip_code' => $zipCode,
+                            'original_state' => $stateCode,
+                            'corrected_state' => $expectedState
+                        ]);
+                        data_set($payload, 'to_address.province_code', $expectedState);
                     }
+                } else {
+                    // For non-DC ZIP codes, perform normal validation
+                    if (!$this->validateUsZipCodeState($zipCode, $stateCode)) {
+                        Log::error('ZIP code validation failed:', [
+                            'zip_code' => $zipCode,
+                            'state_code' => $stateCode
+                        ]);
 
-                    $errorMessage .= " Please verify the shipping address.";
+                        // Get the expected state for this ZIP code (if possible)
+                        $expectedState = $this->getStateFromZipCode($zipCode);
+                        $errorMessage = "The ZIP code {$zipCode} does not match the state {$stateCode}.";
 
-                    throw new \Exception($errorMessage);
+                        if ($expectedState) {
+                            $errorMessage .= " ZIP code {$zipCode} appears to be in {$expectedState}.";
+                        }
+
+                        $errorMessage .= " Please verify the shipping address.";
+
+                        throw new \Exception($errorMessage);
+                    }
                 }
             }
 
@@ -334,6 +357,11 @@ class StallionExpressService
             // Use only first 5 digits for validation
             $zipCode = substr($zipCode, 0, 5);
 
+            // Special case handling for DC (Washington DC)
+            if ($zipCode >= '20001' && $zipCode <= '20599' && $stateCode === 'DC') {
+                return true;
+            }
+
             // Call external API to validate ZIP code against state
             $apiUrl = "https://api.zippopotam.us/us/" . $zipCode;
 
@@ -393,6 +421,11 @@ class StallionExpressService
     {
         $zipPrefix = substr($zipCode, 0, 2);
         $zipFirst3 = substr($zipCode, 0, 3);
+
+        // Special case for DC ZIP codes
+        if ($zipPrefix === '20' && $stateCode === 'DC') {
+            return true;
+        }
 
         // More comprehensive state to ZIP mapping
         $stateZipMap = [
