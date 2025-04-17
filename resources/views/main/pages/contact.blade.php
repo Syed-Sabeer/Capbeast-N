@@ -41,7 +41,10 @@
                             </div>
                             <div class="ms-3 flex-grow-1">
                                 <h5 class="fs-17 lh-base mb-2">Phone Number</h5>
-                                <p class="text-muted fs-14 mb-0">+1 855 932 6752</p>
+                                <a href="tel:18888822780">
+                                <p class="text-muted fs-14 mb-0">+1
+                                    (888)
+                                    882-2780</p></a>
                             </div>
                         </div>
                     </div>

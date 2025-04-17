@@ -27,9 +27,9 @@ return [
 
     'stallion' => [
         'base_url' => env('STALLION_API_BASE', 'https://api.stallionexpress.ca/api/v4'),
-        'sandbox_url' => env('STALLION_SANDBOX_URL', 'https://sandbox.stallionexpress.ca/api/v4'),
+        'sandbox_url' => env('STALLION_SANDBOX_URL', 'https://ship.stallionexpress.ca/api/v4'),
         'token' => env('STALLION_API_KEY'),
-        'sandbox' => env('STALLION_SANDBOX', true),
+        'sandbox' => env('STALLION_SANDBOX', false),
         'timeout' => env('STALLION_TIMEOUT', 30)
     ],
 

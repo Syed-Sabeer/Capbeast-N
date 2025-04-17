@@ -17,12 +17,17 @@
 @endsection
 
 @section('content')
-    <h4 class="py-3 mb-2">
-        <span class="text-muted fw-light">Customizer /</span> Designs
-    </h4>
-    <div class="d-flex justify-content-end mb-4">
+    
+
+    <div class="d-flex align-items-center justify-content-between py-3 mb-4">
+        <h4 class="mb-0">
+            <span class="text-muted fw-light">Customizer /</span> Designs
+        </h4>
         <a href="{{ route($prefix . '.customizer-designs.create') }}" class="btn btn-primary">Add Design</a>
-    </div>
+      </div>
+      
+
+
     <!-- Designs List Table -->
     <div class="card">
         <div class="card-datatable table-responsive">
