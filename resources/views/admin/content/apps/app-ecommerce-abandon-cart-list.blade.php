@@ -18,7 +18,7 @@
 
 @section('content')
 <h4 class="py-3 mb-2">
-  <span class="text-muted fw-light">eCommerce /</span> Order List
+  <span class="text-muted fw-light">eCommerce /</span> Abandon Cart List
 </h4>
 
 
@@ -32,21 +32,35 @@
         <tr>
           <th></th>
         
-          <th>order #</th>
-          <th>order placed at</th>
-          <th>customers</th>
-          <th>Total Amount</th>
-           <th>user status</th>
-         {{-- <th>method</th> --}}
+          
+          <th>Customer</th>
+          <th>Cart Qty</th>
+          <th>Cart Amount</th>
+           
           <th>actions</th>
         </tr>
       </thead>
       <tbody>
         @foreach ($abandoncart as $item)
-     
+          <tr>
+            <td></td>
+            <td>{{ $item->user->first_name ?? 'Unknown' }} {{ $item->user->last_name ?? 'Unknown' }}</td>
+            <td>{{ $item->total_qty }}</td>
+            <td>${{ number_format($item->total_amount, 2) }}</td>
+            <td>
+              <!-- Action buttons or dropdowns can go here -->
+              <div class="dropdown">
+                <button onclick="toggleDropdown({{ $item->user_id }})">⋮</button>
+                <div class="custom-dropdown-content" id="dropdownMenu-{{ $item->user_id }}">
+                  <a class="custom-dropdown-item" href="#">View Cart</a>
+                  <a class="custom-dropdown-item" href="#">Remove</a>
+                </div>
+              </div>
+            </td>
+          </tr>
         @endforeach
- 
       </tbody>
+      
     </table>
   </div>
 
