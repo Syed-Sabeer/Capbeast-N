@@ -81,7 +81,7 @@
                         </td>
                         <td>{{ $product->productBrand->title ?? 'No Brand' }}</td>
                         <td>{{ $product->categories->pluck('title')->implode(', ') ?: 'No Category' }}</td>
-                        
+
                         <td>
                             {{ $product->sku }}
 
@@ -104,10 +104,9 @@
                             <a href="{{ route($prefix .'.app-ecommerce-product-delete', $product->id) }}" class="me-2 delete-product delete_confirm" data-id="{{ $product->id }}">
                                 <i class="fa-solid fa-trash"></i>
                             </a>
-                            {{-- <a href="javascript:void(0);" class="me-2 delete-product" data-id="{{ $product->id }}">
-                                <i class="fa-solid fa-trash"></i>
-                            </a> --}}
-                            <a data-bs-toggle="modal" data-bs-target="#onboardHorizontalImageModal"><i class="fa-solid fa-eye"></i></a>
+                            <a href="{{ route($prefix .'.app-ecommerce-product-color-list', $product->id) }}">
+                              <i class="fa-solid fa-eye"></i>
+                            </a>
                         </td>
                     </tr>
 
@@ -128,7 +127,7 @@
 
 
        <!-- Form with Image horizontal Modal -->
-       <div class="modal-onboarding modal fade animate__animated" id="onboardHorizontalImageModal" tabindex="-1" aria-hidden="true">
+       {{-- <div class="modal-onboarding modal fade animate__animated" id="onboardHorizontalImageModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
           <div class="modal-content text-center">
             <div class="modal-header border-0">
@@ -170,7 +169,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> --}}
       <!--/ Form with Image horizontal Modal -->
 
 

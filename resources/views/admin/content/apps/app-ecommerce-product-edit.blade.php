@@ -223,7 +223,7 @@
 
         </div>
 
-        <div class="col-12 col-lg-12">
+        {{-- <div class="col-12 col-lg-12">
             <div class="card mb-4">
                 <div class="card-header">Colors</div>
                 <div class="card-body" id="color-section">
@@ -332,7 +332,7 @@
                 </div>
                 <button type="button" class="btn btn-primary" id="add-color">Add another color</button>
             </div>
-        </div>
+        </div> --}}
 
         <div class="col-12 col-lg-8">
             <div class="card mb-4">
@@ -386,72 +386,72 @@
     <script>
         $(document).ready(function() {
             // Add new color section
-            let colorIndex = 0;
-            $("#add-color").click(function() {
-                let colorHtml = `
-                        <div class="color-item">
-                            <div class="row mb-3">
-                                <div class="col-3">
-                                    <label class="form-label">Color Name 1</label>
-                                    <input type="text" name="colorname1[]" class="form-control">
-                                </div>
-                                <div class="col-3">
-                                    <label class="form-label">Color Code 1</label>
-                                    <input type="color" name="colorcode1[]" class="form-control">
-                                </div>
-                                <div class="col-3">
-                                    <label class="form-label">Color Name 2 (Optional)</label>
-                                    <input type="text" name="colorname2[]" class="form-control">
-                                </div>
-                                <div class="col-3">
-                                    <label class="form-label">Color Code 2 (Optional)</label>
-                                    <input type="color" name="colorcode2[]" class="form-control">
-                                </div>
-                                <div class="col-3 mt-4">
-                                    <label class="form-label">Front Image</label>
-                                    <input type="file" name="frontimage[]" class="form-control">
-                                    <div class="form-check mt-2">
-                                        <input class="form-check-input" type="checkbox" name="is_front[${colorIndex}]" checked>
-                                        <label class="form-check-label">Allow Customization</label>
-                                    </div>
-                                </div>
-                                <div class="col-3 mt-4">
-                                    <label class="form-label">Back Image</label>
-                                    <input type="file" name="backimage[]" class="form-control">
-                                    <div class="form-check mt-2">
-                                        <input class="form-check-input" type="checkbox" name="is_back[${colorIndex}]" checked>
-                                        <label class="form-check-label">Allow Customization</label>
-                                    </div>
-                                </div>
-                                <div class="col-3 mt-4">
-                                    <label class="form-label">Right Image</label>
-                                    <input type="file" name="rightimage[]" class="form-control">
-                                    <div class="form-check mt-2">
-                                        <input class="form-check-input" type="checkbox" name="is_right[${colorIndex}]" checked>
-                                        <label class="form-check-label">Allow Customization</label>
-                                    </div>
-                                </div>
-                                <div class="col-3 mt-4">
-                                    <label class="form-label">Left Image</label>
-                                    <input type="file" name="leftimage[]" class="form-control">
-                                    <div class="form-check mt-2">
-                                        <input class="form-check-input" type="checkbox" name="is_left[${colorIndex}]" checked>
-                                        <label class="form-check-label">Allow Customization</label>
-                                    </div>
-                                </div>
-                                <div class="col-3 mt-4">
-                                    <button type="button" class="btn btn-sm btn-danger mt-2 remove-color">Remove</button>
-                                </div>
-                            </div>
-                        </div>`;
-                $("#color-section").append(colorHtml);
-                colorIndex++;
-            });
+            // let colorIndex = 0;
+            // $("#add-color").click(function() {
+            //     let colorHtml = `
+            //             <div class="color-item">
+            //                 <div class="row mb-3">
+            //                     <div class="col-3">
+            //                         <label class="form-label">Color Name 1</label>
+            //                         <input type="text" name="colorname1[]" class="form-control">
+            //                     </div>
+            //                     <div class="col-3">
+            //                         <label class="form-label">Color Code 1</label>
+            //                         <input type="color" name="colorcode1[]" class="form-control">
+            //                     </div>
+            //                     <div class="col-3">
+            //                         <label class="form-label">Color Name 2 (Optional)</label>
+            //                         <input type="text" name="colorname2[]" class="form-control">
+            //                     </div>
+            //                     <div class="col-3">
+            //                         <label class="form-label">Color Code 2 (Optional)</label>
+            //                         <input type="color" name="colorcode2[]" class="form-control">
+            //                     </div>
+            //                     <div class="col-3 mt-4">
+            //                         <label class="form-label">Front Image</label>
+            //                         <input type="file" name="frontimage[]" class="form-control">
+            //                         <div class="form-check mt-2">
+            //                             <input class="form-check-input" type="checkbox" name="is_front[${colorIndex}]" checked>
+            //                             <label class="form-check-label">Allow Customization</label>
+            //                         </div>
+            //                     </div>
+            //                     <div class="col-3 mt-4">
+            //                         <label class="form-label">Back Image</label>
+            //                         <input type="file" name="backimage[]" class="form-control">
+            //                         <div class="form-check mt-2">
+            //                             <input class="form-check-input" type="checkbox" name="is_back[${colorIndex}]" checked>
+            //                             <label class="form-check-label">Allow Customization</label>
+            //                         </div>
+            //                     </div>
+            //                     <div class="col-3 mt-4">
+            //                         <label class="form-label">Right Image</label>
+            //                         <input type="file" name="rightimage[]" class="form-control">
+            //                         <div class="form-check mt-2">
+            //                             <input class="form-check-input" type="checkbox" name="is_right[${colorIndex}]" checked>
+            //                             <label class="form-check-label">Allow Customization</label>
+            //                         </div>
+            //                     </div>
+            //                     <div class="col-3 mt-4">
+            //                         <label class="form-label">Left Image</label>
+            //                         <input type="file" name="leftimage[]" class="form-control">
+            //                         <div class="form-check mt-2">
+            //                             <input class="form-check-input" type="checkbox" name="is_left[${colorIndex}]" checked>
+            //                             <label class="form-check-label">Allow Customization</label>
+            //                         </div>
+            //                     </div>
+            //                     <div class="col-3 mt-4">
+            //                         <button type="button" class="btn btn-sm btn-danger mt-2 remove-color">Remove</button>
+            //                     </div>
+            //                 </div>
+            //             </div>`;
+            //     $("#color-section").append(colorHtml);
+            //     colorIndex++;
+            // });
 
-            // Remove color section
-            $(document).on("click", ".remove-color", function() {
-                $(this).closest(".color-item").remove();
-            });
+            // // Remove color section
+            // $(document).on("click", ".remove-color", function() {
+            //     $(this).closest(".color-item").remove();
+            // });
 
             // Add new discount section
             $("#add-discount").click(function() {
