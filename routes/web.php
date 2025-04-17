@@ -1,9 +1,6 @@
 <?php
 
-use App\Http\Controllers\Admin\apps\CustomizerDesignController;
-use App\Http\Controllers\Admin\apps\CustomizerColorController;
-use App\Http\Controllers\Admin\apps\CustomizerPriceController;
-use App\Http\Controllers\Admin\Apps\EcommerceAbandonCartController;
+
 use App\Http\Controllers\Main\TOSDController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
@@ -44,6 +41,10 @@ use App\Http\Controllers\Admin\apps\EcommerceCustomerDetailsOverview;
 use App\Http\Controllers\Admin\apps\EcommerceOrderDetails;
 use App\Http\Controllers\Admin\apps\EcommerceCustomerAll;
 use App\Http\Controllers\Admin\apps\EcommerceProductColor;
+use App\Http\Controllers\Admin\apps\CustomizerDesignController;
+use App\Http\Controllers\Admin\apps\CustomizerColorController;
+use App\Http\Controllers\Admin\apps\CustomizerPriceController;
+use App\Http\Controllers\Admin\Apps\EcommerceAbandonCartController;
 use App\Http\Controllers\Admin\components\TVQTaxPricingController;
 use App\Http\Controllers\Admin\components\TPSTaxPricingController;
 use App\Http\Controllers\Admin\components\InternalStatusController;
