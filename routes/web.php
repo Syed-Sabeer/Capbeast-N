@@ -43,7 +43,7 @@ use App\Http\Controllers\Admin\apps\EcommerceOrderList;
 use App\Http\Controllers\Admin\apps\EcommerceCustomerDetailsOverview;
 use App\Http\Controllers\Admin\apps\EcommerceOrderDetails;
 use App\Http\Controllers\Admin\apps\EcommerceCustomerAll;
-
+use App\Http\Controllers\Admin\apps\EcommerceProductColor;
 use App\Http\Controllers\Admin\components\TVQTaxPricingController;
 use App\Http\Controllers\Admin\components\TPSTaxPricingController;
 use App\Http\Controllers\Admin\components\InternalStatusController;
@@ -298,6 +298,14 @@ foreach ($roles as $role => $prefix) {
         Route::post('/product/edit/{id}', [EcommerceProductList::class, 'update'])->name(Route::prefixed($prefix, 'app-ecommerce-product-update'));
         // Route::post('/product/edit/{id}', [EcommerceProductList::class, 'update'])->name(Route::prefixed($prefix, 'app-ecommerce-product-update'));
         Route::post('/update-visibility/{id}', [EcommerceProductList::class, 'updateVisibility'])->name(Route::prefixed($prefix, 'update.visibility'));
+
+        Route::get('/product/colors/{id}', [EcommerceProductColor::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-product-color-list'));
+        Route::get('/product/colors/create/{id}', [EcommerceProductColor::class, 'create'])->name(Route::prefixed($prefix, 'app-ecommerce-product-color-add'));
+        Route::post('/product/colors/store/{id}', [EcommerceProductColor::class, 'store'])->name(Route::prefixed($prefix, 'app-ecommerce-product-color-store'));
+        Route::get('/product/colors/edit/{id}', [EcommerceProductColor::class, 'edit'])->name(Route::prefixed($prefix, 'app-ecommerce-product-color-edit'));
+        Route::put('/product/colors/update/{id}', [EcommerceProductColor::class, 'update'])->name(Route::prefixed($prefix, 'app-ecommerce-product-color-update'));
+        Route::get('/product/colors/delete/{id}', [EcommerceProductColor::class, 'destroy'])->name(Route::prefixed($prefix, 'app-ecommerce-product-color-delete'));
+        Route::post('/product/colors/update-visibility/{id}', [EcommerceProductColor::class, 'updateVisibility'])->name(Route::prefixed($prefix, 'update.product-color.visibility'));
 
         Route::get('/delete/product-color/{id}', [EcommerceProductList::class, 'deleteProductColor'])->name(Route::prefixed($prefix, 'delete.product-color'));
 

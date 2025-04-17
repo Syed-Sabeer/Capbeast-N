@@ -23,11 +23,11 @@ class EcommerceProductList extends Controller
   {
       // Fetch all products ordered by creation date (newest first), with pagination
       $products = Product::orderBy('created_at', 'desc')->paginate(25);
-  
+
       // Return the view with the products
       return view('admin.content.apps.app-ecommerce-product-list', compact('products'));
   }
-  
+
 
   public function updateVisibility($id, Request $request)
   {
@@ -108,10 +108,10 @@ class EcommerceProductList extends Controller
               'description' => 'required|string',
               'category_ids' => 'nullable|array',
               'quantity.*' => 'nullable|integer',
-              'front_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
-              'back_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
-              'right_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
-              'left_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+              // 'front_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+              // 'back_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+              // 'right_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+              // 'left_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
               'discount.*' => 'nullable|numeric',
               'size' => 'nullable|array',
           ]);
@@ -174,57 +174,57 @@ class EcommerceProductList extends Controller
           }
 
            // Process and store images
-      if (is_array($request->colorname1)) {
-        foreach ($request->colorname1 as $index => $colorName1) {
-          $colorName2 = $request->colorname2[$index] ?? null;
-          $colorCode1 = $request->colorcode1[$index] ?? null;
-          $colorCode2 = $request->colorcode2[$index] ?? null;
+          // if (is_array($request->colorname1)) {
+          //   foreach ($request->colorname1 as $index => $colorName1) {
+          //     $colorName2 = $request->colorname2[$index] ?? null;
+          //     $colorCode1 = $request->colorcode1[$index] ?? null;
+          //     $colorCode2 = $request->colorcode2[$index] ?? null;
 
-          // Ensure each file input is correctly retrieved
-          $frontImagePath = $request->hasFile("frontimage.$index") ? $request->file("frontimage")[$index]->store('ProductImages/FrontImage', 'public') : null;
-          $backImagePath = $request->hasFile("backimage.$index") ? $request->file("backimage")[$index]->store('ProductImages/BackImage', 'public') : null;
-          $rightImagePath = $request->hasFile("rightimage.$index") ? $request->file("rightimage")[$index]->store('ProductImages/RightImage', 'public') : null;
-          $leftImagePath = $request->hasFile("leftimage.$index") ? $request->file("leftimage")[$index]->store('ProductImages/LeftImage', 'public') : null;
+          //     // Ensure each file input is correctly retrieved
+          //     $frontImagePath = $request->hasFile("frontimage.$index") ? $request->file("frontimage")[$index]->store('ProductImages/FrontImage', 'public') : null;
+          //     $backImagePath = $request->hasFile("backimage.$index") ? $request->file("backimage")[$index]->store('ProductImages/BackImage', 'public') : null;
+          //     $rightImagePath = $request->hasFile("rightimage.$index") ? $request->file("rightimage")[$index]->store('ProductImages/RightImage', 'public') : null;
+          //     $leftImagePath = $request->hasFile("leftimage.$index") ? $request->file("leftimage")[$index]->store('ProductImages/LeftImage', 'public') : null;
 
-          // Get checkbox values for this color entry
-          $isFront = isset($request->is_front[$index]) && $request->is_front[$index] === 'on' ? '1' : '0';
-          $isBack = isset($request->is_back[$index]) && $request->is_back[$index] === 'on' ? '1' : '0';
-          $isRight = isset($request->is_right[$index]) && $request->is_right[$index] === 'on' ? '1' : '0';
-          $isLeft = isset($request->is_left[$index]) && $request->is_left[$index] === 'on' ? '1' : '0';
+          //     // Get checkbox values for this color entry
+          //     $isFront = isset($request->is_front[$index]) && $request->is_front[$index] === 'on' ? '1' : '0';
+          //     $isBack = isset($request->is_back[$index]) && $request->is_back[$index] === 'on' ? '1' : '0';
+          //     $isRight = isset($request->is_right[$index]) && $request->is_right[$index] === 'on' ? '1' : '0';
+          //     $isLeft = isset($request->is_left[$index]) && $request->is_left[$index] === 'on' ? '1' : '0';
 
-          Log::info("Image paths", compact('frontImagePath', 'backImagePath', 'rightImagePath', 'leftImagePath'));
+          //     Log::info("Image paths", compact('frontImagePath', 'backImagePath', 'rightImagePath', 'leftImagePath'));
 
-          // Create the product color entry if any image or color exists
-          if ($colorName1 || $colorName2 || $frontImagePath || $backImagePath || $rightImagePath || $leftImagePath) {
-            $productColor = ProductColor::create([
-              'product_id' => $product->id,
-              'color_name_1' => $colorName1,
-              'color_code_1' => $colorCode1,
-              'color_name_2' => $colorName2,
-              'color_code_2' => $colorCode2,
-              'front_image' => $frontImagePath,
-              'back_image' => $backImagePath,
-              'right_image' => $rightImagePath,
-              'left_image' => $leftImagePath,
-                // Add checkbox values
-              'is_front' => $isFront,
-              'is_back' => $isBack,
-              'is_right' => $isRight,
-              'is_left' => $isLeft,
-            ]);
+          //     // Create the product color entry if any image or color exists
+          //     if ($colorName1 || $colorName2 || $frontImagePath || $backImagePath || $rightImagePath || $leftImagePath) {
+          //       $productColor = ProductColor::create([
+          //         'product_id' => $product->id,
+          //         'color_name_1' => $colorName1,
+          //         'color_code_1' => $colorCode1,
+          //         'color_name_2' => $colorName2,
+          //         'color_code_2' => $colorCode2,
+          //         'front_image' => $frontImagePath,
+          //         'back_image' => $backImagePath,
+          //         'right_image' => $rightImagePath,
+          //         'left_image' => $leftImagePath,
+          //           // Add checkbox values
+          //         'is_front' => $isFront,
+          //         'is_back' => $isBack,
+          //         'is_right' => $isRight,
+          //         'is_left' => $isLeft,
+          //       ]);
 
-            if ($productColor) {
-              Log::info("Product color entry created successfully", ['product_color_id' => $productColor->id]);
-            } else {
-              Log::error("Failed to create product color entry", ['product_id' => $product->id]);
-            }
-          } else {
-            Log::warning("Skipping color entry due to missing data", ['index' => $index]);
-          }
-        }
-      } else {
-        Log::error("colorname1 is not an array", ['colorname1' => $request->colorname1]);
-      }
+          //       if ($productColor) {
+          //         Log::info("Product color entry created successfully", ['product_color_id' => $productColor->id]);
+          //       } else {
+          //         Log::error("Failed to create product color entry", ['product_id' => $product->id]);
+          //       }
+          //     } else {
+          //       Log::warning("Skipping color entry due to missing data", ['index' => $index]);
+          //     }
+          //   }
+          // } else {
+          //   Log::error("colorname1 is not an array", ['colorname1' => $request->colorname1]);
+          // }
 
           DB::commit();
 
