@@ -14,7 +14,7 @@ class Product extends Model
 
     protected $table = 'products'; // Define the table name
     protected $fillable = [
-        'brand_id', 'mlb_id', 'title', 'slug', 'description', 'cost_price', 'selling_price',
+        'brand_id', 'mlb_id', 'title', 'slug', 'sku','description', 'cost_price', 'selling_price',
         'size_unit', 'height', 'width', 'length', 'weight_unit', 'weight', 'visibility', 'size'
     ];
 

@@ -1671,16 +1671,16 @@
             // Boundary configurations
             const boundaryConfigs = {
                 'front': {
-                    top: '20%',
+                    top: '30%',
                     left: '50%',
                     width: '60%',
-                    height: '40%'
+                    height: '30%'
                 },
                 'back': {
-                    top: '20%',
+                    top: '30%',
                     left: '50%',
                     width: '60%',
-                    height: '40%'
+                    height: '30%'
                 },
                 'left': {
                     top: '46%',
@@ -2084,6 +2084,170 @@
             }
 
             // Element editing setup
+            // function setupImageEditing(element) {
+            //     const $element = $(element);
+            //     const imgContent = $element.find('img')[0];
+            //     let startX, startY, startWidth, startHeight, startAngle;
+            //     let isDragging = false,
+            //         isResizing = false,
+            //         isRotating = false;
+            //     let resizeDirection = '';
+
+            //     $element.on('mousedown', function(e) {
+            //         if (e.target === element || e.target === imgContent) {
+            //             isDragging = true;
+            //             startX = e.clientX - element.getBoundingClientRect().left;
+            //             startY = e.clientY - element.getBoundingClientRect().top;
+            //             selectElement(element);
+            //             e.preventDefault();
+            //         }
+            //     });
+
+            //     $element.find('.resize-handle').on('mousedown', function(e) {
+            //         isResizing = true;
+            //         resizeDirection = $(this).attr('class').split(' ')[1].split('-')[1];
+            //         const style = $element[0].style;
+            //         startWidth = parseFloat(style.width) || imgContent.offsetWidth;
+            //         startHeight = parseFloat(style.height) || imgContent.offsetHeight;
+            //         startLeft = parseFloat(style.left) || 0;
+            //         startTop = parseFloat(style.top) || 0;
+            //         startX = e.clientX;
+            //         startY = e.clientY;
+            //         selectElement(element);
+            //         e.stopPropagation();
+            //         e.preventDefault();
+            //     });
+
+            //     $element.find('.rotate-handle').on('mousedown', function(e) {
+            //         isRotating = true;
+            //         const rect = element.getBoundingClientRect();
+            //         const centerX = rect.left + rect.width / 2;
+            //         const centerY = rect.top + rect.height / 2;
+            //         startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
+            //         const currentAngle = parseFloat($element.css('transform')?.replace(/[^0-9\-.,]/g, '') ||
+            //             0);
+            //         startAngle -= currentAngle;
+            //         selectElement(element);
+            //         e.stopPropagation();
+            //         e.preventDefault();
+            //     });
+
+            //     // Modify the delete button click handler
+            //     $element.find('.delete-btn').on('click', function(e) {
+            //         const imageId = $element.data('image-id');
+
+            //         if (imageId) {
+            //             if (confirm('Are you sure you want to delete this image permanently?')) {
+            //                 $('#loader').show();
+            //                 $.ajax({
+            //                     url: "{{ route('customizer.delete-image', '') }}/" + imageId,
+            //                     method: 'GET',
+            //                     headers: {
+            //                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            //                     },
+            //                     success: () => {
+            //                         $('#loader').hide();
+            //                         $element.remove();
+            //                         saveState();
+            //                     },
+            //                     error: () => {
+            //                         $('#loader').hide();
+            //                         alert('Failed to delete image from server');
+            //                     }
+            //                 });
+            //             }
+            //         } else {
+            //             $element.remove();
+            //             saveState();
+            //         }
+
+            //         e.stopPropagation();
+            //     });
+
+            //     $(document).on('mousemove', function(e) {
+            //         if (!selectedElement || selectedElement !== element) return;
+
+            //         const boundaryRect = designContent[0].getBoundingClientRect();
+            //         const elemRect = element.getBoundingClientRect();
+
+            //         if (isDragging) {
+            //             let newLeft = e.clientX - boundaryRect.left - startX;
+            //             let newTop = e.clientY - boundaryRect.top - startY;
+            //             newLeft = Math.max(0, Math.min(newLeft, boundaryRect.width - elemRect.width));
+            //             newTop = Math.max(0, Math.min(newTop, boundaryRect.height - elemRect.height));
+            //             $element.css({
+            //                 left: `${newLeft}px`,
+            //                 top: `${newTop}px`
+            //             });
+            //         } else if (isResizing) {
+            //             const deltaX = e.clientX - startX;
+            //             const deltaY = e.clientY - startY;
+            //             let newWidth = startWidth;
+            //             let newHeight = startHeight;
+
+            //             // Calculate new dimensions based on resize direction
+            //             if (resizeDirection.includes('e')) newWidth += deltaX;
+            //             if (resizeDirection.includes('w')) newWidth -= deltaX;
+            //             if (resizeDirection.includes('s')) newHeight += deltaY;
+            //             if (resizeDirection.includes('n')) newHeight -= deltaY;
+
+            //             // Maintain aspect ratio if shift key is pressed
+            //             if (e.shiftKey) {
+            //                 const aspect = startWidth / startHeight;
+            //                 if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            //                     newHeight = newWidth / aspect;
+            //                 } else {
+            //                     newWidth = newHeight * aspect;
+            //                 }
+            //             }
+
+            //             // Apply minimum size constraints
+            //             newWidth = Math.max(newWidth, 30);
+            //             newHeight = Math.max(newHeight, 30);
+
+            //             // Calculate new position based on initial values and size changes
+            //             let newLeft = startLeft;
+            //             let newTop = startTop;
+
+            //             if (resizeDirection.includes('w')) {
+            //                 newLeft = startLeft + (startWidth - newWidth);
+            //             }
+            //             if (resizeDirection.includes('n')) {
+            //                 newTop = startTop + (startHeight - newHeight);
+            //             }
+
+            //             // Boundary constraints
+            //             const boundaryRect = designContent[0].getBoundingClientRect();
+            //             newLeft = Math.max(0, Math.min(newLeft, boundaryRect.width - newWidth));
+            //             newTop = Math.max(0, Math.min(newTop, boundaryRect.height - newHeight));
+
+            //             // Apply new dimensions and position
+            //             $element.css({
+            //                 width: `${newWidth}px`,
+            //                 height: `${newHeight}px`,
+            //                 left: `${newLeft}px`,
+            //                 top: `${newTop}px`
+            //             });
+
+            //             $(imgContent).css({
+            //                 width: '100%',
+            //                 height: '100%'
+            //             });
+            //         } else if (isRotating) {
+            //             const rect = element.getBoundingClientRect();
+            //             const centerX = rect.left + rect.width / 2;
+            //             const centerY = rect.top + rect.height / 2;
+            //             const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
+            //             $element.css('transform', `rotate(${angle - startAngle}deg)`);
+            //         }
+            //     });
+
+            //     $(document).on('mouseup', function() {
+            //         if (isDragging || isResizing || isRotating) saveState();
+            //         isDragging = isResizing = isRotating = false;
+            //     });
+            // }
+            // In the setupImageEditing function, update the event listeners:
             function setupImageEditing(element) {
                 const $element = $(element);
                 const imgContent = $element.find('img')[0];
@@ -2093,17 +2257,38 @@
                     isRotating = false;
                 let resizeDirection = '';
 
-                $element.on('mousedown', function(e) {
+                // Helper function to get coordinates from either mouse or touch event
+                function getCoordinates(e) {
+                    if (e.type.startsWith('touch')) {
+                        return {
+                            clientX: e.touches[0].clientX,
+                            clientY: e.touches[0].clientY
+                        };
+                    }
+                    return {
+                        clientX: e.clientX,
+                        clientY: e.clientY
+                    };
+                }
+
+                // Mouse and touch start handlers
+                function handleStart(e) {
+                    const coords = getCoordinates(e);
                     if (e.target === element || e.target === imgContent) {
                         isDragging = true;
-                        startX = e.clientX - element.getBoundingClientRect().left;
-                        startY = e.clientY - element.getBoundingClientRect().top;
+                        const rect = element.getBoundingClientRect();
+                        startX = coords.clientX - rect.left;
+                        startY = coords.clientY - rect.top;
                         selectElement(element);
                         e.preventDefault();
                     }
-                });
+                }
 
-                $element.find('.resize-handle').on('mousedown', function(e) {
+                $element.on('mousedown touchstart', handleStart);
+
+                // Resize handles
+                $element.find('.resize-handle').on('mousedown touchstart', function(e) {
+                    const coords = getCoordinates(e);
                     isResizing = true;
                     resizeDirection = $(this).attr('class').split(' ')[1].split('-')[1];
                     const style = $element[0].style;
@@ -2111,25 +2296,107 @@
                     startHeight = parseFloat(style.height) || imgContent.offsetHeight;
                     startLeft = parseFloat(style.left) || 0;
                     startTop = parseFloat(style.top) || 0;
-                    startX = e.clientX;
-                    startY = e.clientY;
+                    startX = coords.clientX;
+                    startY = coords.clientY;
                     selectElement(element);
                     e.stopPropagation();
                     e.preventDefault();
                 });
 
-                $element.find('.rotate-handle').on('mousedown', function(e) {
+                // Rotate handle
+                $element.find('.rotate-handle').on('mousedown touchstart', function(e) {
+                    const coords = getCoordinates(e);
                     isRotating = true;
                     const rect = element.getBoundingClientRect();
                     const centerX = rect.left + rect.width / 2;
                     const centerY = rect.top + rect.height / 2;
-                    startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
+                    startAngle = Math.atan2(coords.clientY - centerY, coords.clientX - centerX) * 180 / Math
+                        .PI;
                     const currentAngle = parseFloat($element.css('transform')?.replace(/[^0-9\-.,]/g, '') ||
                         0);
                     startAngle -= currentAngle;
                     selectElement(element);
                     e.stopPropagation();
                     e.preventDefault();
+                });
+
+                // Move handlers
+                function handleMove(e) {
+                    if (!selectedElement || selectedElement !== element) return;
+                    const coords = getCoordinates(e);
+
+                    const boundaryRect = designContent[0].getBoundingClientRect();
+                    const elemRect = element.getBoundingClientRect();
+
+                    if (isDragging) {
+                        let newLeft = coords.clientX - boundaryRect.left - startX;
+                        let newTop = coords.clientY - boundaryRect.top - startY;
+                        newLeft = Math.max(0, Math.min(newLeft, boundaryRect.width - elemRect.width));
+                        newTop = Math.max(0, Math.min(newTop, boundaryRect.height - elemRect.height));
+                        $element.css({
+                            left: `${newLeft}px`,
+                            top: `${newTop}px`
+                        });
+                    } else if (isResizing) {
+                        const deltaX = coords.clientX - startX;
+                        const deltaY = coords.clientY - startY;
+                        let newWidth = startWidth;
+                        let newHeight = startHeight;
+
+                        if (resizeDirection.includes('e')) newWidth += deltaX;
+                        if (resizeDirection.includes('w')) newWidth -= deltaX;
+                        if (resizeDirection.includes('s')) newHeight += deltaY;
+                        if (resizeDirection.includes('n')) newHeight -= deltaY;
+
+                        if (e.shiftKey) {
+                            const aspect = startWidth / startHeight;
+                            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                                newHeight = newWidth / aspect;
+                            } else {
+                                newWidth = newHeight * aspect;
+                            }
+                        }
+
+                        newWidth = Math.max(newWidth, 30);
+                        newHeight = Math.max(newHeight, 30);
+
+                        let newLeft = startLeft;
+                        let newTop = startTop;
+
+                        if (resizeDirection.includes('w')) {
+                            newLeft = startLeft + (startWidth - newWidth);
+                        }
+                        if (resizeDirection.includes('n')) {
+                            newTop = startTop + (startHeight - newHeight);
+                        }
+
+                        const boundaryRect = designContent[0].getBoundingClientRect();
+                        newLeft = Math.max(0, Math.min(newLeft, boundaryRect.width - newWidth));
+                        newTop = Math.max(0, Math.min(newTop, boundaryRect.height - newHeight));
+
+                        $element.css({
+                            width: `${newWidth}px`,
+                            height: `${newHeight}px`,
+                            left: `${newLeft}px`,
+                            top: `${newTop}px`
+                        });
+
+                        $(imgContent).css({
+                            width: '100%',
+                            height: '100%'
+                        });
+                    } else if (isRotating) {
+                        const rect = element.getBoundingClientRect();
+                        const centerX = rect.left + rect.width / 2;
+                        const centerY = rect.top + rect.height / 2;
+                        const angle = Math.atan2(coords.clientY - centerY, coords.clientX - centerX) * 180 / Math
+                            .PI;
+                        $element.css('transform', `rotate(${angle - startAngle}deg)`);
+                    }
+                }
+
+                $(document).on('mousemove touchmove', function(e) {
+                    handleMove(e);
                 });
 
                 // Modify the delete button click handler
@@ -2164,91 +2431,90 @@
                     e.stopPropagation();
                 });
 
-                $(document).on('mousemove', function(e) {
-                    if (!selectedElement || selectedElement !== element) return;
-
-                    const boundaryRect = designContent[0].getBoundingClientRect();
-                    const elemRect = element.getBoundingClientRect();
-
-                    if (isDragging) {
-                        let newLeft = e.clientX - boundaryRect.left - startX;
-                        let newTop = e.clientY - boundaryRect.top - startY;
-                        newLeft = Math.max(0, Math.min(newLeft, boundaryRect.width - elemRect.width));
-                        newTop = Math.max(0, Math.min(newTop, boundaryRect.height - elemRect.height));
-                        $element.css({
-                            left: `${newLeft}px`,
-                            top: `${newTop}px`
-                        });
-                    } else if (isResizing) {
-                        const deltaX = e.clientX - startX;
-                        const deltaY = e.clientY - startY;
-                        let newWidth = startWidth;
-                        let newHeight = startHeight;
-
-                        // Calculate new dimensions based on resize direction
-                        if (resizeDirection.includes('e')) newWidth += deltaX;
-                        if (resizeDirection.includes('w')) newWidth -= deltaX;
-                        if (resizeDirection.includes('s')) newHeight += deltaY;
-                        if (resizeDirection.includes('n')) newHeight -= deltaY;
-
-                        // Maintain aspect ratio if shift key is pressed
-                        if (e.shiftKey) {
-                            const aspect = startWidth / startHeight;
-                            if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                                newHeight = newWidth / aspect;
-                            } else {
-                                newWidth = newHeight * aspect;
-                            }
-                        }
-
-                        // Apply minimum size constraints
-                        newWidth = Math.max(newWidth, 30);
-                        newHeight = Math.max(newHeight, 30);
-
-                        // Calculate new position based on initial values and size changes
-                        let newLeft = startLeft;
-                        let newTop = startTop;
-
-                        if (resizeDirection.includes('w')) {
-                            newLeft = startLeft + (startWidth - newWidth);
-                        }
-                        if (resizeDirection.includes('n')) {
-                            newTop = startTop + (startHeight - newHeight);
-                        }
-
-                        // Boundary constraints
-                        const boundaryRect = designContent[0].getBoundingClientRect();
-                        newLeft = Math.max(0, Math.min(newLeft, boundaryRect.width - newWidth));
-                        newTop = Math.max(0, Math.min(newTop, boundaryRect.height - newHeight));
-
-                        // Apply new dimensions and position
-                        $element.css({
-                            width: `${newWidth}px`,
-                            height: `${newHeight}px`,
-                            left: `${newLeft}px`,
-                            top: `${newTop}px`
-                        });
-
-                        $(imgContent).css({
-                            width: '100%',
-                            height: '100%'
-                        });
-                    } else if (isRotating) {
-                        const rect = element.getBoundingClientRect();
-                        const centerX = rect.left + rect.width / 2;
-                        const centerY = rect.top + rect.height / 2;
-                        const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
-                        $element.css('transform', `rotate(${angle - startAngle}deg)`);
-                    }
-                });
-
-                $(document).on('mouseup', function() {
+                // End handlers
+                function handleEnd() {
                     if (isDragging || isResizing || isRotating) saveState();
                     isDragging = isResizing = isRotating = false;
-                });
+                }
+
+                $(document).on('mouseup touchend', handleEnd);
             }
 
+            // Update CSS to prevent unwanted touch behaviors
+            $('<style>').text(`
+                .resize-handle, .rotate-handle, .delete-btn {
+                    touch-action: none;
+                }
+                .editable-image, .text-design {
+                    touch-action: none;
+                }
+                .editable-image, .text-design {
+                    touch-action: none;
+                }
+            `).appendTo('head');
+
             // Text editing setup
+            // function setupTextEditing(element) {
+            //     const $element = $(element);
+            //     let isDragging = false;
+            //     let offset = {
+            //         x: 0,
+            //         y: 0
+            //     };
+
+            //     $element.on('mousedown', function(e) {
+            //         // Only allow editing if this is the current view's text
+            //         const textView = designState.views[designState.currentView].elements.find(el =>
+            //             el.type === 'text' && el.content === $(this).text()
+            //         );
+
+            //         if (textView) {
+            //             isDragging = true;
+            //             offset = {
+            //                 x: e.clientX - element.getBoundingClientRect().left,
+            //                 y: e.clientY - element.getBoundingClientRect().top
+            //             };
+            //             $element.css('cursor', 'grabbing');
+            //             selectElement(element);
+            //             currentTextElement = $element;
+            //             $('#text-panel input[type="text"]').val($element.text());
+            //             e.preventDefault();
+            //         }
+            //     });
+
+            //     $(document).on('mousemove', function(e) {
+            //         if (!isDragging) return;
+            //         const boundaryRect = designContent[0].getBoundingClientRect();
+            //         const newLeft = e.clientX - boundaryRect.left - offset.x;
+            //         const newTop = e.clientY - boundaryRect.top - offset.y;
+            //         const maxX = boundaryRect.width - element.offsetWidth;
+            //         const maxY = boundaryRect.height - element.offsetHeight;
+            //         $element.css({
+            //             left: `${Math.min(Math.max(newLeft, 0), maxX)}px`,
+            //             top: `${Math.min(Math.max(newTop, 0), maxY)}px`
+            //         });
+            //     });
+
+            //     $(document).on('mouseup', function() {
+            //         isDragging = false;
+            //         $element.css('cursor', 'grab');
+            //         saveState();
+            //     });
+
+            //     // Make text non-editable when not selected
+            //     $element.prop('contentEditable', false);
+
+            //     $element.on('dblclick', function() {
+            //         if (currentTextElement === $element) {
+            //             $element.prop('contentEditable', true).focus();
+            //         }
+            //     });
+
+            //     $element.on('blur', function() {
+            //         $element.prop('contentEditable', false);
+            //         saveState();
+            //     });
+            // }
             function setupTextEditing(element) {
                 const $element = $(element);
                 let isDragging = false;
@@ -2257,17 +2523,31 @@
                     y: 0
                 };
 
-                $element.on('mousedown', function(e) {
-                    // Only allow editing if this is the current view's text
+                function getCoordinates(e) {
+                    if (e.type.startsWith('touch')) {
+                        return {
+                            clientX: e.touches[0].clientX,
+                            clientY: e.touches[0].clientY
+                        };
+                    }
+                    return {
+                        clientX: e.clientX,
+                        clientY: e.clientY
+                    };
+                }
+
+                function handleStart(e) {
+                    const coords = getCoordinates(e);
+
                     const textView = designState.views[designState.currentView].elements.find(el =>
-                        el.type === 'text' && el.content === $(this).text()
+                        el.type === 'text' && el.content === $element.text()
                     );
 
                     if (textView) {
                         isDragging = true;
                         offset = {
-                            x: e.clientX - element.getBoundingClientRect().left,
-                            y: e.clientY - element.getBoundingClientRect().top
+                            x: coords.clientX - element.getBoundingClientRect().left,
+                            y: coords.clientY - element.getBoundingClientRect().top
                         };
                         $element.css('cursor', 'grabbing');
                         selectElement(element);
@@ -2275,26 +2555,35 @@
                         $('#text-panel input[type="text"]').val($element.text());
                         e.preventDefault();
                     }
-                });
+                }
 
-                $(document).on('mousemove', function(e) {
+                function handleMove(e) {
                     if (!isDragging) return;
+                    const coords = getCoordinates(e);
+
                     const boundaryRect = designContent[0].getBoundingClientRect();
-                    const newLeft = e.clientX - boundaryRect.left - offset.x;
-                    const newTop = e.clientY - boundaryRect.top - offset.y;
+                    const newLeft = coords.clientX - boundaryRect.left - offset.x;
+                    const newTop = coords.clientY - boundaryRect.top - offset.y;
                     const maxX = boundaryRect.width - element.offsetWidth;
                     const maxY = boundaryRect.height - element.offsetHeight;
+
                     $element.css({
                         left: `${Math.min(Math.max(newLeft, 0), maxX)}px`,
                         top: `${Math.min(Math.max(newTop, 0), maxY)}px`
                     });
-                });
+                }
 
-                $(document).on('mouseup', function() {
-                    isDragging = false;
-                    $element.css('cursor', 'grab');
-                    saveState();
-                });
+                function handleEnd() {
+                    if (isDragging) {
+                        isDragging = false;
+                        $element.css('cursor', 'grab');
+                        saveState();
+                    }
+                }
+
+                $element.on('mousedown touchstart', handleStart);
+                $(document).on('mousemove touchmove', handleMove);
+                $(document).on('mouseup touchend', handleEnd);
 
                 // Make text non-editable when not selected
                 $element.prop('contentEditable', false);
@@ -2310,6 +2599,7 @@
                     saveState();
                 });
             }
+
 
             // Text input handling - modified to be view-specific
             $('#text-panel input[type="text"]').on('input', function() {

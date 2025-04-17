@@ -35,10 +35,16 @@
 
                     <div class="card-body">
                         <div class="row">
-                            <div class="mb-3 col-12">
+                            <div class="mb-3 col-8">
                                 <label class="form-label">Product Name</label>
                                 <input type="text" name="title" class="form-control" placeholder="Product title"
                                     value="{{ $product->title }}" required>
+                            </div>
+
+                            <div class="mb-3 col-4">
+                                <label class="form-label">Product SKU</label>
+                                <input type="text" name="sku" class="form-control" placeholder="Product SKU"
+                                    value="{{ $product->sku }}" required>
                             </div>
 
 

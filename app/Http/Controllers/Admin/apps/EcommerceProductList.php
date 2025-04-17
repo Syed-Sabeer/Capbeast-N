@@ -21,13 +21,13 @@ class EcommerceProductList extends Controller
 {
   public function index()
   {
-    // Fetch all products and their pricing information
-    $products = Product::paginate(25);
-
-
-    // Return the view with the products and their pricing
-    return view('admin.content.apps.app-ecommerce-product-list', compact('products'));
+      // Fetch all products ordered by creation date (newest first), with pagination
+      $products = Product::orderBy('created_at', 'desc')->paginate(25);
+  
+      // Return the view with the products
+      return view('admin.content.apps.app-ecommerce-product-list', compact('products'));
   }
+  
 
   public function updateVisibility($id, Request $request)
   {
@@ -104,6 +104,7 @@ class EcommerceProductList extends Controller
               'metadescription' => 'nullable|string',
               'metakeywords' => 'nullable|string',
               'slug' => 'required|string|unique:products,slug,' . $id,
+              'sku' => 'nullable|string|unique:products,sku|max:255',
               'description' => 'required|string',
               'category_ids' => 'nullable|array',
               'quantity.*' => 'nullable|integer',
@@ -126,6 +127,7 @@ class EcommerceProductList extends Controller
               'mlb_id' => $request->mlb_id,
               'title' => $request->title,
               'slug' => $request->slug,
+              'sku' => $request->sku,
               'description' => $request->description,
               'cost_price' => $request->cost_price,
               'selling_price' => $request->selling_price,

@@ -43,6 +43,7 @@ class EcommerceProductAdd extends Controller
         'metadescription' => 'nullable|string',
         'metakeywords' => 'nullable|string',
         'slug' => 'nullable|string|unique:products,slug|max:255',
+        'sku' => 'nullable|string|unique:products,sku|max:255',
         'description' => 'required|string',
         'base_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         'color.*' => 'required|string',
@@ -76,6 +77,7 @@ class EcommerceProductAdd extends Controller
         'width' => $request->width,
         'length' => $request->length,
         'weight' => $request->weight,
+        'sku' => $request->sku,
       ]);
 
       // Check if category_ids exists and is an array before looping

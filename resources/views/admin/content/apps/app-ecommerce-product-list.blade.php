@@ -44,10 +44,11 @@
                         <th>#</th>
                         <th>Image</th>
                         <th>Product</th>
-                        <th>Selling Price</th>
+                        <th>S. Price</th>
                         <th>Brand</th>
                         <th>Category</th>
-                        <th>Visibility</th>
+                        <th>SKU</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -71,7 +72,9 @@
                         </td>
 
 
-                        <td>{{ $product->title }}</td>
+                        <td>{{ \Illuminate\Support\Str::limit($product->title, 20, '...') }}</td>
+
+
                         <td>
                             {{ $product->selling_price }}
 
@@ -79,7 +82,10 @@
                         <td>{{ $product->productBrand->title ?? 'No Brand' }}</td>
                         <td>{{ $product->categories->pluck('title')->implode(', ') ?: 'No Category' }}</td>
                         
+                        <td>
+                            {{ $product->sku }}
 
+                        </td>
                         <td>
                             <div class="w-25 d-flex justify-content-end">
                                 <label class="switch switch-primary switch-sm me-4 pe-2">
