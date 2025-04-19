@@ -44,7 +44,7 @@ use App\Http\Controllers\Admin\apps\EcommerceProductColor;
 use App\Http\Controllers\Admin\apps\CustomizerDesignController;
 use App\Http\Controllers\Admin\apps\CustomizerColorController;
 use App\Http\Controllers\Admin\apps\CustomizerPriceController;
-use App\Http\Controllers\Admin\Apps\EcommerceAbandonCartController;
+use App\Http\Controllers\Admin\apps\EcommerceAbandonCartController;
 use App\Http\Controllers\Admin\components\TVQTaxPricingController;
 use App\Http\Controllers\Admin\components\TPSTaxPricingController;
 use App\Http\Controllers\Admin\components\InternalStatusController;
@@ -208,8 +208,8 @@ foreach ($roles as $role => $prefix) {
 
         Route::get('/abandoncart/list', [EcommerceAbandonCartController::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-abandon-cart-list'));
         Route::get('/abandoncart/detail/{cartId}', [EcommerceAbandonCartController::class, 'view'])->name(Route::prefixed($prefix, 'app-ecommerce-abandon-cart-detail'));
-        // Route::post('/order/upload-file/{id}', [EcommerceOrderDetails::class, 'orderfileupload'])->name(Route::prefixed($prefix, 'order.file.upload'));
-        // Route::post('/order/{orderId}/update-status', [EcommerceOrderDetails::class, 'updateOrderStatus'])->name(Route::prefixed($prefix, 'order-status.update'));
+        Route::post('/admin/abandoncart/{id}/status', [EcommerceAbandonCartController::class, 'updateStatusCart'])->name(Route::prefixed($prefix, 'admin.abandoncart.updateStatus'));
+        
 
 
 
@@ -331,7 +331,7 @@ foreach ($roles as $role => $prefix) {
         Route::post('/order/{orderId}/update-status', [EcommerceOrderDetails::class, 'updateOrderStatus'])->name(Route::prefixed($prefix, 'order-status.update'));
 
         Route::post('/admin/orders/{id}/status', [EcommerceOrderList::class, 'updateStatus'])->name(Route::prefixed($prefix, 'admin.orders.updateStatus'));
-        Route::post('/admin/abandoncart/{id}/status', [EcommerceAbandonCartController::class, 'updateStatusCart'])->name(Route::prefixed($prefix, 'admin.abandoncart.updateStatus'));
+      
 
         Route::get('/customer/all', [EcommerceCustomerAll::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-customer-all'));
         Route::get('/customer/{id}', [EcommerceCustomerDetailsOverview::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-customer-detail'));
