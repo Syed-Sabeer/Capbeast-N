@@ -100,7 +100,7 @@
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <p><strong>Joined:</strong>
-                                                                    {{ $item['user']->created_at->format('M d, Y') }}</p>
+                                                                    {{ $item['user']->created_at->format('M d, Y') ?? 'N/A'}}</p>
                                                                 <p><strong>Address:</strong>
                                                                     {{ $item['user']->address ?? 'N/A' }}</p>
                                                                 <p><strong>Country:</strong>
