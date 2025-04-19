@@ -59,7 +59,7 @@ Route::get('/', function () {
   return redirect()->route('home');
 });
 
-Route::get('/sabeer', function() {
+Route::get('/cache', function() {
   $exitCode = Artisan::call('cache:clear');
   $exitCode = Artisan::call('config:clear');
   $exitCode = Artisan::call('route:clear');
@@ -331,6 +331,7 @@ foreach ($roles as $role => $prefix) {
         Route::post('/order/{orderId}/update-status', [EcommerceOrderDetails::class, 'updateOrderStatus'])->name(Route::prefixed($prefix, 'order-status.update'));
 
         Route::post('/admin/orders/{id}/status', [EcommerceOrderList::class, 'updateStatus'])->name(Route::prefixed($prefix, 'admin.orders.updateStatus'));
+        Route::post('/admin/abandoncart/{id}/status', [EcommerceAbandonCartController::class, 'updateStatusCart'])->name(Route::prefixed($prefix, 'admin.abandoncart.updateStatus'));
 
         Route::get('/customer/all', [EcommerceCustomerAll::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-customer-all'));
         Route::get('/customer/{id}', [EcommerceCustomerDetailsOverview::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-customer-detail'));
