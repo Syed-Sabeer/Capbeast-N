@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class EcommerceAbandonCartController extends Controller
 {
+    
     public function index()
     {
         // First get users with abandoned carts
