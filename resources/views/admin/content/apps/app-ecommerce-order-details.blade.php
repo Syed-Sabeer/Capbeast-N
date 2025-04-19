@@ -331,9 +331,14 @@
                                 @endif
                             @endif
 
-                            <div class="d-flex justify-content-between mb-2">
+                            {{-- <div class="d-flex justify-content-between mb-2">
                                 <span class="w-px-100 text-heading">Custom. Price:</span>
                                 <h6 class="mb-0"> ${{ $totalCustomizationPrice }}</h6>
+                            </div> --}}
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="w-px-100 text-heading">Shipping ({{ $order->shippingRate->service_name }}):</span>
+                                <h6 class="mb-0">- ${{ $order->shipping_price }}</h6>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="w-px-100 text-heading">Discount:</span>
