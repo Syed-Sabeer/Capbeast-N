@@ -99,8 +99,10 @@
                                                                     {{ $item['user']->phone ?? 'N/A' }}</p>
                                                             </div>
                                                             <div class="col-md-6">
-                                                                <p><strong>Joined:</strong>
-                                                                  {{ $item['user']->created_at->format('M d, Y') ?? 'N/A' }}
+                                                              <p><strong>Joined:</strong>
+                                                                {{ optional($item['user']->created_at)->format('M d, Y') ?? 'N/A' }}
+                                                            </p>
+                                                            
 
                                                                 <p><strong>Address:</strong>
                                                                     {{ $item['user']->address ?? 'N/A' }}</p>
