@@ -160,7 +160,7 @@
                                     <div class="row g-3">
                                         <div class="col-lg-3 col-6">
                                             <p class="text-muted mb-2 text-uppercase fw-semibold fs-14">Order No</p>
-                                            <h5 class="fs-15 mb-0">#TTB<span id="invoice-no"></span></h5>
+                                            <h5 class="fs-15 mb-0">#<span id="invoice-no"></span></h5>
                                         </div>
                                         <div class="col-lg-3 col-6">
                                             <p class="text-muted mb-2 text-uppercase fw-semibold fs-14">Date</p>
