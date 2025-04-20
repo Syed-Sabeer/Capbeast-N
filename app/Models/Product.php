@@ -38,6 +38,10 @@ class Product extends Model
     return $this->hasMany(OrderItem::class, 'product_id');
 }
 
+public function wishlist()
+{
+    return $this->hasMany(UserWishlist::class, 'product_id');
+}
 
     public function productBrand()
     {

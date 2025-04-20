@@ -12,4 +12,10 @@ class UserWishlist extends Model
     protected $table = 'user_wishlists'; // Define table name
 
     protected $fillable = ['user_id', 'product_id']; // Allow mass assignment
+
+    public function product()
+{
+    return $this->belongsTo(Product::class, 'product_id');
+}
+
 }

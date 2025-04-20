@@ -115,6 +115,7 @@ Route::middleware(['web'])->group(function () {
     Route::post('/checkout/add', [OrderController::class, 'add'])->name('checkout.add');
     Route::get('/order-success', [OrderController::class, 'orderSuccess'])->name('main.pages.success');
     Route::get('/order-history', [OrderController::class, 'orderHistory'])->name('main.pages.orderhistory');
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist');
     Route::get('/payment-status', [OrderController::class, 'GetPaymentStatus'])->name('status');
     Route::post('/apply-discount', [OrderController::class, 'applyDiscount'])->name('apply.discount');
 

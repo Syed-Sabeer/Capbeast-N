@@ -254,6 +254,13 @@
         <a class="dropdown-item" href="{{ route('main.pages.orderhistory') }}"><i
             class="bi bi-cart4 text-muted fs-16 align-middle me-1"></i>
         <span class="align-middle">Order History</span></a>
+
+        <a class="dropdown-item" href="{{ route('wishlist') }}">
+            <i class="bi bi-heart text-muted fs-16 align-middle me-1"></i>
+            <span class="align-middle" data-key="t-wishlist">Wishlist</span>
+        </a>
+        
+
                             {{-- <a class="dropdown-item" href="track-order.html"><i class="bi bi-truck text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Track Orders</span></a> --}}
                             {{-- <a class="dropdown-item" href="../backend/index.html"><i class="bi bi-speedometer2 text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Dashboard</span></a> --}}
                             {{-- <a class="dropdown-item" href="ecommerce-faq.html"><i class="mdi mdi-lifebuoy text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Help</span></a> --}}

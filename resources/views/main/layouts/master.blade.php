@@ -16,6 +16,9 @@
     <link href="{{ asset('assetsMain/css/custom.css') }}" rel="stylesheet" type="text/css" />
 
 
+      
+      
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.5.0/remixicon.css" integrity="sha512-6p+GTq7fjTHD/sdFPWHaFoALKeWOU9f9MPBoPnvJEWBkGS4PKVVbCpMps6IXnTiXghFbxlgDE8QRHc3MU91lJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" integrity="sha512-dPXYcDub/aeb08c63jRq/k6GaKccl256JQy/AnOq7CAnEZ9FzSL9wSbcZkMp4R26vBsMLFYH4kQ67/bbV8XaCQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -79,7 +82,32 @@
     <script src="{{ asset('assets/js/frontend/landing-index.init.js')}}"></script>
 
     <script src="{{ asset('assets/js/frontend/menu.init.js')}}"></script>
+    
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
+<script>
+ @if(Session::has('message'))
+ var type = "{{ Session::get('alert-type','info') }}"
+ switch(type){
+    case 'info':
+    toastr.info(" {{ Session::get('message') }} ");
+    break;
+
+    case 'success':
+    toastr.success(" {{ Session::get('message') }} ");
+    break;
+
+    case 'warning':
+    toastr.warning(" {{ Session::get('message') }} ");
+    break;
+
+    case 'error':
+    toastr.error(" {{ Session::get('message') }} ");
+    break;
+ }
+ @endif
+</script>
+    
 </body>
 
 </html>

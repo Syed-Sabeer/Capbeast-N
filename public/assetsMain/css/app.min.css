@@ -611,7 +611,7 @@
 }
 
 .footer-landing .footer-link a:hover {
-    color: var(--tb-body-color);
+    color: #fff !important;
     text-decoration: underline !important;
 }
 
