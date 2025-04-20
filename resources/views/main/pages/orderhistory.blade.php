@@ -232,24 +232,20 @@
                                                     <td class="text-end"><span id="sub-total"></span> $</td>
                                                 </tr>
 
-                                                @if ($order->TaxDetails && ($order->TaxDetails->tvq_tax_price > 0 || $order->TaxDetails->tvq_tax_percentage > 0))
-                                                    <tr>
-                                                        <td>TVQ Tax <span id="TVQtax-percentage"></span>% (<span
-                                                                id="TVQtax-no"></span>) <small class="text-muted"></small>
-                                                        </td>
-                                                        <td class="text-end"><span id="TVQtax-amount"></span> $</td>
-                                                    </tr>
-                                                @endif
-
-                                                @if ($order->TaxDetails && ($order->TaxDetails->tps_tax_price > 0 || $order->TaxDetails->tps_tax_percentage > 0))
-                                                    <tr>
-                                                        <td>TPS Tax <span id="TPStax-percentage"></span>% (<span
-                                                                id="TPStax-no"></span>)<small class="text-muted"></small>
-                                                        </td>
-                                                        <td class="text-end"><span id="TPStax-amount"></span> $</td>
-                                                    </tr>
-                                                @endif
-
+                                                @if (isset($order) && $order->TaxDetails && ($order->TaxDetails->tvq_tax_price > 0 || $order->TaxDetails->tvq_tax_percentage > 0))
+                                                <tr>
+                                                    <td>TVQ Tax <span id="TVQtax-percentage"></span>% (<span id="TVQtax-no"></span>) <small class="text-muted"></small></td>
+                                                    <td class="text-end"><span id="TVQtax-amount"></span> $</td>
+                                                </tr>
+                                            @endif
+                                            
+                                            @if (isset($order) && $order->TaxDetails && ($order->TaxDetails->tps_tax_price > 0 || $order->TaxDetails->tps_tax_percentage > 0))
+                                                <tr>
+                                                    <td>TPS Tax <span id="TPStax-percentage"></span>% (<span id="TPStax-no"></span>) <small class="text-muted"></small></td>
+                                                    <td class="text-end"><span id="TPStax-amount"></span> $</td>
+                                                </tr>
+                                            @endif
+                                            
                                                 <tr>
                                                     <td>Discount <small class="text-muted"></small></td>
                                                     <td class="text-end">-<span id="discount-amount"></span> $</td>
