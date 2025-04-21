@@ -31,21 +31,28 @@
                         <th></th>
                         <th>Customer</th>
                         <th>Email</th>
+                        <th>Phone</th>
                         <th>Cart Qty</th>
                         <th>Cart Amount</th>
+                        <th>Created At</th>
+                        <th>Updated At</th> <!-- New column -->
                         <th>Status</th>
-                        <th>actions</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($abandoncart as $item)
                         <tr>
-                            <td></td>
-                            <td>{{ $item['user']->first_name ?? 'Unknown' }} {{ $item['user']->last_name ?? 'Unknown' }}
-                            </td>
-                            <td>{{ $item['user']->email ?? 'Unknown' }}</td>
-                            <td>{{ $item['total_qty'] }}</td>
-                            <td>${{ number_format($item['total_amount'], 2) }}</td>
+                            <tr>
+                                <td></td>
+                                <td>{{ $item['user']->first_name ?? 'Unknown' }} {{ $item['user']->last_name ?? 'Unknown' }}</td>
+                                <td>{{ $item['user']->email ?? 'Unknown' }}</td>
+                                <td>{{ $item['user']->contact_number ?? 'Unknown' }}</td>
+                                <td>{{ $item['total_qty'] }}</td>
+                                <td>${{ number_format($item['total_amount'], 2) }}</td>
+                                <td>{{ $item['created_at']->format('Y-m-d H:i') }}</td>
+                                <td>{{ $item['updated_at']->format('Y-m-d H:i') }}</td> <!-- Display updated_at -->
+                    
 
                             <td>
                                 @if ($item['status'] == 0)
@@ -96,7 +103,7 @@
                                                                     {{ $item['user']->last_name }}</p>
                                                                 <p><strong>Email:</strong> {{ $item['user']->email }}</p>
                                                                 <p><strong>Phone:</strong>
-                                                                    {{ $item['user']->phone ?? 'N/A' }}</p>
+                                                                    {{ $item['user']->contact_number ?? 'N/A' }}</p>
                                                             </div>
                                                             <div class="col-md-6">
                                                               <p><strong>Joined:</strong>
@@ -104,8 +111,8 @@
                                                             </p>
                                                             
 
-                                                                <p><strong>Address:</strong>
-                                                                    {{ $item['user']->address ?? 'N/A' }}</p>
+                                                                {{-- <p><strong>Address:</strong>
+                                                                    {{ $item['user']->address ?? 'N/A' }}</p> --}}
                                                                 <p><strong>Country:</strong>
                                                                     {{ $item['user']->country ?? 'N/A' }}</p>
                                                             </div>

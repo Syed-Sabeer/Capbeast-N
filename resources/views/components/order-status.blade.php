@@ -8,7 +8,11 @@
   <span class="badge bg-label-success">Complete</span>
 @elseif ($status == 3)
   <span class="badge bg-label-primary">Shipped</span>
-@elseif ($status == 4)
+  @elseif ($status == 4)
+  <span class="badge bg-label-primary">DST in progress</span>
+  @elseif ($status == 5)
+  <span class="badge bg-label-primary">DST uploaded</span>
+@elseif ($status == 6)
   <span class="badge bg-label-danger">Canceled</span>
 @else
   <span class="badge bg-label-secondary">Unknown Status</span>

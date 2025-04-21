@@ -136,11 +136,14 @@
               <i class="fa-solid fa-ellipsis-vertical"></i>
             </a>
             <div id="dropdownMenu-{{ $order->id }}" class="custom-dropdown-content">
-              <a href="javascript:void(0);" class="custom-dropdown-item" onclick="updateStatus({{ $order->id }}, 0)">Mark as Processing</a>
-              <a href="javascript:void(0);" class="custom-dropdown-item" onclick="updateStatus({{ $order->id }}, 1)">Mark as In Production</a>
-              <a href="javascript:void(0);" class="custom-dropdown-item" onclick="updateStatus({{ $order->id }}, 2)">Mark as Complete</a>
-              <a href="javascript:void(0);" class="custom-dropdown-item" onclick="updateStatus({{ $order->id }}, 3)">Mark as Shipped</a>
-              <a href="javascript:void(0);" class="custom-dropdown-item" onclick="updateStatus({{ $order->id }}, 4)">Cancel Order</a>
+              <a href="javascript:void(0);" class="custom-dropdown-item" onclick="updateStatus({{ $order->id }}, 0)">Processing</a>
+              <a href="javascript:void(0);" class="custom-dropdown-item" onclick="updateStatus({{ $order->id }}, 1)">Production</a>
+              <a href="javascript:void(0);" class="custom-dropdown-item" onclick="updateStatus({{ $order->id }}, 2)">Completed</a>
+              <a href="javascript:void(0);" class="custom-dropdown-item" onclick="updateStatus({{ $order->id }}, 3)">Shipped</a>
+              <a href="javascript:void(0);" class="custom-dropdown-item" onclick="updateStatus({{ $order->id }}, 4)">DST in progress</a>
+              <a href="javascript:void(0);" class="custom-dropdown-item" onclick="updateStatus({{ $order->id }}, 5)">DST uploaded</a>
+
+              <a href="javascript:void(0);" class="custom-dropdown-item" onclick="updateStatus({{ $order->id }}, 6)">Cancel Order</a>
           </div>
           
             
