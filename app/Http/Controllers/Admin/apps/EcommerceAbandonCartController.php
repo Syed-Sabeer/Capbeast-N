@@ -40,13 +40,16 @@ class EcommerceAbandonCartController extends Controller
             }
     
             if ($cartItems->isNotEmpty()) {
+                $latestCart = $cartItems->sortByDesc('updated_at')->first();
                 $abandoncart[] = [
                     'user' => $user,
                     'user_id' => $user->id,
                     'total_qty' => $totalQty,
                     'total_amount' => $totalAmount,
                     'cart_items' => $cartItems,
-                    'status' => $cartItems->first()->status // assuming all items have same status
+                    'status' => $cartItems->first()->status, // assuming all items have same status
+                    'created_at' => $latestCart->created_at,
+                    'updated_at' => $latestCart->updated_at,
                 ];
             }
         }

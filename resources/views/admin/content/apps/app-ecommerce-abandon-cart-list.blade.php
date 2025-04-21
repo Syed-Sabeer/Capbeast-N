@@ -51,7 +51,8 @@
                                 <td>{{ $item['total_qty'] }}</td>
                                 <td>${{ number_format($item['total_amount'], 2) }}</td>
                                 <td>{{ date('Y-m-d H:i', strtotime($item['created_at'])) }}</td>
-<td>{{ date('Y-m-d H:i', strtotime($item['updated_at'])) }}</td>
+                                <td>{{ date('Y-m-d H:i', strtotime($item['updated_at'])) }}</td>
+                                
 
                     
 
