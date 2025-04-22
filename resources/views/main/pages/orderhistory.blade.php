@@ -17,10 +17,10 @@
                             <table class="table fs-15 align-middle table-nowrap">
                                 <thead>
                                     <tr>
-
                                         <th scope="col">Order ID</th>
                                         <th scope="col">Date</th>
                                         <th scope="col">Total Payment</th>
+                                        <th scope="col">Payment Method</th>
                                         <th scope="col">Status</th>
                                         <th scope="col"></th>
                                     </tr>
@@ -46,12 +46,15 @@
                                             data-bs-billing-address="{{ $order->billing_address }}"
                                             data-bs-shipping-name="{{ $order->shipping_name }}"
                                             data-bs-shipping-address="{{ $order->shipping_address }}"
+                                            data-bs-payment-method="{{ $order->payment_method ?? 'N/A' }}"
+                                            data-bs-transaction-id="{{ $order->transaction_id ?? 'N/A' }}"
                                             data-bs-products="{{ json_encode($order->items) }}">
 
                                             <td><a href="#" class="text-body">{{ $order->order_id }}</a></td>
                                             <td><span class="text-muted">{{ $order->created_at->format('d M, Y') }}</span>
                                             </td>
                                             <td class="fw-medium">${{ number_format($order->total_price, 2) }}</td>
+                                            <td class="text-capitalize">{{ $order->payment_method ?? 'N/A' }}</td>
                                             <td>
                                                 <!-- Using the OrderStatus component -->
                                                 <x-order-status :status="$order->status" />
@@ -183,7 +186,7 @@
                                 <div class="card-body p-4 border-top border-top-dashed">
                                     <div class="row g-3">
                                         <div class="col-6">
-                                            <h6 class="text-muted text-uppercase fw-semibold fs-14 mb-3">Order Tracking 
+                                            <h6 class="text-muted text-uppercase fw-semibold fs-14 mb-3">Order Tracking
                                             </h6>
                                             <p class="fw-medium mb-2 fs-16" id="billing-name"></p>
                                             <p class="text-muted mb-1" id="billing-address-line-1"></p>
@@ -232,27 +235,36 @@
                                                     <td class="text-end"><span id="sub-total"></span> $</td>
                                                 </tr>
 
-                                                @if (isset($order) && $order->TaxDetails && ($order->TaxDetails->tvq_tax_price > 0 || $order->TaxDetails->tvq_tax_percentage > 0))
-                                                <tr>
-                                                    <td>TVQ Tax <span id="TVQtax-percentage"></span>% (<span id="TVQtax-no"></span>) <small class="text-muted"></small></td>
-                                                    <td class="text-end"><span id="TVQtax-amount"></span> $</td>
-                                                </tr>
-                                            @endif
-                                            
-                                            @if (isset($order) && $order->TaxDetails && ($order->TaxDetails->tps_tax_price > 0 || $order->TaxDetails->tps_tax_percentage > 0))
-                                                <tr>
-                                                    <td>TPS Tax <span id="TPStax-percentage"></span>% (<span id="TPStax-no"></span>) <small class="text-muted"></small></td>
-                                                    <td class="text-end"><span id="TPStax-amount"></span> $</td>
-                                                </tr>
-                                            @endif
-                                            
+                                                @if (isset($order) &&
+                                                        $order->TaxDetails &&
+                                                        ($order->TaxDetails->tvq_tax_price > 0 || $order->TaxDetails->tvq_tax_percentage > 0))
+                                                    <tr>
+                                                        <td>TVQ Tax <span id="TVQtax-percentage"></span>% (<span
+                                                                id="TVQtax-no"></span>) <small class="text-muted"></small>
+                                                        </td>
+                                                        <td class="text-end"><span id="TVQtax-amount"></span> $</td>
+                                                    </tr>
+                                                @endif
+
+                                                @if (isset($order) &&
+                                                        $order->TaxDetails &&
+                                                        ($order->TaxDetails->tps_tax_price > 0 || $order->TaxDetails->tps_tax_percentage > 0))
+                                                    <tr>
+                                                        <td>TPS Tax <span id="TPStax-percentage"></span>% (<span
+                                                                id="TPStax-no"></span>) <small class="text-muted"></small>
+                                                        </td>
+                                                        <td class="text-end"><span id="TPStax-amount"></span> $</td>
+                                                    </tr>
+                                                @endif
+
                                                 <tr>
                                                     <td>Discount <small class="text-muted"></small></td>
                                                     <td class="text-end">-<span id="discount-amount"></span> $</td>
                                                 </tr>
 
                                                 <tr>
-                                                    <td>Shipping (<span id="Order-service"></span>) <small class="text-muted"></small></td>
+                                                    <td>Shipping (<span id="Order-service"></span>) <small
+                                                            class="text-muted"></small></td>
                                                     <td class="text-end"><span id="shipping-amount"></span> $</td>
                                                 </tr>
 
@@ -266,8 +278,9 @@
                                     <div class="mt-3">
                                         <h6 class="text-muted text-uppercase fw-semibold mb-3">Payment Details:</h6>
                                         <p class="text-muted mb-1">Payment Method: <span class="fw-medium"
-                                                id="payment-method">PayPal</span></p>
-
+                                                id="payment-method-display">PayPal</span></p>
+                                        <p class="text-muted mb-1">Transaction ID: <span class="fw-medium"
+                                                id="transaction-id">N/A</span></p>
                                     </div>
                                     <div class="mt-4">
                                         <div class="alert alert-info">
@@ -348,14 +361,16 @@
                     const TVQtaxPercentage = row.getAttribute('data-bs-TVQtax-percentage');
                     const OrderService = row.getAttribute('data-bs-order-service');
                     const OrderTracking = row.getAttribute('data-bs-order-tracking');
-                    
-                    
+
+
                     const TPStaxPercentage = row.getAttribute('data-bs-TPStax-percentage');
                     const completetotal = row.getAttribute('data-bs-total');
                     const billingName = row.getAttribute('data-bs-billing-name');
                     const billingAddress = row.getAttribute('data-bs-billing-address');
                     const shippingName = row.getAttribute('data-bs-shipping-name');
                     const shippingAddress = row.getAttribute('data-bs-shipping-address');
+                    const paymentMethod = row.getAttribute('data-bs-payment-method');
+                    const transactionId = row.getAttribute('data-bs-transaction-id');
                     const products = JSON.parse(row.getAttribute('data-bs-products'));
 
                     // Helper function to safely set text content
@@ -378,8 +393,22 @@
                     setTextContent('TVQtax-percentage', TVQtaxPercentage);
                     setTextContent('Order-service', OrderService);
                     setTextContent('Order-tracking', OrderTracking);
-                    
-                    
+
+                    // Update payment method display based on type
+                    const paymentMethodDisplay = document.getElementById('payment-method-display');
+                    if (paymentMethodDisplay) {
+                        if (paymentMethod.toLowerCase() === 'authorize_net') {
+                            paymentMethodDisplay.textContent = 'Credit Card';
+                        } else if (paymentMethod.toLowerCase() === 'paypal') {
+                            paymentMethodDisplay.textContent = 'PayPal';
+                        } else {
+                            paymentMethodDisplay.textContent = paymentMethod;
+                        }
+                    }
+
+                    setTextContent('transaction-id', transactionId);
+
+
                     setTextContent('TPStax-percentage', TPStaxPercentage);
                     setTextContent('sub-total', subtotal);
                     setTextContent('total-amount', completetotal);

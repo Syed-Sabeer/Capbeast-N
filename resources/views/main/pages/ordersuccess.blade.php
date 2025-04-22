@@ -48,7 +48,15 @@
                                 style="color: #878a99 !important; margin-bottom: 12px; font-size: 13px; text-transform: uppercase;font-weight: 500;margin-top: 0px;">
                                 Payment</p>
                             <h6 style="font-size: 15px; margin: 0px;font-weight: 600; font-family: 'Inter', sans-serif;">
-                                PayPal</h6>
+@if ($order->payment_method == "authorize_net")
+Card
+@elseif ($order->payment_method == "paypal")
+PayPal
+@else 
+Unknown
+@endif
+
+</h6>
                         </td>
 
                     </tr>

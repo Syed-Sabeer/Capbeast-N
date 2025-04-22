@@ -42,6 +42,9 @@ class OrderController extends Controller
 {
   private $_api_context;
   private $stallionService;
+  private $authorizeNetLoginId;
+  private $authorizeNetTransactionKey;
+  private $authorizeNetEndpoint;
 
   public function __construct()
   {
@@ -57,6 +60,13 @@ class OrderController extends Controller
     $this->_api_context = new ApiContext(new OAuthTokenCredential($paypal['client_id'], $paypal['secret']));
     $this->_api_context->setConfig($paypal['settings']);
     $this->stallionService = new StallionExpressService();
+
+    // Initialize Authorize.net credentials from config
+    $this->authorizeNetLoginId = config('authorize.login_id');
+    $this->authorizeNetTransactionKey = config('authorize.transaction_key');
+    $this->authorizeNetEndpoint = config('authorize.environment') === 'production'
+      ? config('authorize.endpoints.production')
+      : config('authorize.endpoints.sandbox');
   }
 
   public function getStates($code)
@@ -129,7 +139,11 @@ class OrderController extends Controller
     $payerId = $request->query('PayerID');
 
     if (empty($payerId) || empty($paymentId)) {
-      Session::put('error', 'Payment failed');
+      Log::error('PayPal payment failed: Missing payerId or paymentId', [
+        'payer_id' => $payerId,
+        'payment_id' => $paymentId
+      ]);
+      Session::put('error', 'Payment failed: Missing required payment information.');
       return redirect()->route('checkout');
     }
 
@@ -150,15 +164,39 @@ class OrderController extends Controller
       $shippingService = session('checkout_details')['shipping_service'] ?? '';
       $shippingEstimatedDays = session('checkout_details')['shipping_estimated_days'] ?? '';
 
+      // Get PayPal payment details
       $payment = Payment::get($paymentId, $this->_api_context);
+
+      // Log payment information for debugging
+      Log::info('PayPal payment details retrieved', [
+        'payment_id' => $paymentId,
+        'payment_state' => $payment->getState(),
+        'payment_method' => 'paypal'
+      ]);
+
+      // Execute payment
       $execution = new PaymentExecution();
       $execution->setPayerId($payerId);
       $result = $payment->execute($execution, $this->_api_context);
+
+      // Get transaction details
+      $transactions = $payment->getTransactions();
+      $relatedResources = isset($transactions[0]) ? $transactions[0]->getRelatedResources() : [];
+      $sale = !empty($relatedResources) ? $relatedResources[0]->getSale() : null;
+      $saleId = $sale ? $sale->getId() : $paymentId; // Use payment ID as fallback if sale ID not available
+
+      // Log transaction details
+      Log::info('PayPal payment execution result', [
+        'state' => $result->getState(),
+        'sale_id' => $saleId,
+        'amount' => $totalPrice
+      ]);
 
       if ($result->state == 'approved') {
         // Retrieve session data
         $checkoutDetails = session('checkout_details');
         if (!$checkoutDetails) {
+          Log::error('Session expired during PayPal payment process');
           return redirect()->route('checkout')->with('error', 'Session expired.');
         }
 
@@ -178,6 +216,15 @@ class OrderController extends Controller
             'shipping_service' => $shippingService,
             'shipping_estimated_days' => $shippingEstimatedDays,
             'status' => 0,
+            'payment_method' => 'paypal',
+            'transaction_id' => $saleId,
+          ]);
+
+          // Log order creation
+          Log::info('Order created from PayPal payment', [
+            'order_id' => $order->id,
+            'order_string_id' => $order->order_id,
+            'transaction_id' => $saleId
           ]);
 
           // Create shipping rate record
@@ -422,10 +469,12 @@ class OrderController extends Controller
               'shipping_status' => 'failed'
             ]);
 
-            // Note: We don't rollback the transaction here since the order is already committed
-            // Instead, we just log the error and continue with order success
+            // Note: We don't rollback the transaction here since the order is successfully created
+            // Critical shipping errors will be handled manually by admin team
+            // This ensures customer still gets order confirmation even if shipping creation fails
           }
 
+          // Commit transaction after order is created and shipping is processed (whether successful or not)
           DB::commit();
           session()->forget('checkout_details');
 
@@ -433,39 +482,78 @@ class OrderController extends Controller
           try {
             Mail::to(auth()->user()->email)->send(new OrderPlacedMail($order, false));
             Mail::to('info@capbeast.com')->send(new OrderPlacedMail($order, true));
+
+            Log::info('Order confirmation emails sent', [
+              'order_id' => $order->id,
+              'customer_email' => auth()->user()->email
+            ]);
           } catch (\Exception $e) {
             // Log email sending error but continue to success page
+            // Email errors should not prevent order completion
             Log::error('Email sending failed: ' . $e->getMessage(), [
               'order_id' => $order->id,
-              'user_email' => auth()->user()->email
+              'user_email' => auth()->user()->email,
+              'trace' => $e->getTraceAsString()
             ]);
           }
 
           return redirect()->route('main.pages.success', ['orderId' => $order->id]);
         } catch (\Exception $e) {
+          // If there's any critical error during order creation, roll back completely
           DB::rollBack();
-          Log::error('Order creation failed: ' . $e->getMessage());
-          return redirect()->route('checkout')->with('error', 'Order creation failed. Please try again.');
+          Log::error('Order creation failed during PayPal payment process: ' . $e->getMessage(), [
+            'trace' => $e->getTraceAsString(),
+            'user_id' => auth()->id(),
+            'payment_id' => $paymentId
+          ]);
+          return redirect()->route('checkout')->with('error', 'Order creation failed. Your payment was received but we encountered an error. Please contact support with payment ID: ' . $paymentId);
         }
+      } else {
+        // Payment was not approved
+        Log::error('PayPal payment not approved', [
+          'state' => $result->state,
+          'payment_id' => $paymentId
+        ]);
+        return redirect()->route('checkout')->with('error', 'Payment was not approved by PayPal. Please try again or use a different payment method.');
       }
-
-      return redirect()->route('checkout')->with('error', 'Payment failed.');
     } catch (\Exception $e) {
+      // Handle any exception that occurred during payment execution
       DB::rollBack();
-      Log::error('PayPal Payment Execution Failed: ' . $e->getMessage());
-      return redirect()->route('checkout')->with('error', 'Payment failed.');
+      Log::error('PayPal Payment Execution Failed: ' . $e->getMessage(), [
+        'trace' => $e->getTraceAsString(),
+        'payment_id' => $paymentId,
+        'payer_id' => $payerId
+      ]);
+      return redirect()->route('checkout')->with('error', 'Payment processing failed. Please try again or contact support.');
     }
   }
 
 
   public function orderSuccess(Request $request)
   {
+    // Get the order id parameter (could be database id or order_id string)
     $orderId = $request->query('orderId');
+
+    // Check if we can find order by id (primary key)
     $order = Order::where('id', $orderId)->first();
 
+    // If not found, try by order_id (string identifier)
     if (!$order) {
+      $order = Order::where('order_id', $orderId)->first();
+    }
+
+    // If still not found, redirect with error
+    if (!$order) {
+      Log::error('Order not found on success page', ['order_id' => $orderId]);
       return redirect()->route('home')->with('error', 'Order not found.');
     }
+
+    // Log successful order access
+    Log::info('Order success page accessed', [
+      'order_id' => $order->order_id,
+      'payment_method' => $order->payment_method,
+      'transaction_id' => $order->transaction_id
+    ]);
 
     return view('main.pages.ordersuccess', compact('order'));
   }
@@ -555,6 +643,18 @@ class OrderController extends Controller
     $userId = auth()->id();
 
     try {
+      // Get request data
+      $data = $request->json()->all();
+
+      // Log request data for debugging
+      Log::info('Checkout request received', [
+        'user_id' => $userId,
+        'payment_method' => $request->input('paymentMethod'),
+        'total_price' => $request->input('finalTotal'),
+        'json_data' => $data ? 'present' : 'missing',
+        'content_type' => $request->header('Content-Type')
+      ]);
+
       $request->validate([
         'firstname' => 'required|string|max:255',
         'lastname' => 'required|string|max:255',
@@ -641,6 +741,184 @@ class OrderController extends Controller
         ]);
       }
 
+      // Process Authorize.Net Payment
+      if ($request->paymentMethod === 'authorize_net') {
+        // Get full request data as JSON
+        $requestData = $request->json()->all();
+
+        // Debug log card details structure
+        Log::info('Authorize.Net payment request data', [
+          'request_data_keys' => array_keys($requestData),
+          'card_details_set' => isset($requestData['cardDetails']),
+        ]);
+
+        // Validate card details from request
+        if (
+          !isset($requestData['cardDetails']) ||
+          !isset($requestData['cardDetails']['cardNumber']) ||
+          !isset($requestData['cardDetails']['cardName']) ||
+          !isset($requestData['cardDetails']['expiryDate']) ||
+          !isset($requestData['cardDetails']['cvv'])
+        ) {
+
+          // Log validation error
+          Log::error('Authorize.Net card details validation failed', [
+            'has_card_details' => isset($requestData['cardDetails']),
+            'card_details_keys' => isset($requestData['cardDetails']) ? array_keys($requestData['cardDetails']) : []
+          ]);
+
+          return response()->json(['success' => false, 'message' => 'Card details are required.'], 400);
+        }
+
+        // Log card details being processed (without sensitive info)
+        Log::info('Processing Authorize.Net payment', [
+          'card_name' => $requestData['cardDetails']['cardName'],
+          'expiry_format' => $requestData['cardDetails']['expiryDate'],
+          'card_number_length' => strlen($requestData['cardDetails']['cardNumber']),
+        ]);
+
+        // Create customer details array
+        $customerDetails = [
+          'firstname' => $request->input('firstname'),
+          'lastname' => $request->input('lastname'),
+          'companyname' => $request->input('companyname'),
+          'address' => $request->input('address'),
+          'city' => $request->input('city'),
+          'state' => $request->input('state'),
+          'postal_code' => $request->input('postal_code'),
+          'country' => $request->input('country')
+        ];
+
+        // Process payment with Authorize.Net
+        $paymentResult = $this->processAuthorizeNetPayment(
+          $totalPrice,
+          $requestData['cardDetails'],
+          $customerDetails
+        );
+
+        if (!$paymentResult['success']) {
+          Log::error('Authorize.Net payment failed: ' . $paymentResult['message']);
+          return response()->json(['success' => false, 'message' => $paymentResult['message']], 400);
+        }
+
+        // Log successful payment
+        Log::info('Authorize.Net payment successful for user: ' . auth()->id(), [
+          'transaction_id' => $paymentResult['transaction_id'] ?? null,
+          'auth_code' => $paymentResult['auth_code'] ?? null,
+          'amount' => $totalPrice,
+          'customer' => [
+            'name' => $request->firstname . ' ' . $request->lastname,
+            'email' => $request->email
+          ]
+        ]);
+
+        // If payment successful, create order
+        $orderId = $this->generateOrderId();
+
+        // Create the order
+        try {
+          DB::beginTransaction();
+
+          // Create Order with basic shipping price
+          $order = Order::create([
+            'order_id' => $orderId,
+            'user_id' => auth()->id(),
+            'discount_id' => $discountId,
+            'total_price' => $totalPrice,
+            'subtotal_price' => $subtotalPrice,
+            'discount_price' => $discountAmount,
+            'shipping_price' => $requestData['shipping_price'],
+            'shipping_method' => $requestData['shipping_method'],
+            'shipping_service' => $requestData['shipping_service'],
+            'shipping_estimated_days' => $requestData['shipping_estimated_days'],
+            'status' => 0,
+            'payment_method' => 'authorize_net',
+            'transaction_id' => $paymentResult['transaction_id']
+          ]);
+
+          // Create shipping rate record
+          if ($requestData['shipping_method']) {
+            OrderShippingRate::create([
+              'order_id' => $order->id,
+              'postage_type_id' => $requestData['shipping_method'],
+              'postage_type' => $requestData['shipping_service'],
+              'shipping_price' => $requestData['shipping_price'],
+              'delivery_days' => $requestData['shipping_estimated_days'],
+              'service_name' => $requestData['shipping_service'],
+              'rate_details' => session('checkout_details.shipping_rate_details', [])
+            ]);
+          }
+
+          $country = $requestData['country'] ?? null;
+          if (($requestData['TPStaxAmount'] > 0 || $requestData['TVQtaxAmount'] > 0) && $country === 'CA') {
+            OrderTaxDetails::create([
+              'order_id' => $order->id,
+              'tps_tax_no' => $requestData['TPStaxNumber'],
+              'tps_tax_percentage' => $requestData['TPStaxPercentage'],
+              'tps_tax_price' => $requestData['TPStaxAmount'],
+              'tvq_tax_no' => $requestData['TVQtaxNumber'],
+              'tvq_tax_percentage' => $requestData['TVQtaxPercentage'],
+              'tvq_tax_price' => $requestData['TVQtaxAmount'],
+            ]);
+          }
+
+          // Create Shipping Details
+          $shippingDetail = OrderShippingDetail::create([
+            'order_id' => $order->id,
+            'firstname' => $requestData['firstname'],
+            'lastname' => $requestData['lastname'],
+            'companyname' => $requestData['companyname'],
+            'country' => $requestData['country'],
+            'state' => $requestData['state'],
+            'city' => $requestData['city'],
+            'postal_code' => $requestData['postal_code'],
+            'address' => $requestData['address'],
+            'email' => $requestData['email'],
+            'phone' => $requestData['phone'],
+            'additional_info' => $requestData['additional_info'],
+          ]);
+
+          // Insert Order Items
+          $cartItems = Cart::with(['product', 'color', 'userCustomization', 'printing'])
+            ->where('user_id', auth()->id())
+            ->get();
+
+          foreach ($cartItems as $item) {
+            // Calculate volume discount for this item
+            $volumeDiscount = $this->calculateVolumeDiscount($item);
+            $discountedPrice = $volumeDiscount['price'];
+
+            OrderItem::create([
+              'order_id' => $order->id,
+              'product_id' => $item->product_id,
+              'color_id' => $item->color_id,
+              'user_customization_id' => $item->userCustomization ? $item->userCustomization->id : null,
+              'size' => $item->size,
+              'quantity' => $item->quantity,
+              'product_price' => $discountedPrice,
+              'original_price' => $item->product->selling_price,
+              'discount_percentage' => $volumeDiscount['percentage'],
+            ]);
+          }
+
+          // Clear cart
+          Cart::where('user_id', auth()->id())->delete();
+
+          DB::commit();
+
+          // Return success with order ID
+          return response()->json([
+            'success' => true,
+            'message' => 'Payment processed successfully.',
+            'orderId' => $order->order_id
+          ]);
+        } catch (\Exception $e) {
+          DB::rollBack();
+          Log::error('Order creation failed after Authorize.Net payment: ' . $e->getMessage());
+          return response()->json(['success' => false, 'message' => 'Order creation failed: ' . $e->getMessage()], 500);
+        }
+      }
+
       return response()->json(['success' => false, 'message' => 'Payment method not supported.']);
     } catch (\Exception $e) {
       Log::error('Checkout failed: ' . $e->getMessage());
@@ -650,13 +928,13 @@ class OrderController extends Controller
 
   private function generateOrderId()
   {
-      do {
-          $orderId = 'CB' . strtoupper(Str::random(6));
-      } while (Order::where('order_id', $orderId)->exists());
-  
-      return $orderId;
+    do {
+      $orderId = 'CB' . strtoupper(Str::random(6));
+    } while (Order::where('order_id', $orderId)->exists());
+
+    return $orderId;
   }
-  
+
 
   public function applyDiscount(Request $request)
   {
@@ -840,5 +1118,169 @@ class OrderController extends Controller
       'percentage' => 0,
       'price' => $cartItem->product->selling_price
     ];
+  }
+
+  /**
+   * Process payment with Authorize.net
+   * 
+   * @param float $totalPrice Total amount to charge
+   * @param array $cardDetails Customer card details
+   * @param array $customerDetails Customer billing details
+   * @return array Response with success status and messages
+   */
+  public function processAuthorizeNetPayment($totalPrice, $cardDetails, $customerDetails)
+  {
+    try {
+      // Validate required fields
+      if (empty($this->authorizeNetLoginId) || empty($this->authorizeNetTransactionKey)) {
+        Log::error('Authorize.Net credentials are missing');
+        return [
+          'success' => false,
+          'message' => 'Payment configuration error. Please contact the administrator.'
+        ];
+      }
+
+      // Extract card details
+      $cardNumber = $cardDetails['cardNumber'] ?? '';
+      $expiryDate = $cardDetails['expiryDate'] ?? '';
+      $cvv = $cardDetails['cvv'] ?? '';
+      $cardName = $cardDetails['cardName'] ?? '';
+
+      // Format expiry date (MM/YYYY to MMYY)
+      $expiryDate = str_replace(['/', ' '], '', $expiryDate);
+      if (strlen($expiryDate) === 6) {
+        // Format MMYYYY to MMYY
+        $expiryDate = substr($expiryDate, 0, 2) . substr($expiryDate, 4, 2);
+      }
+
+      // Build the request
+      $payload = [
+        'createTransactionRequest' => [
+          'merchantAuthentication' => [
+            'name' => $this->authorizeNetLoginId,
+            'transactionKey' => $this->authorizeNetTransactionKey
+          ],
+          'refId' => 'REF' . time(),
+          'transactionRequest' => [
+            'transactionType' => 'authCaptureTransaction',
+            'amount' => number_format($totalPrice, 2, '.', ''),
+            'payment' => [
+              'creditCard' => [
+                'cardNumber' => $cardNumber,
+                'expirationDate' => $expiryDate,
+                'cardCode' => $cvv
+              ]
+            ],
+            'billTo' => [
+              'firstName' => $customerDetails['firstname'] ?? '',
+              'lastName' => $customerDetails['lastname'] ?? '',
+              'company' => $customerDetails['companyname'] ?? '',
+              'address' => $customerDetails['address'] ?? '',
+              'city' => $customerDetails['city'] ?? '',
+              'state' => $customerDetails['state'] ?? '',
+              'zip' => $customerDetails['postal_code'] ?? '',
+              'country' => $customerDetails['country'] ?? ''
+            ],
+            'customerIP' => request()->ip()
+          ]
+        ]
+      ];
+
+      // Send request to Authorize.Net
+      $response = Http::withHeaders([
+        'Content-Type' => 'application/json'
+      ])->post($this->authorizeNetEndpoint, $payload);
+
+      // Log the raw response for debugging
+      Log::info('Authorize.Net API Raw Response: ' . $response->body());
+
+      // Parse the response - handle possible BOM in JSON response
+      $responseBody = $response->body();
+
+      // Remove BOM characters if present
+      $responseBody = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $responseBody);
+
+      // Try to decode the JSON, with error handling
+      try {
+        $result = json_decode($responseBody, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+          throw new \Exception('Invalid JSON response: ' . json_last_error_msg());
+        }
+      } catch (\Exception $e) {
+        Log::error('Failed to parse Authorize.Net JSON response: ' . $e->getMessage(), [
+          'raw_response' => $responseBody
+        ]);
+        return [
+          'success' => false,
+          'message' => 'Unable to process payment response: ' . $e->getMessage()
+        ];
+      }
+
+      // Log the parsed response
+      Log::info('Authorize.Net API Parsed Response:', $result);
+
+      // Check if transaction was successful by looking at responseCode in transactionResponse
+      if (
+        isset($result['transactionResponse']['responseCode']) &&
+        $result['transactionResponse']['responseCode'] == '1'
+      ) {
+        $transactionId = $result['transactionResponse']['transId'] ?? null;
+        $authCode = $result['transactionResponse']['authCode'] ?? null;
+
+        // Get success message if available
+        $successMessage = 'Payment processed successfully.';
+        if (isset($result['transactionResponse']['messages'][0]['description'])) {
+          $successMessage = $result['transactionResponse']['messages'][0]['description'];
+        }
+
+        // Log successful transaction
+        Log::info('Authorize.Net payment successful', [
+          'transaction_id' => $transactionId,
+          'auth_code' => $authCode,
+          'message' => $successMessage
+        ]);
+
+        return [
+          'success' => true,
+          'message' => $successMessage,
+          'transaction_id' => $transactionId,
+          'auth_code' => $authCode
+        ];
+      } else {
+        // Check for error messages in different possible locations
+        $errorMessage = 'Payment processing failed.';
+
+        // Check main result messages
+        if (isset($result['messages']['message'][0]['text'])) {
+          $errorMessage .= ' ' . $result['messages']['message'][0]['text'];
+        }
+        // Check transaction response errors
+        else if (isset($result['transactionResponse']['errors'][0]['errorText'])) {
+          $errorMessage .= ' ' . $result['transactionResponse']['errors'][0]['errorText'];
+        }
+        // Check transaction response messages (might contain error details)
+        else if (isset($result['transactionResponse']['messages'][0]['description'])) {
+          $errorMessage .= ' ' . $result['transactionResponse']['messages'][0]['description'];
+        }
+
+        Log::error('Authorize.Net payment failed: ' . $errorMessage, [
+          'response' => $result
+        ]);
+
+        return [
+          'success' => false,
+          'message' => $errorMessage
+        ];
+      }
+    } catch (\Exception $e) {
+      Log::error('Authorize.Net Error: ' . $e->getMessage(), [
+        'trace' => $e->getTraceAsString()
+      ]);
+      return [
+        'success' => false,
+        'message' => 'An error occurred during payment processing: ' . $e->getMessage()
+      ];
+    }
   }
 }

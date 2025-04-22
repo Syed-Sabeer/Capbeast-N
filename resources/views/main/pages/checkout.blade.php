@@ -14,7 +14,70 @@
 <script>
     const statesUrlTemplate = "{{ route('countries.states', ['code' => '__CODE__']) }}";
 </script>
+<style>
+    .shipping-methods-list {
+        margin: 10px 0;
+    }
 
+    .shipping-methods-list .form-check {
+        padding: 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        margin-bottom: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .shipping-methods-list .form-check:hover {
+        background-color: #f8f9fa;
+        cursor: pointer;
+    }
+
+    .shipping-methods-list .form-check-input {
+        margin-top: 6px;
+    }
+
+    .shipping-methods-list .form-check-label {
+        width: 100%;
+        cursor: pointer;
+    }
+
+    .shipping-methods-list .text-muted {
+        font-size: 0.875em;
+    }
+
+    .select2-container--classic .select2-selection--single {
+        height: 38px !important;
+        border: 1px solid #dee2e6 !important;
+    }
+
+    .select2-container--classic .select2-selection--single .select2-selection__rendered {
+        line-height: 36px !important;
+    }
+
+    .select2-container--classic .select2-selection--single .select2-selection__arrow {
+        height: 36px !important;
+    }
+
+    .payment-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 30px;
+        padding: 0 10px;
+        border-radius: 4px;
+        color: white;
+        font-weight: bold;
+        font-size: 12px;
+    }
+
+    .paypal-logo {
+        background: #0070ba;
+    }
+
+    .authorize-logo {
+        background: #00a1e0;
+    }
+</style>
 <script>
     $(document).ready(function() {
         let shippingCalculationInProgress = false;
@@ -1179,21 +1242,28 @@
                             <h5 class="mb-0 flex-grow-1">Payment Selection</h5>
 
                             <!-- PayPal Option -->
-                            <div class="form-check">
+                            <div class="form-check mb-3">
                                 <input class="form-check-input" type="radio" name="paymentMethod" id="paypalOption"
                                     value="paypal" checked>
                                 <label class="form-check-label" for="paypalOption">
-                                    Pay with PayPal
+                                    <div class="d-flex align-items-center">
+                                        <div class="payment-logo paypal-logo me-2">PayPal</div>
+                                        Pay with PayPal
+                                    </div>
                                 </label>
                             </div>
 
                             <!-- Authorize.Net Option -->
-                            {{-- <div class="form-check">
-                                <input class="form-check-input" type="radio" name="paymentMethod" id="authorizeNetOption" value="authorize_net">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="paymentMethod"
+                                    id="authorizeNetOption" value="authorize_net">
                                 <label class="form-check-label" for="authorizeNetOption">
-                                    Pay with Authorize.Net
+                                    <div class="d-flex align-items-center">
+                                        <div class="payment-logo authorize-logo me-2">Authorize.net</div>
+                                        Pay with Credit Card (Authorize.Net)
+                                    </div>
                                 </label>
-                            </div> --}}
+                            </div>
                         </div>
                         <!-- Authorize.Net Card Details -->
                         <div id="authorizeNetCardDetails" class="mt-3" style="display: none;">
@@ -1224,31 +1294,63 @@
                             </div>
                         </div>
                     </div>
-                    <script>
-                        document.addEventListener('DOMContentLoaded', () => {
-                            const paypalOption = document.getElementById('paypalOption');
-                            const authorizeNetOption = document.getElementById('authorizeNetOption');
-                            const authorizeNetCardDetails = document.getElementById('authorizeNetCardDetails');
-
-                            // Toggle card details visibility based on the selected payment method
-                            function toggleCardDetails() {
-                                if (authorizeNetOption.checked) {
-                                    authorizeNetCardDetails.style.display = 'block';
-                                } else {
-                                    authorizeNetCardDetails.style.display = 'none';
-                                }
-                            }
-                            // Add event listeners
-                            paypalOption.addEventListener('change', toggleCardDetails);
-                            authorizeNetOption.addEventListener('change', toggleCardDetails);
-
-                            // Initialize the visibility
-                            toggleCardDetails();
-                        });
-                    </script>
+                    
                 </div>
 
-
+                <script>
+                    // Toggle Authorize.Net card details form based on payment method selection
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
+                        const authorizeNetCardDetails = document.getElementById('authorizeNetCardDetails');
+            
+                        function toggleCardDetails() {
+                            const authorizeNetSelected = document.getElementById('authorizeNetOption').checked;
+                            authorizeNetCardDetails.style.display = authorizeNetSelected ? 'block' : 'none';
+                        }
+            
+                        // Add event listeners to payment method radios
+                        paymentMethods.forEach(method => {
+                            method.addEventListener('change', toggleCardDetails);
+                        });
+            
+                        // Initialize visibility
+                        toggleCardDetails();
+            
+                        // Add card number formatting
+                        const cardNumberInput = document.getElementById('cardNumber');
+                        if (cardNumberInput) {
+                            cardNumberInput.addEventListener('input', function(e) {
+                                // Remove non-digit characters
+                                let value = e.target.value.replace(/\D/g, '');
+            
+                                // Add space after every 4 digits
+                                if (value.length > 0) {
+                                    value = value.match(/.{1,4}/g).join(' ');
+                                }
+            
+                                // Update input value
+                                e.target.value = value;
+                            });
+                        }
+            
+                        // Add expiry date formatting (MM/YY)
+                        const expiryDateInput = document.getElementById('expiryDate');
+                        if (expiryDateInput) {
+                            expiryDateInput.addEventListener('input', function(e) {
+                                // Remove non-digit characters
+                                let value = e.target.value.replace(/\D/g, '');
+            
+                                // Format as MM/YY
+                                if (value.length > 2) {
+                                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                                }
+            
+                                // Update input value
+                                e.target.value = value;
+                            });
+                        }
+                    });
+                </script>
                 <!-- end col -->
                 <div class="col-lg-4">
                     <div class="sticky-side-div">
@@ -1828,6 +1930,46 @@
                         shipping_estimated_days: window.selectedShipping.estimated_days
                     };
 
+                       // Add Authorize.Net card details if that payment method is selected
+                if (formData.paymentMethod === 'authorize_net') {
+                    // Validate card details
+                    const cardNumber = document.getElementById('cardNumber').value;
+                    const cardName = document.getElementById('cardName').value;
+                    const expiryDate = document.getElementById('expiryDate').value;
+                    const cvv = document.getElementById('cvv').value;
+
+                    if (!cardNumber || !cardName || !expiryDate || !cvv) {
+                        alert('Please fill in all card details');
+                        checkoutButton.innerHTML = 'Proceed to Pay';
+                        checkoutButton.disabled = false;
+                        return;
+                    }
+
+                    // Format expiry date MM/YY to MM/YYYY for API
+                    let formattedExpiryDate = expiryDate;
+                    if (expiryDate.length === 5 && expiryDate.indexOf('/') === 2) {
+                        const parts = expiryDate.split('/');
+                        formattedExpiryDate = parts[0] + '/20' + parts[1];
+                    }
+
+                    // Add card details to form data
+                    formData.cardDetails = {
+                        cardNumber: cardNumber.replace(/\s+/g, ''), // Remove any spaces
+                        cardName: cardName,
+                        expiryDate: formattedExpiryDate,
+                        cvv: cvv
+                    };
+
+                    // Log card details being sent (except sensitive info)
+                    console.log('Sending payment with card details', {
+                        cardName: formData.cardDetails.cardName,
+                        expiryDate: formData.cardDetails.expiryDate,
+                        cardNumberLength: formData.cardDetails.cardNumber.length
+                    });
+                }
+
+
+
 
                     fetch("{{ route('checkout.add') }}", {
                             method: "POST",
@@ -1840,17 +1982,23 @@
                         .then(response => response.json())
                         .then(result => {
                             if (result.success) {
-                                if (formData.paymentMethod === 'paypal') {
-                                    window.location.href = result.paypalUrl;
-                                } else {
-                                    window.location.href = "{{ route('main.pages.success') }}?orderId=" +
-                                        result.orderId;
-                                }
+                            if (formData.paymentMethod === 'paypal') {
+                                window.location.href = result.paypalUrl;
+                            } else if (formData.paymentMethod === 'authorize_net') {
+                                // For Authorize.net, redirect to the success page with order ID
+                                window.location.href = "{{ route('main.pages.success') }}?orderId=" + result.orderId;
                             } else {
-                                alert(result.message);
-                                checkoutButton.innerHTML = 'Proceed to Pay';
-                                checkoutButton.disabled = false;
+                                window.location.href = "{{ route('main.pages.success') }}?orderId=" +
+                                    result.orderId;
                             }
+                        } else {
+                            // Handle error with more details
+                            let errorMsg = result.message || 'Payment processing failed. Please try again.';
+                            console.error('Payment error:', errorMsg);
+                            alert(errorMsg);
+                            checkoutButton.innerHTML = 'Proceed to Pay';
+                            checkoutButton.disabled = false;
+                        }
                         })
                         .catch(error => {
                             alert('An error occurred during checkout. Please try again.');

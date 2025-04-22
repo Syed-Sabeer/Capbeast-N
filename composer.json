@@ -9,7 +9,7 @@
   "license": "MIT",
   "require": {
     "php": "^8.1",
-    "authorizenet/authorizenet": "*",
+    "authorizenet/authorizenet": "^2.0",
     "guzzlehttp/guzzle": "^7.9",
     "laravel/framework": "^10.23",
     "laravel/jetstream": "^4.3",
