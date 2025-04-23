@@ -429,6 +429,10 @@
                                 <img width="45" src="{{ asset('assetsCommon/svgs/jpg.svg') }}" alt="">
                             @elseif(in_array($fileExtension, ['zip']))
                                 <img width="45" src="{{ asset('assetsCommon/svgs/zip.svg') }}" alt="">
+                            {{-- Embroidery & custom files --}}
+@elseif(in_array($fileExtension, ['dst', 'emb', 'exp', 'hus','pxf', 'jef', 'dgt', 'vp3', 'xxx', 'pcs', 'pes', 'sew']))
+<img width="45" src="{{ asset("assetsCommon/svgs/{$fileExtension}.svg") }}" alt="{{ $fileExtension }}">
+
                             @else
                                 <img width="45" src="{{ asset('assetsCommon/svgs/defaultfile.svg') }}"
                                     alt="">
