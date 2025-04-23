@@ -436,7 +436,7 @@
 
                             <div class="ms-3"> <!-- Add margin-left for spacing between the image and text -->
                                 <h6>{{ $item->title }}</h6>
-                                <a href="{{ asset($item->file) }}" class="fs-12 fw-500 color-primary"
+                                <a href="{{ asset('storage/'.$item->file) }}" class="fs-12 fw-500 color-primary"
                                     download>Download</a>
                             </div>
                         </div>

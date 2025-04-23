@@ -91,29 +91,40 @@ class EcommerceOrderDetails extends Controller
 
 
   public function orderfileupload(Request $request, $id)
-  {
-
+{
     $request->validate([
-      'title' => 'required|string|max:255',
-      'file' => 'required|file|mimes:jpg,jpeg,png,pdf,doc,docx,zip,xls,xlsm,xlsx,xltx|max:2048',
+        'title' => 'required|string|max:255',
+        'file' => 'required|file|max:2048',
     ]);
 
-    if ($request->hasFile('file')) {
-      $file = $request->file('file');
+    $allowedExtensions = [
+        'jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx', 'zip',
+        'xls', 'xlsm', 'xlsx', 'xltx',
+        'dst', 'emb', 'exp', 'hus', 'jef', 'dgt', 'vp3', 'xxx', 'pcs', 'pes', 'sew'
+    ];
 
-      // Store the file using the public disk
-      $filePath = $file->store('OrderFiles', 'public');
+    $file = $request->file('file');
+    $extension = strtolower($file->getClientOriginalExtension());
 
-      // Save the file details in the database
-      OrderFiles::create([
-        'order_id' => $id,
-        'title' => $request->input('title'),
-        'file' => $filePath, // Path stored in 'public/OrderFiles'
-      ]);
-
-      return back()->with('success', 'File uploaded successfully!');
+    if (!in_array($extension, $allowedExtensions)) {
+        return back()->withErrors(['file' => 'This file type is not allowed.']);
     }
 
-    return back()->with('error', 'No file was uploaded.');
-  }
+    // Create a unique file name with original extension
+    $filename = uniqid('orderfile_') . '.' . $extension;
+
+    // Store the file with original extension
+    $filePath = $file->storeAs('OrderFiles', $filename, 'public');
+
+    // Save file details in DB
+    OrderFiles::create([
+        'order_id' => $id,
+        'title' => $request->input('title'),
+        'file' => $filePath,
+    ]);
+
+    return back()->with('success', 'File uploaded successfully!');
+}
+
+  
 }
