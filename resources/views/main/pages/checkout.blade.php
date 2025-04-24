@@ -1073,8 +1073,25 @@
                                                     <div class="d-flex align-items-center gap-2">
                                                         <div class="avatar-sm flex-shrink-0">
                                                             <div class="avatar-title  rounded-3">
-                                                                <img src="{{ asset('storage/' . ($item->color->front_image ?? ($item->color->right_image ?? ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg'))))) }}"
-                                                                    alt="" class="avatar-xs">
+                                                                @if ($item->userCustomization)
+                                                                    <img src="{{ asset(
+                                                                        $item->userCustomization->front_image ??
+                                                                            ($item->userCustomization->right_image ??
+                                                                                ($item->userCustomization->left_image ??
+                                                                                    ($item->userCustomization->back_image ?? 'ProductImages/default.jpg'))),
+                                                                    ) }}"
+                                                                        alt="" class="avatar-xs">
+                                                                @else
+                                                                    <img src="{{ asset(
+                                                                        'storage/' .
+                                                                            ($item->color->front_image ??
+                                                                                ($item->color->right_image ??
+                                                                                    ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg')))),
+                                                                    ) }}"
+                                                                        alt="" class="avatar-xs">
+                                                                @endif
+                                                                {{-- <img src="{{ asset('storage/' . ($item->color->front_image ?? ($item->color->right_image ?? ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg'))))) }}"
+                                                                    alt="" class="avatar-xs"> --}}
                                                             </div>
                                                         </div>
                                                         <div class="flex-grow-1">

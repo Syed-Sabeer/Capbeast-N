@@ -48,15 +48,15 @@
                                 style="color: #878a99 !important; margin-bottom: 12px; font-size: 13px; text-transform: uppercase;font-weight: 500;margin-top: 0px;">
                                 Payment</p>
                             <h6 style="font-size: 15px; margin: 0px;font-weight: 600; font-family: 'Inter', sans-serif;">
-@if ($order->payment_method == "authorize_net")
-Card
-@elseif ($order->payment_method == "paypal")
-PayPal
-@else 
-Unknown
-@endif
+                                @if ($order->payment_method == 'authorize_net')
+                                    Card
+                                @elseif ($order->payment_method == 'paypal')
+                                    PayPal
+                                @else
+                                    Unknown
+                                @endif
 
-</h6>
+                            </h6>
                         </td>
 
                     </tr>
@@ -92,13 +92,30 @@ Unknown
                             <td style="padding: 12px 5px; vertical-align: top;width: 65px;">
                                 <div
                                     style="border: 1px solid #eaeef4;height: 64px;width: 64px;display: flex; align-items: center;justify-content: center;border-radius: 6px;">
-                                    <img src="{{ asset(
+                                    {{-- <img src="{{ asset(
                                         'storage/' .
                                             ($item->color->front_image ??
                                                 ($item->color->right_image ??
                                                     ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg')))),
                                     ) }}"
-                                        alt="" class="avatar-xs">
+                                        alt="" class="avatar-xs"> --}}
+                                    @if ($item->userCustomization)
+                                        <img src="{{ asset(
+                                            $item->userCustomization->front_image ??
+                                                ($item->userCustomization->right_image ??
+                                                    ($item->userCustomization->left_image ??
+                                                        ($item->userCustomization->back_image ?? 'ProductImages/default.jpg'))),
+                                        ) }}"
+                                            alt="" class="avatar-xs">
+                                    @else
+                                        <img src="{{ asset(
+                                            'storage/' .
+                                                ($item->color->front_image ??
+                                                    ($item->color->right_image ??
+                                                        ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg')))),
+                                        ) }}"
+                                            alt="" class="avatar-xs">
+                                    @endif
 
 
                                 </div>

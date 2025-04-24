@@ -22,6 +22,15 @@
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/sweetalert2/sweetalert2.js') }}"></script>
 @endsection
+@php
+            if (!function_exists('decodeFontJson')) {
+                function decodeFontJson($fontData)
+                {
+                    $decoded = json_decode($fontData, true);
+                    return is_array($decoded) ? $decoded : [];
+                }
+            }
+        @endphp
 
 @section('page-script')
     <script src="{{ asset('assets/js/app-ecommerce-order-details.js') }}"></script>
@@ -286,11 +295,11 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         @php
-                                                            function decodeFontJson($fontData)
-                                                            {
-                                                                $decoded = json_decode($fontData, true);
-                                                                return is_array($decoded) ? $decoded : [];
-                                                            }
+                                                            // function decodeFontJson($fontData)
+                                                            // {
+                                                            //     $decoded = json_decode($fontData, true);
+                                                            //     return is_array($decoded) ? $decoded : [];
+                                                            // }
  
                                                             $fontParts = [
                                                                 'Front Font' => $item->userCustomization->front_font,
