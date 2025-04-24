@@ -212,7 +212,7 @@ foreach ($roles as $role => $prefix) {
         Route::post('/admin/abandoncart/{id}/status', [EcommerceAbandonCartController::class, 'updateStatusCart'])->name(Route::prefixed($prefix, 'admin.abandoncart.updateStatus'));
         
 
-
+        Route::post('/abandon-cart-comment', [EcommerceAbandonCartController::class, 'store'])->name('abandonCartComment.store');
 
         Route::get('/category', [EcommerceProductCategory::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-product-category'));
         Route::get('/category/add', [EcommerceProductCategory::class, 'create'])->name(Route::prefixed($prefix, 'category.add'));

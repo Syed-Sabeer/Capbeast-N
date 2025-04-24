@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Mlb;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\ProductColor;
@@ -118,15 +119,18 @@ class EcommerceProductList extends Controller
 
           DB::beginTransaction();
 
-          $product = Product::findOrFail($id);
-          $sizeArray = $request->input('size'); // already an array
-          $sizeJson = json_encode($sizeArray);  // convert to JSON format
+       // Generate the slug or use the provided one
+       $slug = $request->slug ? Str::slug($request->slug) : Str::slug($request->title);
+
+       $product = Product::findOrFail($id);
+       $sizeArray = $request->input('size'); 
+       $sizeJson = json_encode($sizeArray);
 
           $product->update([
               'brand_id' => $request->brand_id,
               'mlb_id' => $request->mlb_id,
               'title' => $request->title,
-              'slug' => $request->slug,
+              'slug' => $slug,
               'sku' => $request->sku,
               'description' => $request->description,
               'cost_price' => $request->cost_price,

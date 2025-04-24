@@ -101,7 +101,7 @@
                             <div class="mb-3 col-6">
                                 <label class="form-label">Slug</label>
                                 <input type="text" name="slug" class="form-control" placeholder="Product slug"
-                                    value="{{ $product->slug }}" required>
+                                    value="{{ $product->slug }}" >
                             </div>
                             <div class="mb-3 col-3">
                                 <label class="form-label">Cost Price</label>
