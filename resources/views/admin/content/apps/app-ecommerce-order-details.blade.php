@@ -252,8 +252,98 @@
                                         </td>
                                         <td><button class="btn btn-primary" data-bs-toggle="modal"
                                           data-bs-target="#CustomizerUploadModal{{ $item->id }}">View
-                                          Customization Uploads</button></td>
+                                         Uploads</button>
+                                         @if (
+                                                $item->userCustomization->front_font ||
+                                                    $item->userCustomization->back_font ||
+                                                    $item->userCustomization->left_font ||
+                                                    $item->userCustomization->right_font)
+                                                <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
+                                                    data-bs-target="#TextDetailsModal{{ $item->id }}">
+                                                    View Text
+                                                </button>
+                                            @endif
+                                        </td>
                                     </tr>
+
+
+                                    @if (
+                                        $item->userCustomization->front_font ||
+                                            $item->userCustomization->back_font ||
+                                            $item->userCustomization->left_font ||
+                                            $item->userCustomization->right_font)
+                                        <div class="modal fade" id="TextDetailsModal{{ $item->id }}" tabindex="-1"
+                                            aria-labelledby="TextDetailsModalLabel{{ $item->id }}"
+                                            aria-hidden="true">
+                                            <div class="modal-dialog modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title"
+                                                            id="TextDetailsModalLabel{{ $item->id }}">Font
+                                                            Customization Details</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        @php
+                                                            function decodeFontJson($fontData)
+                                                            {
+                                                                $decoded = json_decode($fontData, true);
+                                                                return is_array($decoded) ? $decoded : [];
+                                                            }
+ 
+                                                            $fontParts = [
+                                                                'Front Font' => $item->userCustomization->front_font,
+                                                                'Back Font' => $item->userCustomization->back_font,
+                                                                'Left Font' => $item->userCustomization->left_font,
+                                                                'Right Font' => $item->userCustomization->right_font,
+                                                            ];
+                                                        @endphp
+ 
+                                                        @foreach ($fontParts as $label => $json)
+                                                            @if (!empty($json))
+                                                                <h6>{{ $label }}:</h6>
+                                                                @foreach (decodeFontJson($json) as $font)
+                                                                    <div class="mb-3 p-2 border rounded bg-light">
+                                                                        <p><strong>Text:</strong>
+                                                                            {{ $font['content'] ?? '-' }}</p>
+                                                                        <p><strong>Font Family:</strong>
+                                                                            {{ $font['styles']['fontFamily'] ?? '-' }}</p>
+                                                                        <p><strong>Font Size:</strong>
+                                                                            {{ $font['styles']['fontSize'] ?? '-' }}</p>
+                                                                        <p><strong>Font Color:</strong>
+                                                                            @if (str_starts_with($font['styles']['color'] ?? '', 'url'))
+                                                                                <img src="{{ str_replace(['url("', '")'], '', $font['styles']['color']) }}"
+                                                                                    width="40" />
+                                                                            @else
+                                                                                {{ $font['styles']['color'] ?? '-' }}
+                                                                            @endif
+                                                                        </p>
+                                                                        <p><strong>Font Weight:</strong>
+                                                                            {{ $font['styles']['fontWeight'] ?? '-' }}</p>
+                                                                        <p><strong>Position:</strong> Left
+                                                                            {{ $font['position']['left'] ?? '?' }}, Top
+                                                                            {{ $font['position']['top'] ?? '?' }}</p>
+                                                                        <p><strong>Rotation:</strong>
+                                                                            {{ $font['rotation'] ?? '-' }}</p>
+                                                                    </div>
+                                                                @endforeach
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                            Close
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+ 
+
+
                                     {{-- Modal --}}
                                     <div class="modal fade" id="CustomizerUploadModal{{ $item->id }}" tabindex="-1"
                                         aria-labelledby="CustomizerUploadModalLabel{{ $item->id }}"

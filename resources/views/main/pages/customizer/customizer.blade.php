@@ -2,8 +2,12 @@
 
 {{-- @dd($customizerPrice) --}}
 @section('main-container')
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Adamina&family=Aladin&family=Amatic+SC:wght@400;700&family=Amiri&family=Arizonia&family=Berkshire+Swash&family=Black+Ops+One&family=Cookie&family=Damion&family=Fondamento&family=IM+Fell+English&family=Indie+Flower&family=Kaushan+Script&family=Merienda&family=Old+Standard+TT&family=Pacifico&family=Patrick+Hand&family=Permanent+Marker&family=Rock+Salt&family=Satisfy&family=Shadows+Into+Light&family=Special+Elite&family=Tangerine&family=Yesteryear&display=swap">
+    {{-- <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Adamina&family=Aladin&family=Amatic+SC:wght@400;700&family=Amiri&family=Arizonia&family=Berkshire+Swash&family=Black+Ops+One&family=Cookie&family=Damion&family=Fondamento&family=IM+Fell+English&family=Indie+Flower&family=Kaushan+Script&family=Merienda&family=Old+Standard+TT&family=Pacifico&family=Patrick+Hand&family=Permanent+Marker&family=Rock+Salt&family=Satisfy&family=Shadows+Into+Light&family=Special+Elite&family=Tangerine&family=Yesteryear&display=swap"> --}}
+    <link
+        href="https://fonts.googleapis.com/css2?family=Aldrich&family=Allan&family=Allerta&family=Allerta+Stencil&family=Anton&family=Archivo+Black&family=Arvo&family=Atomic+Age&family=Audiowide&family=Bangers&family=Berkshire+Swash&family=Bitter&family=Black+Ops+One&family=Butcherman&family=Calligraffitti&family=Ceviche+One&family=Changa+One&family=Chewy&family=Comfortaa&family=Coming+Soon&family=Contrail+One&family=Courgette&family=Coustard&family=Crafty+Girls&family=Domine&family=Fjalla+One&family=Fontdiner+Swanky&family=Francois+One&family=Geostar+Fill&family=Gloria+Hallelujah&family=Graduate&family=Grand+Hotel&family=Griffy&family=Hanalei+Fill&family=Indie+Flower&family=Jockey+One&family=Kaushan+Script&family=Keania+One&family=La+Belle+Aurore&family=Leckerli+One&family=Lilita+One&family=Lily+Script+One&family=Lobster&family=Marck+Script&family=Merienda+One&family=Mountains+of+Christmas&family=Mr+Dafoe&family=Nosifer&family=Nunito&family=Orbitron&family=Pacifico&family=Passero+One&family=Pathway+Gothic+One&family=Permanent+Marker&family=Piedra&family=Pirata+One&family=Plaster&family=Playball&family=Press+Start+2P&family=Quantico&family=Racing+Sans+One&family=Rationale&family=Rock+Salt&family=Ruslan+Display&family=Sancreek&family=Shadows+Into+Light+Two&family=Shojumaru&family=Sigmar+One&family=Six+Caps&family=Slackey&family=Special+Elite&family=UnifrakturCook&family=UnifrakturMaguntia&family=Waiting+for+the+Sunrise&family=Yanone+Kaffeesatz&display=swap"
+        rel="stylesheet">
+
 
     <style>
         :root {
@@ -119,7 +123,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             border: 1px solid #e9ecef;
-            max-width: 400px;
+            max-width: 80%;
             margin: 20px auto;
         }
 
@@ -613,6 +617,37 @@
                 transform: rotate(360deg);
             }
         }
+
+        .align-btn {
+            margin: 0 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            background: #3a86ff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+        }
+
+        .align-btn:hover {
+            background: #2b6bcc;
+        }
+        /* .option-bar .align-area, .product-details-area, .add-to-cart-btn{
+            width: 80%;
+          } */
+        @media (max-width: 768px) {
+          .option-bar {
+            flex-direction: column;
+          }
+          .option-bar .align-area, .product-details-area, .add-to-cart-btn{
+            width: 80% !important;
+          }
+
+          .align-btn {
+              padding: 6px 8px;
+              font-size: 16px;
+          }
+      }
+
     </style>
     <section class="section">
         <div class="container-fluid">
@@ -659,7 +694,7 @@
 
                             <label class="form-label">Font Family</label>
                             <!-- Updated dropdown -->
-                            <select class="form-select mb-3">
+                            {{-- <select class="form-select mb-3">
                                 <!-- Standard fonts -->
                                 <option value="Arial, sans-serif" style="font-family: Arial, sans-serif;">Arial</option>
                                 <option value="Helvetica, sans-serif" style="font-family: Helvetica, sans-serif;">Helvetica
@@ -717,6 +752,105 @@
                                 </option>
                                 <option value="'Yesteryear', cursive" style="font-family: 'Yesteryear', cursive;">Varsity
                                 </option>
+                            </select> --}}
+
+                            <select id="fontStyle" class="form-select">
+                                <option style="font-family: Aldrich;" value="Aldrich">Aldrich</option>
+                                <option style="font-family: Allan;" value="Allan">Allan</option>
+                                <option style="font-family: Allerta;" value="Allerta">Allerta</option>
+                                <option style="font-family: 'Allerta Stencil';" value="Allerta Stencil">Allerta Stencil
+                                </option>
+                                <option style="font-family: Quantico;" value="Quantico">Quantico</option>
+                                <option style="font-family: Playball;" value="Playball">Playball</option>
+                                <option style="font-family: Anton;" value="Anton">Anton</option>
+                                <option style="font-family: 'Archivo Black';" value="Archivo Black">ArchivoBlack</option>
+                                <option style="font-family: Arvo;" value="Arvo">Arvo</option>
+                                <option style="font-family: 'Atomic Age';" value="Atomic Age">Atomic Age</option>
+                                <option style="font-family: Audiowide;" value="Audiowide">Audiowide</option>
+                                <option style="font-family: Bangers;" value="Bangers">Bangers</option>
+                                <option style="font-family: 'Berkshire Swash';" value="Berkshire Swash">Berkshire Swash
+                                </option>
+                                <option style="font-family: Bitter;" value="Bitter">Bitter</option>
+                                <option style="font-family: 'Black Ops One';" value="Black Ops One">Black OpsOne</option>
+                                <option style="font-family: Butcherman;" value="Butcherman">Butcherman</option>
+                                <option style="font-family: Calligraffitti;" value="Calligraffitti">Calligraffitti
+                                </option>
+                                <option style="font-family: 'Ceviche One';" value="Ceviche One">Ceviche One</option>
+                                <option style="font-family: 'Changa One';" value="Changa One">Changa One</option>
+                                <option style="font-family: Chewy;" value="Chewy">Chewy</option>
+                                <option style="font-family: Comfortaa;" value="Comfortaa">Comfortaa</option>
+                                <option style="font-family: 'Coming Soon';" value="Coming Soon">Coming Soon</option>
+                                <option style="font-family: 'Contrail One';" value="Contrail One">Contrail One</option>
+                                <option style="font-family: Courgette;" value="Courgette">Courgette</option>
+                                <option style="font-family: Coustard;" value="Coustard">Coustard</option>
+                                <option style="font-family: 'Crafty Girls';" value="Crafty Girls">Crafty Girls</option>
+                                <option style="font-family: Domine;" value="Domine">Domine</option>
+                                <option style="font-family: 'Fjalla One';" value="Fjalla One">Fjalla One</option>
+                                <option style="font-family: 'Fontdiner Swanky';" value="Fontdiner Swanky">Fontdiner Swanky
+                                </option>
+                                <option style="font-family: 'Francois One';" value="Francois One">Francois One</option>
+                                <option style="font-family: 'Geostar Fill';" value="Geostar Fill">Geostar Fill</option>
+                                <option style="font-family: 'Gloria Hallelujah';" value="Gloria Hallelujah">Gloria
+                                    Hallelujah</option>
+                                <option style="font-family: Graduate;" value="Graduate">Graduate</option>
+                                <option style="font-family: 'Grand Hotel';" value="Grand Hotel">Grand Hotel</option>
+                                <option style="font-family: Griffy;" value="Griffy">Griffy</option>
+                                <option style="font-family: 'Hanalei Fill';" value="Hanalei Fill">Hanalei Fill</option>
+                                <option style="font-family: 'Indie Flower';" value="Indie Flower">Indie Flower</option>
+                                <option style="font-family: 'Jockey One';" value="Jockey One">Jockey One</option>
+                                <option style="font-family: 'Kaushan Script';" value="Kaushan Script">KaushanScript
+                                </option>
+                                <option style="font-family: 'Keania One';" value="Keania One">Keania One</option>
+                                <option style="font-family: 'La Belle Aurore';" value="La Belle Aurore">LaBelle Aurore
+                                </option>
+                                <option style="font-family: 'Leckerli One';" value="Leckerli One">Leckerli One</option>
+                                <option style="font-family: 'Lilita One';" value="Lilita One">Lilita One</option>
+                                <option style="font-family: 'Lily Script One';" value="Lily Script One">LilyScript One
+                                </option>
+                                <option style="font-family: Lobster;" value="Lobster">Lobster</option>
+                                <option style="font-family: 'Marck Script';" value="Marck Script">Marck Script</option>
+                                <option style="font-family: 'Merienda One';" value="Merienda One">Merienda One</option>
+                                <option style="font-family: 'Mountains of Christmas';" value="Mountains of Christmas">
+                                    Mountains of Christmas</option>
+                                <option style="font-family: 'Mr Dafoe';" value="Mr Dafoe">Mr Dafoe</option>
+                                <option style="font-family: Nosifer;" value="Nosifer">Nosifer</option>
+                                <option style="font-family: Nunito;" value="Nunito">Nunito</option>
+                                <option style="font-family: Orbitron;" value="Orbitron">Orbitron</option>
+                                <option style="font-family: Pacifico;" value="Pacifico">Pacifico</option>
+                                <option style="font-family: 'Passero One';" value="Passero One">Passero One</option>
+                                <option style="font-family: 'Pathway Gothic One';" value="Pathway Gothic One">Pathway
+                                    Gothic One</option>
+                                <option style="font-family: 'Permanent Marker';" value="Permanent Marker">Permanent Marker
+                                </option>
+                                <option style="font-family: Piedra;" value="Piedra">Piedra</option>
+                                <option style="font-family: 'Pirata One';" value="Pirata One">Pirata One</option>
+                                <option style="font-family: Plaster;" value="Plaster">Plaster</option>
+                                <option style="font-family: Playball;" value="Playball">Playball</option>
+                                <option style="font-family: 'Press Start 2P';" value="Press Start 2P">PressStart 2P
+                                </option>
+                                <option style="font-family: Quantico;" value="Quantico">Quantico</option>
+                                <option style="font-family: 'Racing Sans One';" value="Racing Sans One">RacingSans One
+                                </option>
+                                <option style="font-family: Rationale;" value="Rationale">Rationale</option>
+                                <option style="font-family: 'Rock Salt';" value="Rock Salt">Rock Salt</option>
+                                <option style="font-family: 'Ruslan Display';" value="Ruslan Display">RuslanDisplay
+                                </option>
+                                <option style="font-family: Sancreek;" value="Sancreek">Sancreek</option>
+                                <option style="font-family: 'Shadows Into Light Two';" value="Shadows Into Light Two">
+                                    Shadows Into Light Two</option>
+                                <option style="font-family: Shojumaru;" value="Shojumaru">Shojumaru</option>
+                                <option style="font-family: 'Sigmar One';" value="Sigmar One">Sigmar One</option>
+                                <option style="font-family: 'Six Caps';" value="Six Caps">Six Caps</option>
+                                <option style="font-family: Slackey;" value="Slackey">Slackey</option>
+                                <option style="font-family: 'Special Elite';" value="Special Elite">SpecialElite</option>
+                                <option style="font-family: 'UnifrakturCook';" value="UnifrakturCook">UnifrakturCook
+                                </option>
+                                <option style="font-family: 'UnifrakturMaguntia';" value="UnifrakturMaguntia">
+                                    UnifrakturMaguntia</option>
+                                <option style="font-family: 'Waiting for the Sunrise';" value="Waiting for the Sunrise">
+                                    Waiting for the Sunrise</option>
+                                <option style="font-family: 'Yanone Kaffeesatz';" value="Yanone Kaffeesatz">Yanone
+                                    Kaffeesatz</option>
                             </select>
 
 
@@ -817,9 +951,24 @@
                                 @endif
                             @endif
                         </div>
-                    </div>
-                    <div class="option-bar mt-4 d-flex justify-content-between align-items-center p-3">
-                        <div style="width: 50%">
+                      </div>
+                      <div class="option-bar mt-4 d-flex justify-content-between align-items-center p-3">
+                        <div class="align-area" style="width: 30%">
+                          <div class="row">
+                            <div class="col-12 d-flex justify-content-center mb-2">
+                              <button class="align-btn" data-align="top">↑</button>
+                            </div>
+                            <div class="col-12 d-flex justify-content-center">
+                              <button class="align-btn" data-align="left">←</button>
+                              <button class="align-btn" data-align="center">⨀</button>
+                              <button class="align-btn" data-align="right">→</button>
+                            </div>
+                            <div class="col-12 d-flex justify-content-center mt-2">
+                              <button class="align-btn" data-align="bottom">↓</button>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="product-details-area" style="width: 35%">
                             <span>Product:
                                 <strong>
                                     @if (isset($product))
@@ -843,7 +992,7 @@
                                 </strong>
                             </span>
                         </div>
-                        <button class="btn btn-primary add-to-cart-btn" style="width: 50%">
+                        <button class="btn btn-primary add-to-cart-btn" style="width: 35%">
                             <i class="fas fa-shopping-cart me-2"></i>ADD TO CART <br> $<span
                                 id="total-price">{{ isset($product) ? $product->selling_price : '0.00' }}</span>
                         </button>
@@ -867,6 +1016,15 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Add this in your HTML where appropriate -->
+                {{-- <div class="alignment-toolbar" style="display: none;">
+                  <button class="align-btn" data-align="left">←</button>
+                  <button class="align-btn" data-align="right">→</button>
+                  <button class="align-btn" data-align="top">↑</button>
+                  <button class="align-btn" data-align="bottom">↓</button>
+                  <button class="align-btn" data-align="center">⨀</button>
+                </div> --}}
             </div>
         </div>
     </section>
@@ -1017,6 +1175,41 @@
         });
 
         $(document).ready(function() {
+            // Create alignment toolbar
+            // const alignmentToolbar = $('<div>').addClass('alignment-toolbar').css({
+            //     position: 'fixed',
+            //     bottom: '120px',
+            //     right: '20px',
+            //     background: '#fff',
+            //     padding: '10px',
+            //     borderRadius: '5px',
+            //     boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            //     zIndex: 1000,
+            //     display: 'none'
+            // });
+
+            // const alignButtons = {
+            //     left: '←',
+            //     right: '→',
+            //     top: '↑',
+            //     bottom: '↓',
+            //     center: '⨀'
+            // };
+
+            // Object.entries(alignButtons).forEach(([align, text]) => {
+            //     const button = $('<button>')
+            //         .addClass('align-btn')
+            //         .attr('data-align', align)
+            //         .text(text)
+            //         .css({
+            //             margin: '0 5px',
+            //             padding: '5px 10px',
+            //             cursor: 'pointer'
+            //         });
+            //     alignmentToolbar.append(button);
+            // });
+
+            // $('body').append(alignmentToolbar);
             $('#loader').hide();
             updateTotalPrice();
             // Create download button in the UI
@@ -1486,6 +1679,7 @@
                 $('#loader').show();
                 const originalView = designState.currentView;
                 const previews = {};
+                const texts = {};
 
                 // Collect views that have designs
                 const viewsToCapture = Object.keys(priceState.views).filter(view => priceState.views[
@@ -1508,11 +1702,25 @@
                     // Generate preview image
                     const dataUrl = await generatePreview();
                     previews[view] = dataUrl;
+
+                    // Capture all text elements from the view
+                    // const textElements = designState.views[view].elements
+                    //     .filter(el => el.type === 'text')
+                    //     .map(el => el.content);
+
+                    const textElements = designState.views[view].elements
+                        .filter(el => el.type === 'text')
+                        .map(el => ({
+                            ...el
+                        }));
+
+                    texts[view] = textElements;
                 }
 
                 // Switch back to original view
                 $(`.view-option[data-view="${originalView}"]`).trigger('click');
                 console.log('Views', previews);
+                console.log('Text Elements', texts);
                 // Send data to server
                 $.ajax({
                     url: '{{ route('customizer.update', $userCustomization->id) }}', // Replace with your route
@@ -1521,7 +1729,8 @@
                         _token: '{{ csrf_token() }}',
                         product_id: {{ $product->id ?? 0 }},
                         total_price: $('#total-price').text(),
-                        previews: previews
+                        texts: texts,
+                        previews: previews,
                     },
                     success: function(response) {
                         if (response.redirect_url) {
@@ -1918,40 +2127,6 @@
                 selectedElement = null;
             }
 
-            // Image upload handling
-            // $('.upload-area button').on('click', function() {
-            //     const input = $('<input>').attr({
-            //         type: 'file',
-            //         accept: 'image/*'
-            //     }).on('change', function(e) {
-            //         const file = e.target.files[0];
-            //         const reader = new FileReader();
-            //         reader.onload = function(event) {
-            //             const img = $('<div>').addClass('editable-image');
-            //             const imgContent = $('<img>').attr({
-            //                 src: event.target.result,
-            //                 draggable: false
-            //             });
-
-            //             createResizeHandles().forEach(handle => img.append(handle));
-            //             img.append(createDeleteButton());
-            //             img.append(createRotateHandle());
-            //             img.append(imgContent);
-            //             designContent.append(img);
-
-            //             img.css({
-            //                 left: '50%',
-            //                 top: '50%'
-            //             });
-            //             setupImageEditing(img[0]);
-            //             selectElement(img[0]);
-            //             saveState();
-            //         };
-            //         reader.readAsDataURL(file);
-            //     });
-            //     input.click();
-            // });
-
             $('.upload-area button').on('click', function() {
                 const input = $('<input>').attr({
                     type: 'file',
@@ -2082,171 +2257,6 @@
             function createRotateHandle() {
                 return $('<div>').addClass('rotate-handle').html('↻');
             }
-
-            // Element editing setup
-            // function setupImageEditing(element) {
-            //     const $element = $(element);
-            //     const imgContent = $element.find('img')[0];
-            //     let startX, startY, startWidth, startHeight, startAngle;
-            //     let isDragging = false,
-            //         isResizing = false,
-            //         isRotating = false;
-            //     let resizeDirection = '';
-
-            //     $element.on('mousedown', function(e) {
-            //         if (e.target === element || e.target === imgContent) {
-            //             isDragging = true;
-            //             startX = e.clientX - element.getBoundingClientRect().left;
-            //             startY = e.clientY - element.getBoundingClientRect().top;
-            //             selectElement(element);
-            //             e.preventDefault();
-            //         }
-            //     });
-
-            //     $element.find('.resize-handle').on('mousedown', function(e) {
-            //         isResizing = true;
-            //         resizeDirection = $(this).attr('class').split(' ')[1].split('-')[1];
-            //         const style = $element[0].style;
-            //         startWidth = parseFloat(style.width) || imgContent.offsetWidth;
-            //         startHeight = parseFloat(style.height) || imgContent.offsetHeight;
-            //         startLeft = parseFloat(style.left) || 0;
-            //         startTop = parseFloat(style.top) || 0;
-            //         startX = e.clientX;
-            //         startY = e.clientY;
-            //         selectElement(element);
-            //         e.stopPropagation();
-            //         e.preventDefault();
-            //     });
-
-            //     $element.find('.rotate-handle').on('mousedown', function(e) {
-            //         isRotating = true;
-            //         const rect = element.getBoundingClientRect();
-            //         const centerX = rect.left + rect.width / 2;
-            //         const centerY = rect.top + rect.height / 2;
-            //         startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
-            //         const currentAngle = parseFloat($element.css('transform')?.replace(/[^0-9\-.,]/g, '') ||
-            //             0);
-            //         startAngle -= currentAngle;
-            //         selectElement(element);
-            //         e.stopPropagation();
-            //         e.preventDefault();
-            //     });
-
-            //     // Modify the delete button click handler
-            //     $element.find('.delete-btn').on('click', function(e) {
-            //         const imageId = $element.data('image-id');
-
-            //         if (imageId) {
-            //             if (confirm('Are you sure you want to delete this image permanently?')) {
-            //                 $('#loader').show();
-            //                 $.ajax({
-            //                     url: "{{ route('customizer.delete-image', '') }}/" + imageId,
-            //                     method: 'GET',
-            //                     headers: {
-            //                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            //                     },
-            //                     success: () => {
-            //                         $('#loader').hide();
-            //                         $element.remove();
-            //                         saveState();
-            //                     },
-            //                     error: () => {
-            //                         $('#loader').hide();
-            //                         alert('Failed to delete image from server');
-            //                     }
-            //                 });
-            //             }
-            //         } else {
-            //             $element.remove();
-            //             saveState();
-            //         }
-
-            //         e.stopPropagation();
-            //     });
-
-            //     $(document).on('mousemove', function(e) {
-            //         if (!selectedElement || selectedElement !== element) return;
-
-            //         const boundaryRect = designContent[0].getBoundingClientRect();
-            //         const elemRect = element.getBoundingClientRect();
-
-            //         if (isDragging) {
-            //             let newLeft = e.clientX - boundaryRect.left - startX;
-            //             let newTop = e.clientY - boundaryRect.top - startY;
-            //             newLeft = Math.max(0, Math.min(newLeft, boundaryRect.width - elemRect.width));
-            //             newTop = Math.max(0, Math.min(newTop, boundaryRect.height - elemRect.height));
-            //             $element.css({
-            //                 left: `${newLeft}px`,
-            //                 top: `${newTop}px`
-            //             });
-            //         } else if (isResizing) {
-            //             const deltaX = e.clientX - startX;
-            //             const deltaY = e.clientY - startY;
-            //             let newWidth = startWidth;
-            //             let newHeight = startHeight;
-
-            //             // Calculate new dimensions based on resize direction
-            //             if (resizeDirection.includes('e')) newWidth += deltaX;
-            //             if (resizeDirection.includes('w')) newWidth -= deltaX;
-            //             if (resizeDirection.includes('s')) newHeight += deltaY;
-            //             if (resizeDirection.includes('n')) newHeight -= deltaY;
-
-            //             // Maintain aspect ratio if shift key is pressed
-            //             if (e.shiftKey) {
-            //                 const aspect = startWidth / startHeight;
-            //                 if (Math.abs(deltaX) > Math.abs(deltaY)) {
-            //                     newHeight = newWidth / aspect;
-            //                 } else {
-            //                     newWidth = newHeight * aspect;
-            //                 }
-            //             }
-
-            //             // Apply minimum size constraints
-            //             newWidth = Math.max(newWidth, 30);
-            //             newHeight = Math.max(newHeight, 30);
-
-            //             // Calculate new position based on initial values and size changes
-            //             let newLeft = startLeft;
-            //             let newTop = startTop;
-
-            //             if (resizeDirection.includes('w')) {
-            //                 newLeft = startLeft + (startWidth - newWidth);
-            //             }
-            //             if (resizeDirection.includes('n')) {
-            //                 newTop = startTop + (startHeight - newHeight);
-            //             }
-
-            //             // Boundary constraints
-            //             const boundaryRect = designContent[0].getBoundingClientRect();
-            //             newLeft = Math.max(0, Math.min(newLeft, boundaryRect.width - newWidth));
-            //             newTop = Math.max(0, Math.min(newTop, boundaryRect.height - newHeight));
-
-            //             // Apply new dimensions and position
-            //             $element.css({
-            //                 width: `${newWidth}px`,
-            //                 height: `${newHeight}px`,
-            //                 left: `${newLeft}px`,
-            //                 top: `${newTop}px`
-            //             });
-
-            //             $(imgContent).css({
-            //                 width: '100%',
-            //                 height: '100%'
-            //             });
-            //         } else if (isRotating) {
-            //             const rect = element.getBoundingClientRect();
-            //             const centerX = rect.left + rect.width / 2;
-            //             const centerY = rect.top + rect.height / 2;
-            //             const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * 180 / Math.PI;
-            //             $element.css('transform', `rotate(${angle - startAngle}deg)`);
-            //         }
-            //     });
-
-            //     $(document).on('mouseup', function() {
-            //         if (isDragging || isResizing || isRotating) saveState();
-            //         isDragging = isResizing = isRotating = false;
-            //     });
-            // }
             // In the setupImageEditing function, update the event listeners:
             function setupImageEditing(element) {
                 const $element = $(element);
@@ -2453,68 +2463,6 @@
                 }
             `).appendTo('head');
 
-            // Text editing setup
-            // function setupTextEditing(element) {
-            //     const $element = $(element);
-            //     let isDragging = false;
-            //     let offset = {
-            //         x: 0,
-            //         y: 0
-            //     };
-
-            //     $element.on('mousedown', function(e) {
-            //         // Only allow editing if this is the current view's text
-            //         const textView = designState.views[designState.currentView].elements.find(el =>
-            //             el.type === 'text' && el.content === $(this).text()
-            //         );
-
-            //         if (textView) {
-            //             isDragging = true;
-            //             offset = {
-            //                 x: e.clientX - element.getBoundingClientRect().left,
-            //                 y: e.clientY - element.getBoundingClientRect().top
-            //             };
-            //             $element.css('cursor', 'grabbing');
-            //             selectElement(element);
-            //             currentTextElement = $element;
-            //             $('#text-panel input[type="text"]').val($element.text());
-            //             e.preventDefault();
-            //         }
-            //     });
-
-            //     $(document).on('mousemove', function(e) {
-            //         if (!isDragging) return;
-            //         const boundaryRect = designContent[0].getBoundingClientRect();
-            //         const newLeft = e.clientX - boundaryRect.left - offset.x;
-            //         const newTop = e.clientY - boundaryRect.top - offset.y;
-            //         const maxX = boundaryRect.width - element.offsetWidth;
-            //         const maxY = boundaryRect.height - element.offsetHeight;
-            //         $element.css({
-            //             left: `${Math.min(Math.max(newLeft, 0), maxX)}px`,
-            //             top: `${Math.min(Math.max(newTop, 0), maxY)}px`
-            //         });
-            //     });
-
-            //     $(document).on('mouseup', function() {
-            //         isDragging = false;
-            //         $element.css('cursor', 'grab');
-            //         saveState();
-            //     });
-
-            //     // Make text non-editable when not selected
-            //     $element.prop('contentEditable', false);
-
-            //     $element.on('dblclick', function() {
-            //         if (currentTextElement === $element) {
-            //             $element.prop('contentEditable', true).focus();
-            //         }
-            //     });
-
-            //     $element.on('blur', function() {
-            //         $element.prop('contentEditable', false);
-            //         saveState();
-            //     });
-            // }
             function setupTextEditing(element) {
                 const $element = $(element);
                 let isDragging = false;
@@ -2657,8 +2605,60 @@
             function selectElement(element) {
                 if (selectedElement) $(selectedElement).removeClass('selected');
                 selectedElement = element;
-                if (element) $(element).addClass('selected');
+                if (element) {
+                    $(element).addClass('selected');
+                }
+                // if (element) {
+                //     $(element).addClass('selected');
+                //     alignmentToolbar.show();
+                // } else {
+                //     alignmentToolbar.hide();
+                // }
             }
+            // Alignment functionality
+            $(document).on('click', '.align-btn', function() {
+                const align = $(this).data('align');
+                const element = selectedElement;
+                if (!element) return;
+
+                const $element = $(element);
+                const content = $('.design-content');
+                const contentWidth = content.width();
+                const contentHeight = content.height();
+                const elemWidth = $element.outerWidth();
+                const elemHeight = $element.outerHeight();
+
+                let newLeft = parseFloat($element.css('left')) || 0;
+                let newTop = parseFloat($element.css('top')) || 0;
+                const step = 10; // How much to move in px per click
+
+                switch (align) {
+                    case 'left':
+                        newLeft = Math.max(0, newLeft - step);
+                        break;
+                    case 'right':
+                        newLeft = Math.min(contentWidth - elemWidth, newLeft + step);
+                        break;
+                    case 'top':
+                        newTop = Math.max(0, newTop - step);
+                        break;
+                    case 'bottom':
+                        newTop = Math.min(contentHeight - elemHeight, newTop + step);
+                        break;
+                    case 'center':
+                        newLeft = (contentWidth - elemWidth) / 2;
+                        newTop = (contentHeight - elemHeight) / 2;
+                        break;
+                }
+
+                $element.css({
+                    left: newLeft + 'px',
+                    top: newTop + 'px'
+                });
+
+                saveState();
+            });
+
 
             // Save state function
             function saveState() {

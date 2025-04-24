@@ -230,6 +230,22 @@ class CustomizerController extends Controller
         'size' => $userCustomization->size,
       ]);
 
+      $texts = $request->input('texts', []); // Get the texts array
+ 
+      $fontFields = [
+        'front' => 'front_font',
+        'back' => 'back_font',
+        'left' => 'left_font',
+        'right' => 'right_font',
+      ];
+ 
+      foreach ($fontFields as $view => $column) {
+        if (!empty($texts[$view])) {
+          // If there are multiple text elements, store them all
+          $userCustomization->$column = json_encode($texts[$view]);
+        }
+      }
+
       $userCustomization->cart_id = $cartItem->id;
       $userCustomization->save();
 
