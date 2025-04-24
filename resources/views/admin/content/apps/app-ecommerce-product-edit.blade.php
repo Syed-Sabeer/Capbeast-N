@@ -200,7 +200,7 @@
                                     @if (!empty($sizes))
                                         @foreach ($sizes as $index => $sizeValue)
                                             <div class="sizeInputItem mb-2 d-flex gap-2">
-                                                <input type="number" name="size[]" value="{{ $sizeValue }}"
+                                                <input type="text" name="size[]" value="{{ $sizeValue }}"
                                                     class="form-control" placeholder="i.e. 10">
                                                 <button type="button"
                                                     class="btn btn-danger btn-sm removeSize {{ $index == 0 ? 'd-none' : '' }}">Remove</button>
@@ -208,7 +208,7 @@
                                         @endforeach
                                     @else
                                         <div class="sizeInputItem mb-2 d-flex gap-2">
-                                            <input type="number" name="size[]" class="form-control"
+                                            <input type="text" name="size[]" class="form-control"
                                                 placeholder="i.e. 10">
                                             <button type="button"
                                                 class="btn btn-danger btn-sm removeSize d-none">Remove</button>
@@ -493,7 +493,7 @@
             $('#addSize').on('click', function() {
                 const inputHTML = `
                 <div class="sizeInputItem mb-2 d-flex gap-2">
-                    <input type="number" name="size[]" class="form-control" placeholder="i.e. 10">
+                    <input type="text" name="size[]" class="form-control" placeholder="i.e. 10">
                     <button type="button" class="btn btn-danger btn-sm removeSize">Remove</button>
                 </div>`;
                 $('.sizeInputContainer').append(inputHTML);

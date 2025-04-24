@@ -22,11 +22,11 @@ class EcommerceProductList extends Controller
 {
   public function index()
   {
-      // Fetch all products ordered by creation date (newest first), with pagination
-      $products = Product::orderBy('created_at', 'desc')->paginate(25);
+    // Fetch all products ordered by creation date (newest first), with pagination
+    $products = Product::orderBy('created_at', 'desc')->paginate(25);
 
-      // Return the view with the products
-      return view('admin.content.apps.app-ecommerce-product-list', compact('products'));
+    // Return the view with the products
+    return view('admin.content.apps.app-ecommerce-product-list', compact('products'));
   }
 
 
@@ -85,12 +85,12 @@ class EcommerceProductList extends Controller
 
   public function edit($id)
   {
-      $product = Product::with(['categories', 'productSEO', 'productColors', 'ProductVolumeDiscount'])
-          ->findOrFail($id);
-      $categories = Category::all();
-      $mlbs = Mlb::all();
-      $brands = Brand::all();
-      return view('admin.content.apps.app-ecommerce-product-edit', compact('product', 'mlbs','categories', 'brands'));
+    $product = Product::with(['categories', 'productSEO', 'productColors', 'ProductVolumeDiscount'])
+      ->findOrFail($id);
+    $categories = Category::all();
+    $mlbs = Mlb::all();
+    $brands = Brand::all();
+    return view('admin.content.apps.app-ecommerce-product-edit', compact('product', 'mlbs', 'categories', 'brands'));
   }
 
 
@@ -98,146 +98,154 @@ class EcommerceProductList extends Controller
   public function update($id, Request $request)
   {
     // dd($request->all());
-      try {
-          $request->validate([
-              'title' => 'required|string|max:255',
-              'metatitle' => 'nullable|string',
-              'metadescription' => 'nullable|string',
-              'metakeywords' => 'nullable|string',
-              'slug' => 'required|string|unique:products,slug,' . $id,
-              'sku' => 'nullable|string|unique:products,sku|max:255',
-              'description' => 'required|string',
-              'category_ids' => 'nullable|array',
-              'quantity.*' => 'nullable|integer',
-              // 'front_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
-              // 'back_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
-              // 'right_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
-              // 'left_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
-              'discount.*' => 'nullable|numeric',
-              'size' => 'nullable|array',
-          ]);
+    try {
+      $request->validate([
+        'title' => 'required|string|max:255',
+        'metatitle' => 'nullable|string',
+        'metadescription' => 'nullable|string',
+        'metakeywords' => 'nullable|string',
+        'slug' => 'required|string|unique:products,slug,' . $id,
+        'sku' => 'nullable|string|unique:products,sku,' . $id . '|max:255',
+        'description' => 'required|string',
+        'category_ids' => 'nullable|array',
+        'quantity.*' => 'nullable|integer',
+        // 'front_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+        // 'back_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+        // 'right_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+        // 'left_image.*.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+        'discount.*' => 'nullable|numeric',
+        'size' => 'nullable|array',
+      ]);
 
-          DB::beginTransaction();
+      DB::beginTransaction();
 
-       // Generate the slug or use the provided one
-       $slug = $request->slug ? Str::slug($request->slug) : Str::slug($request->title);
-
-       $product = Product::findOrFail($id);
-       $sizeArray = $request->input('size'); 
-       $sizeJson = json_encode($sizeArray);
-
-          $product->update([
-              'brand_id' => $request->brand_id,
-              'mlb_id' => $request->mlb_id,
-              'title' => $request->title,
-              'slug' => $slug,
-              'sku' => $request->sku,
-              'description' => $request->description,
-              'cost_price' => $request->cost_price,
-              'selling_price' => $request->selling_price,
-              'size' => $sizeJson,
-              'size_unit' => $request->size_unit,
-              'weight_unit' => $request->weight_unit,
-              'height' => $request->height,
-              'width' => $request->width,
-              'length' => $request->length,
-              'weight' => $request->weight,
-          ]);
-
-          ProductSEO::updateOrCreate(
-              ['product_id' => $product->id],
-              [
-                  'metatitle' => $request->metatitle,
-                  'metadescription' => $request->metadescription,
-                  'metakeywords' => $request->metakeywords,
-              ]
-          );
-
-          // Update categories: Remove old ones if not present in request
-          ProductCategory::where('product_id', $product->id)->delete();
-          if (!empty($request->category_ids)) {
-              foreach ($request->category_ids as $category_id) {
-                  ProductCategory::create([
-                      'product_id' => $product->id,
-                      'category_id' => $category_id,
-                  ]);
-              }
-          }
-
-          ProductVolumeDiscount::where('product_id', $product->id)->delete();
-          if (isset($request->quantity) && count($request->quantity) > 0) {
-              foreach ($request->quantity as $index => $qty) {
-                  if (!empty($qty)) {
-                      ProductVolumeDiscount::create([
-                          'product_id' => $product->id,
-                          'quantity' => $qty,
-                          'discount' => $request->discount[$index] ?? 0,
-                      ]);
-                  }
-              }
-          }
-
-           // Process and store images
-          // if (is_array($request->colorname1)) {
-          //   foreach ($request->colorname1 as $index => $colorName1) {
-          //     $colorName2 = $request->colorname2[$index] ?? null;
-          //     $colorCode1 = $request->colorcode1[$index] ?? null;
-          //     $colorCode2 = $request->colorcode2[$index] ?? null;
-
-          //     // Ensure each file input is correctly retrieved
-          //     $frontImagePath = $request->hasFile("frontimage.$index") ? $request->file("frontimage")[$index]->store('ProductImages/FrontImage', 'public') : null;
-          //     $backImagePath = $request->hasFile("backimage.$index") ? $request->file("backimage")[$index]->store('ProductImages/BackImage', 'public') : null;
-          //     $rightImagePath = $request->hasFile("rightimage.$index") ? $request->file("rightimage")[$index]->store('ProductImages/RightImage', 'public') : null;
-          //     $leftImagePath = $request->hasFile("leftimage.$index") ? $request->file("leftimage")[$index]->store('ProductImages/LeftImage', 'public') : null;
-
-          //     // Get checkbox values for this color entry
-          //     $isFront = isset($request->is_front[$index]) && $request->is_front[$index] === 'on' ? '1' : '0';
-          //     $isBack = isset($request->is_back[$index]) && $request->is_back[$index] === 'on' ? '1' : '0';
-          //     $isRight = isset($request->is_right[$index]) && $request->is_right[$index] === 'on' ? '1' : '0';
-          //     $isLeft = isset($request->is_left[$index]) && $request->is_left[$index] === 'on' ? '1' : '0';
-
-          //     Log::info("Image paths", compact('frontImagePath', 'backImagePath', 'rightImagePath', 'leftImagePath'));
-
-          //     // Create the product color entry if any image or color exists
-          //     if ($colorName1 || $colorName2 || $frontImagePath || $backImagePath || $rightImagePath || $leftImagePath) {
-          //       $productColor = ProductColor::create([
-          //         'product_id' => $product->id,
-          //         'color_name_1' => $colorName1,
-          //         'color_code_1' => $colorCode1,
-          //         'color_name_2' => $colorName2,
-          //         'color_code_2' => $colorCode2,
-          //         'front_image' => $frontImagePath,
-          //         'back_image' => $backImagePath,
-          //         'right_image' => $rightImagePath,
-          //         'left_image' => $leftImagePath,
-          //           // Add checkbox values
-          //         'is_front' => $isFront,
-          //         'is_back' => $isBack,
-          //         'is_right' => $isRight,
-          //         'is_left' => $isLeft,
-          //       ]);
-
-          //       if ($productColor) {
-          //         Log::info("Product color entry created successfully", ['product_color_id' => $productColor->id]);
-          //       } else {
-          //         Log::error("Failed to create product color entry", ['product_id' => $product->id]);
-          //       }
-          //     } else {
-          //       Log::warning("Skipping color entry due to missing data", ['index' => $index]);
-          //     }
-          //   }
-          // } else {
-          //   Log::error("colorname1 is not an array", ['colorname1' => $request->colorname1]);
-          // }
-
-          DB::commit();
-
-          return redirect()->back()->with('success', 'Product updated successfully!');
-      } catch (\Exception $e) {
-          DB::rollBack();
-          Log::error('Error occurred while updating product:', ['error' => $e->getMessage()]);
-          return redirect()->back()->with('error', 'Failed to update product. Please try again.');
+      // Generate the slug or use the provided one
+      $slug = $request->slug ? Str::slug($request->slug) : Str::slug($request->title);
+      // Ensure slug is not empty by using title as fallback
+      if (empty($slug)) {
+        $slug = Str::slug($request->title);
       }
+      // If still empty (unlikely), use a timestamp
+      if (empty($slug)) {
+        $slug = 'product-' . time();
+      }
+
+      $product = Product::findOrFail($id);
+      $sizeArray = $request->input('size');
+      $sizeJson = json_encode($sizeArray);
+
+      $product->update([
+        'brand_id' => $request->brand_id,
+        'mlb_id' => $request->mlb_id,
+        'title' => $request->title,
+        'slug' => $slug,
+        'sku' => $request->sku,
+        'description' => $request->description,
+        'cost_price' => $request->cost_price,
+        'selling_price' => $request->selling_price,
+        'size' => $sizeJson,
+        'size_unit' => $request->size_unit,
+        'weight_unit' => $request->weight_unit,
+        'height' => $request->height,
+        'width' => $request->width,
+        'length' => $request->length,
+        'weight' => $request->weight,
+      ]);
+
+      ProductSEO::updateOrCreate(
+        ['product_id' => $product->id],
+        [
+          'metatitle' => $request->metatitle,
+          'metadescription' => $request->metadescription,
+          'metakeywords' => $request->metakeywords,
+        ]
+      );
+
+      // Update categories: Remove old ones if not present in request
+      ProductCategory::where('product_id', $product->id)->delete();
+      if (!empty($request->category_ids)) {
+        foreach ($request->category_ids as $category_id) {
+          ProductCategory::create([
+            'product_id' => $product->id,
+            'category_id' => $category_id,
+          ]);
+        }
+      }
+
+      ProductVolumeDiscount::where('product_id', $product->id)->delete();
+      if (isset($request->quantity) && count($request->quantity) > 0) {
+        foreach ($request->quantity as $index => $qty) {
+          if (!empty($qty)) {
+            ProductVolumeDiscount::create([
+              'product_id' => $product->id,
+              'quantity' => $qty,
+              'discount' => $request->discount[$index] ?? 0,
+            ]);
+          }
+        }
+      }
+
+      // Process and store images
+      // if (is_array($request->colorname1)) {
+      //   foreach ($request->colorname1 as $index => $colorName1) {
+      //     $colorName2 = $request->colorname2[$index] ?? null;
+      //     $colorCode1 = $request->colorcode1[$index] ?? null;
+      //     $colorCode2 = $request->colorcode2[$index] ?? null;
+
+      //     // Ensure each file input is correctly retrieved
+      //     $frontImagePath = $request->hasFile("frontimage.$index") ? $request->file("frontimage")[$index]->store('ProductImages/FrontImage', 'public') : null;
+      //     $backImagePath = $request->hasFile("backimage.$index") ? $request->file("backimage")[$index]->store('ProductImages/BackImage', 'public') : null;
+      //     $rightImagePath = $request->hasFile("rightimage.$index") ? $request->file("rightimage")[$index]->store('ProductImages/RightImage', 'public') : null;
+      //     $leftImagePath = $request->hasFile("leftimage.$index") ? $request->file("leftimage")[$index]->store('ProductImages/LeftImage', 'public') : null;
+
+      //     // Get checkbox values for this color entry
+      //     $isFront = isset($request->is_front[$index]) && $request->is_front[$index] === 'on' ? '1' : '0';
+      //     $isBack = isset($request->is_back[$index]) && $request->is_back[$index] === 'on' ? '1' : '0';
+      //     $isRight = isset($request->is_right[$index]) && $request->is_right[$index] === 'on' ? '1' : '0';
+      //     $isLeft = isset($request->is_left[$index]) && $request->is_left[$index] === 'on' ? '1' : '0';
+
+      //     Log::info("Image paths", compact('frontImagePath', 'backImagePath', 'rightImagePath', 'leftImagePath'));
+
+      //     // Create the product color entry if any image or color exists
+      //     if ($colorName1 || $colorName2 || $frontImagePath || $backImagePath || $rightImagePath || $leftImagePath) {
+      //       $productColor = ProductColor::create([
+      //         'product_id' => $product->id,
+      //         'color_name_1' => $colorName1,
+      //         'color_code_1' => $colorCode1,
+      //         'color_name_2' => $colorName2,
+      //         'color_code_2' => $colorCode2,
+      //         'front_image' => $frontImagePath,
+      //         'back_image' => $backImagePath,
+      //         'right_image' => $rightImagePath,
+      //         'left_image' => $leftImagePath,
+      //           // Add checkbox values
+      //         'is_front' => $isFront,
+      //         'is_back' => $isBack,
+      //         'is_right' => $isRight,
+      //         'is_left' => $isLeft,
+      //       ]);
+
+      //       if ($productColor) {
+      //         Log::info("Product color entry created successfully", ['product_color_id' => $productColor->id]);
+      //       } else {
+      //         Log::error("Failed to create product color entry", ['product_id' => $product->id]);
+      //       }
+      //     } else {
+      //       Log::warning("Skipping color entry due to missing data", ['index' => $index]);
+      //     }
+      //   }
+      // } else {
+      //   Log::error("colorname1 is not an array", ['colorname1' => $request->colorname1]);
+      // }
+
+      DB::commit();
+
+      return redirect()->back()->with('success', 'Product updated successfully!');
+    } catch (\Exception $e) {
+      DB::rollBack();
+      Log::error('Error occurred while updating product:', ['error' => $e->getMessage()]);
+      return redirect()->back()->with('error', 'Failed to update product. Please try again.');
+    }
   }
 
 
