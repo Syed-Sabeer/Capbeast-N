@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Helpers\CartHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
@@ -75,9 +76,14 @@ class OrderController extends Controller
       $states = State::where('country_code', $code)->get(['code', 'name']);
       return response()->json($states);
     } catch (\Exception $e) {
+      // Update cart error status (if user is logged in)
+      if (auth()->check()) {
+          CartHelper::updateCartErrorStatus(auth()->id(), 'shipping error: ' . $e->getMessage());
+      }
+  
       \Log::error('Error in getStates: ' . $e->getMessage());
       return response()->json(['error' => 'Failed to load states'], 500);
-    }
+  }
   }
 
 
@@ -112,11 +118,16 @@ class OrderController extends Controller
 
       $payment->create($this->_api_context);
       Log::info("PayPal Payment Created: " . json_encode($payment));
-    } catch (\Exception $ex) {
+    }catch (\Exception $ex) {
+      // Update cart error status
+      if (auth()->check()) {
+          CartHelper::updateCartErrorStatus(auth()->id(), 'payment error: ' . $ex->getMessage());
+      }
+  
       Log::error("PayPal Error: " . $ex->getMessage());
       Session::put('error', 'Payment failed: ' . $ex->getMessage());
       return Redirect::route('checkout');
-    }
+  }
 
     foreach ($payment->getLinks() as $link) {
       if ($link->getRel() == 'approval_url') {
@@ -139,14 +150,19 @@ class OrderController extends Controller
     $payerId = $request->query('PayerID');
 
     if (empty($payerId) || empty($paymentId)) {
-      Log::error('PayPal payment failed: Missing payerId or paymentId', [
-        'payer_id' => $payerId,
-        'payment_id' => $paymentId
-      ]);
-      Session::put('error', 'Payment failed: Missing required payment information.');
-      return redirect()->route('checkout');
+        // Update cart error status
+        if (auth()->check()) {
+            CartHelper::updateCartErrorStatus(auth()->id(), 'payment error');
+        }
+    
+        Log::error('PayPal payment failed: Missing payerId or paymentId', [
+            'payer_id' => $payerId,
+            'payment_id' => $paymentId
+        ]);
+        Session::put('error', 'Payment failed: Missing required payment information.');
+        return redirect()->route('checkout');
     }
-
+    
     try {
       // Retrieve total price and discount details from session
       $totalPrice = session('checkout_details')['total_price'] ?? 0;
@@ -196,9 +212,12 @@ class OrderController extends Controller
         // Retrieve session data
         $checkoutDetails = session('checkout_details');
         if (!$checkoutDetails) {
+          // Update cart error status
+          CartHelper::updateCartErrorStatus(auth()->id(), 'payment error');
+      
           Log::error('Session expired during PayPal payment process');
           return redirect()->route('checkout')->with('error', 'Session expired.');
-        }
+      }
 
         DB::beginTransaction();
 
@@ -458,21 +477,28 @@ class OrderController extends Controller
               'tracking_code' => $formattedResponse['tracking_code'] ?? null
             ]);
           } catch (\Exception $e) {
+            // Update cart error status (if user is logged in)
+            if (auth()->check()) {
+                // Update the cart error status with a meaningful message
+                CartHelper::updateCartErrorStatus(auth()->id(), 'shipping error: Failed to create shipment');
+            }
+        
             Log::error('Failed to create shipment for order #' . $order->order_id, [
-              'error' => $e->getMessage(),
-              'trace' => $e->getTraceAsString()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
-
+        
             // Store shipping error in order
             $order->update([
-              'shipping_error' => $e->getMessage(),
-              'shipping_status' => 'failed'
+                'shipping_error' => $e->getMessage(),
+                'shipping_status' => 'failed'
             ]);
-
+        
             // Note: We don't rollback the transaction here since the order is successfully created
             // Critical shipping errors will be handled manually by admin team
             // This ensures customer still gets order confirmation even if shipping creation fails
-          }
+        }
+        
 
           // Commit transaction after order is created and shipping is processed (whether successful or not)
           DB::commit();
@@ -499,33 +525,54 @@ class OrderController extends Controller
 
           return redirect()->route('main.pages.success', ['orderId' => $order->id]);
         } catch (\Exception $e) {
+          // Update cart error status (if user is logged in)
+          if (auth()->check()) {
+              // Update the cart error status with a meaningful message
+              CartHelper::updateCartErrorStatus(auth()->id(), 'payment error: Order creation failed during PayPal payment process');
+          }
+      
           // If there's any critical error during order creation, roll back completely
           DB::rollBack();
+          
           Log::error('Order creation failed during PayPal payment process: ' . $e->getMessage(), [
-            'trace' => $e->getTraceAsString(),
-            'user_id' => auth()->id(),
-            'payment_id' => $paymentId
+              'trace' => $e->getTraceAsString(),
+              'user_id' => auth()->id(),
+              'payment_id' => $paymentId
           ]);
+          
           return redirect()->route('checkout')->with('error', 'Order creation failed. Your payment was received but we encountered an error. Please contact support with payment ID: ' . $paymentId);
-        }
+      }
       } else {
         // Payment was not approved
+        if (auth()->check()) {
+            // Update cart error status (if user is logged in)
+            CartHelper::updateCartErrorStatus(auth()->id(), 'payment error: PayPal payment not approved');
+        }
+    
         Log::error('PayPal payment not approved', [
-          'state' => $result->state,
-          'payment_id' => $paymentId
+            'state' => $result->state,
+            'payment_id' => $paymentId
         ]);
+        
         return redirect()->route('checkout')->with('error', 'Payment was not approved by PayPal. Please try again or use a different payment method.');
-      }
+    }
     } catch (\Exception $e) {
+      // Update cart error status (if user is logged in)
+      if (auth()->check()) {
+          // Update the cart error status with a meaningful message
+          CartHelper::updateCartErrorStatus(auth()->id(), 'payment error: PayPal Payment Execution Failed');
+      }
+  
       // Handle any exception that occurred during payment execution
       DB::rollBack();
       Log::error('PayPal Payment Execution Failed: ' . $e->getMessage(), [
-        'trace' => $e->getTraceAsString(),
-        'payment_id' => $paymentId,
-        'payer_id' => $payerId
+          'trace' => $e->getTraceAsString(),
+          'payment_id' => $paymentId,
+          'payer_id' => $payerId
       ]);
+      
       return redirect()->route('checkout')->with('error', 'Payment processing failed. Please try again or contact support.');
-    }
+  }
   }
 
 
@@ -609,7 +656,10 @@ class OrderController extends Controller
     if ($cart->isEmpty()) {
       return redirect()->route('cart')->with('error', 'Your cart is empty. Please add items before proceeding to checkout.');
     }
-
+    if (auth()->check()) {
+      // Update the cart error status with a meaningful message
+      CartHelper::updateCartErrorStatus(auth()->id(), 'Checkout Page');
+  }
     return view('main.pages.checkout', compact('cart', 'TPStaxPercentage', 'TVQtaxPercentage', 'countries'));
   }
 
@@ -634,9 +684,14 @@ class OrderController extends Controller
 
       return response()->json($countries);
     } catch (\Exception $e) {
+      // Update cart error status (if user is logged in)
+      if (auth()->check()) {
+          CartHelper::updateCartErrorStatus(auth()->id(), 'shipping error: Error fetching countries');
+      }
+  
       Log::error('Error fetching countries: ' . $e->getMessage());
       return response()->json(['error' => 'Server error: ' . $e->getMessage()], 500);
-    }
+  }
   }
   public function add(Request $request)
   {
@@ -797,10 +852,14 @@ class OrderController extends Controller
         );
 
         if (!$paymentResult['success']) {
+          // Update cart error status (if user is logged in)
+          if (auth()->check()) {
+              CartHelper::updateCartErrorStatus(auth()->id(), 'payment error: Authorize.Net payment failed');
+          }
+      
           Log::error('Authorize.Net payment failed: ' . $paymentResult['message']);
           return response()->json(['success' => false, 'message' => $paymentResult['message']], 400);
-        }
-
+      }
         // Log successful payment
         Log::info('Authorize.Net payment successful for user: ' . auth()->id(), [
           'transaction_id' => $paymentResult['transaction_id'] ?? null,
@@ -913,17 +972,28 @@ class OrderController extends Controller
             'orderId' => $order->order_id
           ]);
         } catch (\Exception $e) {
+          // Update cart error status (if user is logged in)
+          if (auth()->check()) {
+              CartHelper::updateCartErrorStatus(auth()->id(), 'payment error: Order creation failed after Authorize.Net payment');
+          }
+      
           DB::rollBack();
           Log::error('Order creation failed after Authorize.Net payment: ' . $e->getMessage());
+      
           return response()->json(['success' => false, 'message' => 'Order creation failed: ' . $e->getMessage()], 500);
-        }
+      }
       }
 
       return response()->json(['success' => false, 'message' => 'Payment method not supported.']);
     } catch (\Exception $e) {
+      // Update cart error status (if user is logged in)
+      if (auth()->check()) {
+          CartHelper::updateCartErrorStatus(auth()->id(), 'payment error: Checkout failed');
+      }
+  
       Log::error('Checkout failed: ' . $e->getMessage());
       return response()->json(['success' => false, 'message' => 'Checkout failed. Please try again later.'], 500);
-    }
+  }
   }
 
   private function generateOrderId()
@@ -1083,10 +1153,17 @@ class OrderController extends Controller
       DB::commit();
 
       return redirect()->route('order.success', $order->order_number);
-    } catch (\Exception $e) {
+    }catch (\Exception $e) {
+      // Update cart error status (if user is logged in)
+      if (auth()->check()) {
+          CartHelper::updateCartErrorStatus(auth()->id(), 'Order Placing Error: ' . $e->getMessage());
+      }
+  
       DB::rollBack();
+      Log::error('Database transaction failed: ' . $e->getMessage());
+  
       return back()->with('error', 'Something went wrong. Please try again.');
-    }
+  }
   }
 
   private function calculateVolumeDiscount($cartItem)
@@ -1133,12 +1210,17 @@ class OrderController extends Controller
     try {
       // Validate required fields
       if (empty($this->authorizeNetLoginId) || empty($this->authorizeNetTransactionKey)) {
+        // Update cart error status
+        if (auth()->check()) {
+            CartHelper::updateCartErrorStatus(auth()->id(), 'payment configuration error: missing credentials');
+        }
+    
         Log::error('Authorize.Net credentials are missing');
         return [
-          'success' => false,
-          'message' => 'Payment configuration error. Please contact the administrator.'
+            'success' => false,
+            'message' => 'Payment configuration error. Please contact the administrator.'
         ];
-      }
+    }
 
       // Extract card details
       $cardNumber = $cardDetails['cardNumber'] ?? '';
@@ -1208,14 +1290,19 @@ class OrderController extends Controller
           throw new \Exception('Invalid JSON response: ' . json_last_error_msg());
         }
       } catch (\Exception $e) {
+        // Update cart error status with specific payment error
+        if (auth()->check()) {
+            CartHelper::updateCartErrorStatus(auth()->id(), 'payment error: ' . $e->getMessage());
+        }
+    
         Log::error('Failed to parse Authorize.Net JSON response: ' . $e->getMessage(), [
-          'raw_response' => $responseBody
+            'raw_response' => $responseBody
         ]);
         return [
-          'success' => false,
-          'message' => 'Unable to process payment response: ' . $e->getMessage()
+            'success' => false,
+            'message' => 'Unable to process payment response: ' . $e->getMessage()
         ];
-      }
+    }
 
       // Log the parsed response
       Log::info('Authorize.Net API Parsed Response:', $result);

@@ -81,4 +81,14 @@ class Order extends Model
     {
         return $this->hasOne(OrderShippingRate::class);
     }
+
+    /**
+     * Get the comments for this order.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function comments()
+    {
+        return $this->hasMany(OrderComment::class, 'order_id');
+    }
 }
