@@ -1176,7 +1176,7 @@
                                 </div>
 
                                 <!-- City input -->
-                              
+
 
                                 <div class="row mb-4">
                                     <div class="col-md-6">
@@ -1200,39 +1200,44 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                <div class="col-md-6">
-                                <div data-mdb-input-init class="form-outline mb-4">
-                                    <label class="form-label" for="city">City *</label>
-                                    <input type="text" id="city" name="city" class="form-control" required />
-                                </div>
-                            </div>
-                                <div class="col-md-6">
-                                    <div data-mdb-input-init class="form-outline">
-                                        <label class="form-label" for="postal_code">Postal Code *</label>
-                                        <input type="text" id="postal_code" name="postal_code" class="form-control"
-                                            required />
+                                    <div class="col-md-6">
+                                        <div data-mdb-input-init class="form-outline mb-4">
+                                            <label class="form-label" for="city">City *</label>
+                                            <input type="text" id="city" name="city" class="form-control"
+                                                required />
+                                        </div>
                                     </div>
-                                </div>
+                                    <div class="col-md-6">
+                                        <div data-mdb-input-init class="form-outline">
+                                            <label class="form-label" for="postal_code">Postal Code *</label>
+                                            <input type="text" id="postal_code" name="postal_code"
+                                                class="form-control" required />
+                                        </div>
+                                    </div>
 
-                            </div>
+                                </div>
                                 <div id="shipping-methods-container" class="mb-4">
                                     <!-- Shipping methods will be loaded here -->
                                 </div>
 
                                 <div class="alert alert-warning"
-     style="margin-top: 15px; padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 5px;">
-    <strong>Shipping Notice:</strong> 
-    If you receive the message <em>"Error calculating shipping rates"</em>, please try the following steps:
-    <ul style="margin-top: 5px; padding-left: 20px;">
-        <li>Double-check your shipping details to ensure all required fields are filled correctly.</li>
-        <li>Retype the postal code carefully, or try removing and re-entering one character.</li>
-        <li>Make sure all location fields (country, province, city, etc.) are selected properly.</li>
-    </ul>
-    If the issue persists, please contact our support team for assistance.
-</div>
+                                    style="margin-top: 15px; padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 5px;">
+                                    <strong>Shipping Notice:</strong>
+                                    If you receive the message <em>"Error calculating shipping rates"</em>, please try the
+                                    following steps:
+                                    <ul style="margin-top: 5px; padding-left: 20px;">
+                                        <li>Double-check your shipping details to ensure all required fields are filled
+                                            correctly.</li>
+                                        <li>Retype the postal code carefully, or try removing and re-entering one character.
+                                        </li>
+                                        <li>Make sure all location fields (country, province, city, etc.) are selected
+                                            properly.</li>
+                                    </ul>
+                                    If the issue persists, please contact our support team for assistance.
+                                </div>
 
 
-                             
+
                                 <!-- Email input -->
                                 <div data-mdb-input-init class="form-outline mb-4">
                                     <label class="form-label" for="form6Example5">Email *</label>
@@ -1311,7 +1316,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
 
                 <script>
@@ -1319,49 +1324,49 @@
                     document.addEventListener('DOMContentLoaded', function() {
                         const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
                         const authorizeNetCardDetails = document.getElementById('authorizeNetCardDetails');
-            
+
                         function toggleCardDetails() {
                             const authorizeNetSelected = document.getElementById('authorizeNetOption').checked;
                             authorizeNetCardDetails.style.display = authorizeNetSelected ? 'block' : 'none';
                         }
-            
+
                         // Add event listeners to payment method radios
                         paymentMethods.forEach(method => {
                             method.addEventListener('change', toggleCardDetails);
                         });
-            
+
                         // Initialize visibility
                         toggleCardDetails();
-            
+
                         // Add card number formatting
                         const cardNumberInput = document.getElementById('cardNumber');
                         if (cardNumberInput) {
                             cardNumberInput.addEventListener('input', function(e) {
                                 // Remove non-digit characters
                                 let value = e.target.value.replace(/\D/g, '');
-            
+
                                 // Add space after every 4 digits
                                 if (value.length > 0) {
                                     value = value.match(/.{1,4}/g).join(' ');
                                 }
-            
+
                                 // Update input value
                                 e.target.value = value;
                             });
                         }
-            
+
                         // Add expiry date formatting (MM/YY)
                         const expiryDateInput = document.getElementById('expiryDate');
                         if (expiryDateInput) {
                             expiryDateInput.addEventListener('input', function(e) {
                                 // Remove non-digit characters
                                 let value = e.target.value.replace(/\D/g, '');
-            
+
                                 // Format as MM/YY
                                 if (value.length > 2) {
                                     value = value.substring(0, 2) + '/' + value.substring(2, 4);
                                 }
-            
+
                                 // Update input value
                                 e.target.value = value;
                             });
@@ -1401,7 +1406,7 @@
                                             </tr>
 
                                             <tr>
-                                                <td>Discount :</td>
+                                                <td>Discount <span id="discount-type-text"></span>:</td>
                                                 <td class="text-end cart-discount">
                                                     <span id="discount-amount">0.00</span>
                                                 </td>
@@ -1484,6 +1489,8 @@
     <script>
         let appliedDiscount = 0;
         let discountId = null;
+        let discountType = 'none';
+        let discountPercentage = 0;
         const cartItems = @json($cart);
 
         function updateTaxAndTotal(subtotal, appliedDiscount = 0, shipping = 0) {
@@ -1835,6 +1842,388 @@
             document.getElementById('applyCoupon').addEventListener('click', function() {
                 let couponCode = document.getElementById('couponCode').value;
 
+                if (!couponCode) {
+                    alert('Please enter a coupon code');
+                    return;
+                }
+
+                fetch("{{ route('apply.discount') }}", {
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            coupon_code: couponCode
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            const couponDiscount = parseFloat(result.discount) || 0;
+
+                            // Calculate volume discount
+                            let volumeDiscountAmount = 0;
+                            let volumeDiscountPercentage = 0;
+                            $('.item-total-price').each(function() {
+                                const itemId = $(this).data('item-id');
+                                const quantity = parseInt($(this).closest('tr').find('td:eq(1)')
+                                    .text());
+                                const result = calculateVolumeDiscount(quantity, sellingPrice,
+                                    volumeDiscounts);
+                                if (result.discount > 0) {
+                                    const originalTotal = sellingPrice * quantity;
+                                    const discountedTotal = result.discountedPrice * quantity;
+                                    volumeDiscountAmount += (originalTotal - discountedTotal);
+                                    volumeDiscountPercentage = result.discount;
+                                }
+                            });
+
+                            // Check if both volume discount and coupon discount are available
+                            if (volumeDiscountAmount > 0 && couponDiscount > 0) {
+                                // Create and show modal for discount selection
+                                showDiscountSelectionModal(couponDiscount, result.discountId,
+                                    volumeDiscountAmount, volumeDiscountPercentage);
+                            } else {
+                                // Just apply the coupon discount if no volume discount
+                                appliedDiscount = couponDiscount;
+                                discountId = result.discountId ?? null;
+                                discountType = 'coupon';
+                                discountPercentage = result.percentage || 0;
+
+                                document.getElementById('discount-amount').textContent = appliedDiscount
+                                    .toFixed(2);
+                                updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(document
+                                    .getElementById('shipping-amount').textContent) || 0);
+
+                                // Update the discount type text display
+                                updateDiscountTypeText();
+
+                                alert(result.message);
+                            }
+                        } else {
+                            alert(result.message);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+
+            // Function to show discount selection modal
+            function showDiscountSelectionModal(couponDiscount, couponId, volumeDiscount,
+                volumeDiscountPercentage) {
+                // If modal doesn't exist, create it
+                if (!document.getElementById('discountSelectionModal')) {
+                    const modalHtml = `
+                        <div class="modal fade" id="discountSelectionModal" tabindex="-1" aria-labelledby="discountSelectionModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="discountSelectionModalLabel">Choose Discount</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>You have two possible discounts available. Please choose one:</p>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="radio" name="discountChoice" id="volumeDiscountChoice" value="volume">
+                                            <label class="form-check-label" for="volumeDiscountChoice">
+                                                Volume Discount: $<span id="volumeDiscountAmount"></span> (${volumeDiscountPercentage}% off)
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="discountChoice" id="couponDiscountChoice" value="coupon">
+                                            <label class="form-check-label" for="couponDiscountChoice">
+                                                Coupon Discount: $<span id="couponDiscountAmount"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-primary" id="applySelectedDiscount">Apply Selected Discount</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+                    // Add event listener for applying the selected discount
+                    document.getElementById('applySelectedDiscount').addEventListener('click', function() {
+                        const selectedDiscountType = document.querySelector(
+                            'input[name="discountChoice"]:checked')?.value;
+
+                        if (!selectedDiscountType) {
+                            alert('Please select a discount type');
+                            return;
+                        }
+
+                        if (selectedDiscountType === 'volume') {
+                            // Apply volume discount
+                            appliedDiscount = volumeDiscount;
+                            discountId = null;
+                            discountType = 'volume';
+                            discountPercentage = volumeDiscountPercentage;
+                        } else {
+                            // Apply coupon discount
+                            appliedDiscount = couponDiscount;
+                            discountId = couponId;
+                            discountType = 'coupon';
+                            discountPercentage = couponDiscount / getSubtotal() * 100;
+                        }
+
+                        document.getElementById('discount-amount').textContent = appliedDiscount.toFixed(2);
+                        updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(document
+                            .getElementById('shipping-amount').textContent) || 0);
+
+                        // Update the discount type text display
+                        updateDiscountTypeText();
+
+                        // Close the modal
+                        const modalElement = document.getElementById('discountSelectionModal');
+                        const modal = bootstrap.Modal.getInstance(modalElement);
+                        modal.hide();
+
+                        alert('Discount applied successfully!');
+                    });
+                }
+
+                // Update discount amounts in the modal
+                document.getElementById('volumeDiscountAmount').textContent = volumeDiscount.toFixed(2);
+                document.getElementById('couponDiscountAmount').textContent = couponDiscount.toFixed(2);
+
+                // Select the higher discount by default
+                if (volumeDiscount >= couponDiscount) {
+                    document.getElementById('volumeDiscountChoice').checked = true;
+                } else {
+                    document.getElementById('couponDiscountChoice').checked = true;
+                }
+
+                // Show the modal
+                const modalElement = document.getElementById('discountSelectionModal');
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            }
+
+            // Handle shipping calculation
+            $('#address, #country').on('change', calculateShippingLive);
+
+            function calculateShippingLive() {
+                const country = $('#country').val();
+                const state = $('#state').val();
+                const postalCode = $('#postal_code').val();
+                const address = $('#address').val();
+                const city = $('#city').val();
+
+                if (!country || !state || !postalCode || !address || !city) {
+                    $('#shipping-methods-container').html(
+                        '<div class="alert alert-warning">Please fill in all required shipping fields</div>');
+                    $('#shipping-amount').text('0.00');
+                    return;
+                }
+
+                // Validate address fields
+                if (address.length < 5 || city.length < 2) {
+                    $('#shipping-methods-container').html(
+                        '<div class="alert alert-warning">Please enter a valid address and city</div>');
+                    $('#shipping-amount').text('0.00');
+                    return;
+                }
+
+                // Show loading state
+                $('#shipping-methods-container').html(
+                    '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Calculating shipping rates...</p></div>'
+                );
+
+                // Prepare products data
+                const products = cartItems?.map(item => {
+                    const product = item.product;
+
+                    // Handle missing product data (dimensions or weight)
+                    if (!product.weight || !product.length || !product.width || !product.height) {
+                        console.log("Missing product data:", product);
+                        return null;
+                    }
+
+                    // Validate product dimensions
+                    const weight = parseFloat(product.weight) || 0;
+                    const length = parseFloat(product.length) || 0;
+                    const width = parseFloat(product.width) || 0;
+                    const height = parseFloat(product.height) || 0;
+
+                    if (weight <= 0 || length <= 0 || width <= 0 || height <= 0) {
+                        console.log("Invalid product dimensions:", product);
+                        return null;
+                    }
+
+                    // Convert weight to lbs if needed
+                    let weightInLbs = weight;
+                    if (product.weight_unit === 'kg') {
+                        weightInLbs = weight * 2.20462;
+                    }
+
+                    return {
+                        weight: weightInLbs.toFixed(2),
+                        weight_unit: 'lbs',
+                        length: length,
+                        width: width,
+                        height: height,
+                        size_unit: 'cm',
+                        quantity: item.quantity
+                    };
+                }).filter(item => item !== null);
+
+                if (products.length === 0) {
+                    $('#shipping-methods-container').html(
+                        '<div class="alert alert-warning">No valid items in the cart to calculate shipping.</div>'
+                    );
+                    $('#shipping-amount').text('0.00');
+                    return;
+                }
+
+                // Calculate total package dimensions
+                let totalWeight = 0;
+                let maxLength = 0;
+                let maxWidth = 0;
+                let maxHeight = 0;
+
+                products.forEach(product => {
+                    totalWeight += parseFloat(product.weight) * product.quantity;
+                    maxLength = Math.max(maxLength, product.length);
+                    maxWidth = Math.max(maxWidth, product.width);
+                    maxHeight = Math.max(maxHeight, product.height);
+                });
+
+                // Validate total package dimensions
+                if (totalWeight > 30) { // 30lbs max weight
+                    $('#shipping-methods-container').html(
+                        '<div class="alert alert-warning">Package weight exceeds maximum limit. Please contact support for large orders.</div>'
+                    );
+                    $('#shipping-amount').text('0.00');
+                    return;
+                }
+
+                if (maxLength > 100 || maxWidth > 100 || maxHeight > 100) { // 100cm max dimension
+                    $('#shipping-methods-container').html(
+                        '<div class="alert alert-warning">Package dimensions exceed maximum limits. Please contact support for large orders.</div>'
+                    );
+                    $('#shipping-amount').text('0.00');
+                    return;
+                }
+
+                // Prepare the shipping request payload
+                const payload = {
+                    destination: {
+                        country: country,
+                        state: state,
+                        postal_code: postalCode,
+                        address: address,
+                        city: city
+                    },
+                    products: products,
+                    package: {
+                        weight: totalWeight.toFixed(2),
+                        weight_unit: 'lbs',
+                        length: maxLength,
+                        width: maxWidth,
+                        height: maxHeight,
+                        size_unit: 'cm'
+                    }
+                };
+
+                fetch("{{ route('shipping.calculate') }}", {
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success && data.shipping?.data?.length) {
+                            const shippingAmount = data.shipping.data[0].rate;
+                            document.getElementById('shipping-amount').textContent = shippingAmount.toFixed(2);
+                            updateTaxAndTotal(getSubtotal(), appliedDiscount, shippingAmount);
+
+                            // Display shipping methods
+                            let shippingHtml = '<div class="shipping-methods-list">';
+                            data.shipping.data.forEach(rate => {
+                                const rateUSD = (rate.total * 0.75).toFixed(2);
+                                shippingHtml += `
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input shipping-method-radio" type="radio"
+                                            name="shipping_method"
+                                            value="${rate.postage_type_id}"
+                                            id="shipping_${rate.postage_type_id}"
+                                            data-price="${rateUSD}"
+                                            data-service="${rate.postage_type}"
+                                            data-days="${rate.delivery_days}">
+                                        <label class="form-check-label" for="shipping_${rate.postage_type_id}">
+                                            ${rate.postage_type} - $${rateUSD} USD
+                                            <br>
+                                            <small class="text-muted">Estimated delivery: ${rate.delivery_days} days</small>
+                                        </label>
+                                    </div>
+                                `;
+                            });
+                            shippingHtml += '</div>';
+                            $('#shipping-methods-container').html(shippingHtml);
+
+                            // Add event handler for shipping method selection
+                            $('.shipping-method-radio').on('change', function() {
+                                const selectedPrice = $(this).data('price');
+                                const selectedService = $(this).data('service');
+                                const selectedDays = $(this).data('days');
+
+                                // Update shipping amount display
+                                $('#shipping-amount').text(selectedPrice);
+
+                                // Store selected shipping details
+                                window.selectedShipping = {
+                                    method: $(this).val(),
+                                    price: selectedPrice,
+                                    service: selectedService,
+                                    estimated_days: selectedDays
+                                };
+
+                                // Update total with new shipping price
+                                updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(
+                                    selectedPrice));
+                            });
+
+                            // Select the first shipping method by default
+                            if (data.shipping.data.length > 0) {
+                                const firstRate = data.shipping.data[0];
+                                const firstRateUSD = (firstRate.total * 0.75).toFixed(2);
+                                console.log('Selecting first shipping method:', {
+                                    rate: firstRate,
+                                    price: firstRateUSD
+                                });
+                                $(`#shipping_${firstRate.postage_type_id}`).prop('checked', true).trigger(
+                                    'change');
+                            }
+                        } else {
+                            $('#shipping-methods-container').html(
+                                '<div class="alert alert-danger">Unable to calculate shipping rates. Please try again later or contact support.</div>'
+                            );
+                            $('#shipping-amount').text('0.00');
+                            updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Shipping calculation error:', err);
+                        $('#shipping-methods-container').html(
+                            '<div class="alert alert-danger">Error calculating shipping rates. Please try again later or contact support.</div>'
+                        );
+                        $('#shipping-amount').text('0.00');
+                        updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
+                    });
+            }
+
+            // Handle coupon application
+            document.getElementById('applyCoupon').addEventListener('click', function() {
+                let couponCode = document.getElementById('couponCode').value;
+
 
                 fetch("{{ route('apply.discount') }}", {
                         method: "POST",
@@ -1933,6 +2322,8 @@
                         paymentMethod: document.querySelector('input[name="paymentMethod"]:checked')?.value,
                         DiscountAmount: appliedDiscount,
                         discountId: discountId ? discountId : null,
+                        discount_type: discountType,
+                        discount_percentage: discountPercentage,
                         subtotal: subtotal,
                         TPStaxAmount: TPStaxAmount,
                         TPStaxNumber: TPStaxNumber,
@@ -1947,43 +2338,43 @@
                         shipping_estimated_days: window.selectedShipping.estimated_days
                     };
 
-                       // Add Authorize.Net card details if that payment method is selected
-                if (formData.paymentMethod === 'authorize_net') {
-                    // Validate card details
-                    const cardNumber = document.getElementById('cardNumber').value;
-                    const cardName = document.getElementById('cardName').value;
-                    const expiryDate = document.getElementById('expiryDate').value;
-                    const cvv = document.getElementById('cvv').value;
+                    // Add Authorize.Net card details if that payment method is selected
+                    if (formData.paymentMethod === 'authorize_net') {
+                        // Validate card details
+                        const cardNumber = document.getElementById('cardNumber').value;
+                        const cardName = document.getElementById('cardName').value;
+                        const expiryDate = document.getElementById('expiryDate').value;
+                        const cvv = document.getElementById('cvv').value;
 
-                    if (!cardNumber || !cardName || !expiryDate || !cvv) {
-                        alert('Please fill in all card details');
-                        checkoutButton.innerHTML = 'Proceed to Pay';
-                        checkoutButton.disabled = false;
-                        return;
+                        if (!cardNumber || !cardName || !expiryDate || !cvv) {
+                            alert('Please fill in all card details');
+                            checkoutButton.innerHTML = 'Proceed to Pay';
+                            checkoutButton.disabled = false;
+                            return;
+                        }
+
+                        // Format expiry date MM/YY to MM/YYYY for API
+                        let formattedExpiryDate = expiryDate;
+                        if (expiryDate.length === 5 && expiryDate.indexOf('/') === 2) {
+                            const parts = expiryDate.split('/');
+                            formattedExpiryDate = parts[0] + '/20' + parts[1];
+                        }
+
+                        // Add card details to form data
+                        formData.cardDetails = {
+                            cardNumber: cardNumber.replace(/\s+/g, ''), // Remove any spaces
+                            cardName: cardName,
+                            expiryDate: formattedExpiryDate,
+                            cvv: cvv
+                        };
+
+                        // Log card details being sent (except sensitive info)
+                        console.log('Sending payment with card details', {
+                            cardName: formData.cardDetails.cardName,
+                            expiryDate: formData.cardDetails.expiryDate,
+                            cardNumberLength: formData.cardDetails.cardNumber.length
+                        });
                     }
-
-                    // Format expiry date MM/YY to MM/YYYY for API
-                    let formattedExpiryDate = expiryDate;
-                    if (expiryDate.length === 5 && expiryDate.indexOf('/') === 2) {
-                        const parts = expiryDate.split('/');
-                        formattedExpiryDate = parts[0] + '/20' + parts[1];
-                    }
-
-                    // Add card details to form data
-                    formData.cardDetails = {
-                        cardNumber: cardNumber.replace(/\s+/g, ''), // Remove any spaces
-                        cardName: cardName,
-                        expiryDate: formattedExpiryDate,
-                        cvv: cvv
-                    };
-
-                    // Log card details being sent (except sensitive info)
-                    console.log('Sending payment with card details', {
-                        cardName: formData.cardDetails.cardName,
-                        expiryDate: formData.cardDetails.expiryDate,
-                        cardNumberLength: formData.cardDetails.cardNumber.length
-                    });
-                }
 
 
 
@@ -1999,23 +2390,24 @@
                         .then(response => response.json())
                         .then(result => {
                             if (result.success) {
-                            if (formData.paymentMethod === 'paypal') {
-                                window.location.href = result.paypalUrl;
-                            } else if (formData.paymentMethod === 'authorize_net') {
-                                // For Authorize.net, redirect to the success page with order ID
-                                window.location.href = "{{ route('main.pages.success') }}?orderId=" + result.orderId;
+                                if (formData.paymentMethod === 'paypal') {
+                                    window.location.href = result.paypalUrl;
+                                } else if (formData.paymentMethod === 'authorize_net') {
+                                    // For Authorize.net, redirect to the success page with order ID
+                                    window.location.href = "{{ route('main.pages.success') }}?orderId=" +
+                                        result.orderId;
+                                } else {
+                                    window.location.href = "{{ route('main.pages.success') }}?orderId=" +
+                                        result.orderId;
+                                }
                             } else {
-                                window.location.href = "{{ route('main.pages.success') }}?orderId=" +
-                                    result.orderId;
+                                // Handle error with more details
+                                let errorMsg = result.message || 'Payment processing failed. Please try again.';
+                                console.error('Payment error:', errorMsg);
+                                alert(errorMsg);
+                                checkoutButton.innerHTML = 'Proceed to Pay';
+                                checkoutButton.disabled = false;
                             }
-                        } else {
-                            // Handle error with more details
-                            let errorMsg = result.message || 'Payment processing failed. Please try again.';
-                            console.error('Payment error:', errorMsg);
-                            alert(errorMsg);
-                            checkoutButton.innerHTML = 'Proceed to Pay';
-                            checkoutButton.disabled = false;
-                        }
                         })
                         .catch(error => {
                             alert('An error occurred during checkout. Please try again.');
@@ -2080,6 +2472,35 @@
 
             updateTaxRowsVisibility();
             document.getElementById('checkoutButton').addEventListener('click', proceedToCheckout);
+        });
+    </script>
+
+    <script>
+        // Function to update the discount type text
+        function updateDiscountTypeText() {
+            const discountTypeText = document.getElementById('discount-type-text');
+            if (discountType === 'volume') {
+                discountTypeText.textContent = `(Volume ${discountPercentage}%)`;
+            } else if (discountType === 'coupon') {
+                discountTypeText.textContent = `(Coupon ${discountPercentage.toFixed(2)}%)`;
+            } else {
+                discountTypeText.textContent = '';
+            }
+        }
+
+        // Update the discount type text whenever discount changes
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDiscountTypeText();
+        });
+
+        // Modify the existing discount application code to update the discount type text
+        document.getElementById('applySelectedDiscount').addEventListener('click', function() {
+            // ...existing code...
+
+            // Update the discount type text
+            updateDiscountTypeText();
+
+            // ...rest of the existing code...
         });
     </script>
 @endsection
