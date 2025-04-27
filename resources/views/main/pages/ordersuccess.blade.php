@@ -15,7 +15,7 @@
             style="max-width: 650px;margin:auto; box-shadow: rgba(135, 138, 153, 0.10) 0 5px 20px -6px;border-radius: 6px;border: 1px solid #eef1f5;overflow: hidden;background-color: #fff;">
 
             <div style="padding: 1.5rem;background-color: #fafafa;">
-                <a href="index.html"><img src="{{ asset('assetsMain/images/logo-dark.png') }}" alt="" height="50"
+                <a href="{{ route('home') }}"><img src="{{ asset('assetsMain/images/logo-dark.png') }}" alt="" height="50"
                         style="display: block;margin: 0 auto;"></a>
             </div>
             <div style="padding: 1.5rem;">

@@ -68,6 +68,9 @@ class EcommerceAbandonCartController extends Controller
                     ->get();
             }
 
+            // Get cart error info for this user
+            $cartError = \App\Models\AbandonCartError::where('user_id', $user->id)->first();
+
             if ($cartItems->isNotEmpty()) {
                 $latestCart = $cartItems->sortByDesc('updated_at')->first();
                 $abandoncart[] = [
@@ -82,6 +85,7 @@ class EcommerceAbandonCartController extends Controller
                     'order_id' => $orderIdFromCart,
                     'cart_id' => $cartReference, // Added cart_id for reference
                     'comments' => $comments,
+                    'cart_error' => $cartError, // Add the cart error data
                 ];
             }
         }

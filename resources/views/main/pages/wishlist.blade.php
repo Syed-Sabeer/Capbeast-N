@@ -45,7 +45,7 @@
                                             </div>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <a href="product-details.html"><h6 class="fs-16">{{$item->product->title}}</h6></a>
+                                            <a href="{{ url('/product/' . $item->product->slug) }}"><h6 class="fs-16">{{$item->product->title}}</h6></a>
                                             <p class="mb-0 text-muted fs-13">
                                                 {{ $item->product->categories->pluck('title')->implode(', ') ?: 'N/A' }}
                                             </p>

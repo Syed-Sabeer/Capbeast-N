@@ -11,6 +11,7 @@
 
 @section('vendor-script')
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/bootstrap/bootstrap.bundle.js') }}"></script>
 @endsection
 
 @section('page-script')
@@ -32,10 +33,11 @@
                         <th>Customer</th>
                         <th>Email</th>
                         <th>Phone</th>
-                        <th>Cart Qty</th>
+                        {{-- <th>Cart Qty</th> --}}
                         <th>Cart Amount</th>
-                        <th>Created At</th>
+                        {{-- <th>Created At</th> --}}
                         <th>Updated At</th> <!-- New column -->
+                        <th>Log</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -49,13 +51,69 @@
                             </td>
                             <td>{{ $item['user']->email ?? 'Unknown' }}</td>
                             <td>{{ $item['user']->contact_number ?? 'Unknown' }}</td>
-                            <td>{{ $item['total_qty'] }}</td>
+                            {{-- <td>{{ $item['total_qty'] }}</td> --}}
                             <td>${{ number_format($item['total_amount'], 2) }}</td>
-                            <td>{{ date('Y-m-d H:i', strtotime($item['created_at'])) }}</td>
+                            {{-- <td>{{ date('Y-m-d H:i', strtotime($item['created_at'])) }}</td> --}}
                             <td>{{ date('Y-m-d H:i', strtotime($item['updated_at'])) }}</td>
 
+                            <td>
+                                @if (isset($item['cart_error']) && $item['cart_error'])
+                                    @php
+                                        $badgeClass = 'bg-label-danger'; // Default
+                                        switch (strtolower($item['cart_error']->error_status)) {
+                                            case 'payment':
+                                                $badgeClass = 'bg-label-danger';
+                                                break;
+                                            case 'shipping':
+                                                $badgeClass = 'bg-label-warning';
+                                                break;
+                                            case 'checkout':
+                                                $badgeClass = 'bg-label-info';
+                                                break;
+                                            case 'cart':
+                                                $badgeClass = 'bg-label-info';
+                                                break;
+                                            default:
+                                                $badgeClass = 'bg-label-danger';
+                                        }
+                                    @endphp
+                                    <span class="badge {{ $badgeClass }}">{{ $item['cart_error']->error_status }}</span>
+                                    @if ($item['cart_error']->error_status_detail)
+                                        <button type="button" class="btn btn-sm btn-text-secondary p-0 ms-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#errorDetailModal{{ $item['user_id'] }}">
+                                            <i class="fa-solid fa-info-circle"></i>
+                                        </button>
 
-
+                                        <!-- Error Detail Modal -->
+                                        <div class="modal fade" id="errorDetailModal{{ $item['user_id'] }}" tabindex="-1"
+                                            aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Error Details -
+                                                            {{ $item['cart_error']->error_status }}</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="alert {{ $badgeClass }} mb-0">
+                                                            <p class="mb-0">
+                                                                {{ $item['cart_error']->error_status_detail }}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
 
                             <td>
                                 @if ($item['status'] == 0)

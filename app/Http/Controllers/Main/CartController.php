@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Helpers\CartHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\CartArtwork;
@@ -21,6 +22,11 @@ class CartController extends Controller
     $carts = Cart::with(['product', 'color', 'userCustomization'])
       ->where('user_id', $userId)
       ->get();
+
+      if (auth()->check()) {
+        // Update the cart error with the new method
+        CartHelper::trackError('Cart', 'Cart Page');
+    }
 
 
     return view('main.pages.cart', compact('carts'));
@@ -53,13 +59,18 @@ class CartController extends Controller
         'quantity' => $validated['quantity'],
         'size' => $validated['size'],
       ]);
-
-      return response()->json([
+      if (auth()->check()) {
+        // Update the cart error with the new method
+        CartHelper::trackError('Cart', 'Cart Page');
+    }
+    
+    return response()->json([
         'success' => true,
         'message' => 'Item added to cart!',
         'cartItem' => $cartItem,
-        'redirect_url' => route('cart')  // Add the cart route for redirection
-      ]);
+        'redirect_url' => route('cart') // Cart route for redirection
+    ]);
+    
     } catch (\Exception $e) {
       Log::error('Error adding to cart: ' . $e->getMessage());
       return response()->json(['success' => false, 'message' => 'Failed to add item to cart.'], 500);

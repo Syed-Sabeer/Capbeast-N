@@ -72,7 +72,7 @@
 </div>
         <nav class="navbar navbar-expand-lg ecommerce-navbar" id="navbar">
             <div class="container">
-                <a class="navbar-brand d-none d-lg-block" href="index.html">
+                <a class="navbar-brand d-none d-lg-block" href="{{ route('home') }}">
                     <div class="logo-dark">
                         <img src="{{ asset('assetsMain/images/logo-dark.png')}}" alt="" height="25">
                     </div>
@@ -86,7 +86,7 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav mx-lg-auto mb-2 mb-lg-0" id="navigation-menu">
                         <li class="nav-item d-block d-lg-none">
-                            <a class="d-block p-3 h-auto text-center" href="index.html">
+                            <a class="d-block p-3 h-auto text-center" href="{{ route('home') }}">
                                 <img src="{{ asset('assetsMain/images/logo-dark.png')}}" alt="" height="25" class="card-logo-dark mx-auto">
                                 <img src="{{ asset('assetsMain/images/logo-light.png')}}" alt="" height="25" class="card-logo-light mx-auto">
                             </a>
