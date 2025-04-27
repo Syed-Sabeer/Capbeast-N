@@ -448,9 +448,11 @@
             let TVQtaxAmount = userCountry === "CA" ? (discountedTotal * TVQtaxPercentage) / 100 : 0;
 
             // Calculate final total including all components
-            let finalTotal = discountedTotal + TPStaxAmount + TVQtaxAmount + shipping;
+            let finalTotal = discountedTotal + TPStaxAmount + TVQtaxAmount + parseFloat(shipping);
 
             console.log('Calculated amounts:', {
+                originalSubtotal: subtotal,
+                appliedDiscount: appliedDiscount,
                 discountedTotal: discountedTotal,
                 TPStaxAmount: TPStaxAmount,
                 TVQtaxAmount: TVQtaxAmount,
@@ -458,11 +460,10 @@
                 finalTotal: finalTotal
             });
 
-            // Update display values
+            // Update display values - keep subtotal as original value
             document.getElementById('tps-tax-amount').textContent = TPStaxAmount.toFixed(2);
             document.getElementById('tvq-tax-amount').textContent = TVQtaxAmount.toFixed(2);
             document.getElementById('final-total-amount').textContent = finalTotal.toFixed(2);
-            document.querySelector('.cart-subtotal').textContent = discountedTotal.toFixed(2);
             document.getElementById('discount-amount').textContent = appliedDiscount.toFixed(2);
             document.getElementById('shipping-amount').textContent = shipping.toFixed(2);
 
@@ -470,18 +471,50 @@
             window.paypalTotal = finalTotal;
 
             console.log('Updated display values:', {
+                subtotal: subtotal.toFixed(2),
+                discount: appliedDiscount.toFixed(2),
+                tpsTax: TPStaxAmount.toFixed(2),
+                tvqTax: TVQtaxAmount.toFixed(2),
                 shippingAmount: document.getElementById('shipping-amount').textContent,
                 finalTotal: document.getElementById('final-total-amount').textContent
             });
+
+            // Update the discount type text
+            updateDiscountTypeText();
+        }
+
+        /**
+         * Updates the discount type text in the order summary
+         */
+        function updateDiscountTypeText() {
+            if (discountType === 'coupon') {
+                $('#discount-type-text').text('(Coupon)');
+            } else if (discountType === 'volume') {
+                $('#discount-type-text').text('(Volume)');
+            } else {
+                $('#discount-type-text').text('');
+            }
         }
 
         // Function to get subtotal
         function getSubtotal() {
-            let subtotal = 0;
+            let originalSubtotal = 0;
+
             $('.item-total-price').each(function() {
-                subtotal += parseFloat($(this).text().replace(/[^0-9.]/g, ''));
+                const itemId = $(this).data('item-id');
+                const quantity = parseInt($(this).closest('tr').find('td:eq(1)').text());
+
+                // Calculate the original price without discount
+                const originalItemTotal = sellingPrice * quantity +
+                    (customizationPrice * quantity) +
+                    (pompomPrice * quantity) +
+                    (printingPrice * quantity) +
+                    (deliveryPrice * quantity);
+
+                originalSubtotal += originalItemTotal;
             });
-            return subtotal;
+
+            return originalSubtotal;
         }
 
         // Initial update
@@ -650,44 +683,11 @@
             $('.item-price, .item-total-price').each(function() {
                 const itemId = $(this).data('item-id');
                 const quantity = parseInt($(this).closest('tr').find('td:eq(1)').text());
-                const result = calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts);
-
-                const discountedItemPrice = result.discountedPrice * quantity;
-                const totalCustomizationPrice = (customizationPrice * quantity) + (pompomPrice *
-                    quantity) + (printingPrice * quantity) + (deliveryPrice * quantity);
-                const totalItemPrice = discountedItemPrice + totalCustomizationPrice;
-
-                // Update all price displays
-                $(`.item-price[data-item-id="${itemId}"]`).text(
-                    `$${result.discountedPrice.toFixed(2)}`);
-                $(`.cust-price[data-item-id="${itemId}"]`).text(
-                    `$${totalCustomizationPrice.toFixed(2)}`);
-                $(`.item-total-price[data-item-id="${itemId}"]`).text(
-                    `$${totalItemPrice.toFixed(2)}`);
-
-                if (result.discount > 0) {
-                    $(`#discount-info-${itemId}`).text(`You're saving ${result.discount}%!`);
-                    $(`.original-price[data-item-id="${itemId}"]`).show().text(
-                        `$${sellingPrice.toFixed(2)}`);
-                    $(`.discounted-price[data-item-id="${itemId}"]`).show().text(
-                        `$${result.discountedPrice.toFixed(2)}`);
-                } else {
-                    $(`#discount-info-${itemId}`).text('');
-                    $(`.original-price[data-item-id="${itemId}"]`).hide();
-                    $(`.discounted-price[data-item-id="${itemId}"]`).text(
-                        `$${sellingPrice.toFixed(2)}`);
-                }
+                updatePriceDisplay(itemId, quantity);
             });
 
-            // Calculate initial subtotal
-            let initialSubtotal = 0;
-            $('.item-total-price').each(function() {
-                initialSubtotal += parseFloat($(this).text().replace(/[^0-9.]/g, ''));
-            });
-            $('.cart-subtotal').text(initialSubtotal.toFixed(2));
-
-            // Initial update of tax and total
-            updateTaxAndTotal(initialSubtotal, 0, 0);
+            // Calculate initial subtotal and volume discount using the updateOrderSummary function
+            updateOrderSummary();
         });
 
         function updatePriceDisplay(itemId, quantity) {
@@ -718,12 +718,45 @@
         }
 
         function updateOrderSummary() {
-            let subtotal = 0;
+            let originalSubtotal = 0;
+            let discountedSubtotal = 0;
+            let totalVolumeDiscount = 0;
+
             $('.item-total-price').each(function() {
-                subtotal += parseFloat($(this).text().replace(/[^0-9.]/g, ''));
+                const itemId = $(this).data('item-id');
+                const quantity = parseInt($(this).closest('tr').find('td:eq(1)').text());
+
+                // Calculate the original price without discount
+                const originalItemTotal = sellingPrice * quantity +
+                    (customizationPrice * quantity) +
+                    (pompomPrice * quantity) +
+                    (printingPrice * quantity) +
+                    (deliveryPrice * quantity);
+
+                // Get the current displayed total price with discount applied
+                const currentItemTotal = parseFloat($(this).text().replace(/[^0-9.]/g, ''));
+
+                // The difference is the discount amount
+                const itemDiscount = Math.max(0, originalItemTotal - currentItemTotal);
+                totalVolumeDiscount += itemDiscount;
+
+                originalSubtotal += originalItemTotal;
+                discountedSubtotal += currentItemTotal;
             });
-            $('.cart-subtotal').text(subtotal.toFixed(2));
-            updateTaxAndTotal(subtotal, appliedDiscount, parseFloat($('#shipping-amount').text()) || 0);
+
+            // Update the subtotal display to show original price before discounts
+            $('.cart-subtotal').text(originalSubtotal.toFixed(2));
+
+            // If no other discount is applied (like a coupon) and we have volume discount
+            if (discountType !== 'coupon' && totalVolumeDiscount > 0) {
+                appliedDiscount = totalVolumeDiscount;
+                discountType = 'volume';
+                $('#discount-amount').text(totalVolumeDiscount.toFixed(2));
+                $('#discount-type-text').text('(Volume)');
+            }
+
+            // Pass the original subtotal and the discount amount to updateTaxAndTotal
+            updateTaxAndTotal(originalSubtotal, appliedDiscount, parseFloat($('#shipping-amount').text()) || 0);
         }
 
         function calculateShippingLive() {
@@ -1519,9 +1552,11 @@
             let TVQtaxAmount = userCountry === "CA" ? (discountedTotal * TVQtaxPercentage) / 100 : 0;
 
             // Calculate final total including all components
-            let finalTotal = discountedTotal + TPStaxAmount + TVQtaxAmount + shipping;
+            let finalTotal = discountedTotal + TPStaxAmount + TVQtaxAmount + parseFloat(shipping);
 
             console.log('Calculated amounts:', {
+                originalSubtotal: subtotal,
+                appliedDiscount: appliedDiscount,
                 discountedTotal: discountedTotal,
                 TPStaxAmount: TPStaxAmount,
                 TVQtaxAmount: TVQtaxAmount,
@@ -1529,11 +1564,10 @@
                 finalTotal: finalTotal
             });
 
-            // Update display values
+            // Update display values - keep subtotal as original value
             document.getElementById('tps-tax-amount').textContent = TPStaxAmount.toFixed(2);
             document.getElementById('tvq-tax-amount').textContent = TVQtaxAmount.toFixed(2);
             document.getElementById('final-total-amount').textContent = finalTotal.toFixed(2);
-            document.querySelector('.cart-subtotal').textContent = discountedTotal.toFixed(2);
             document.getElementById('discount-amount').textContent = appliedDiscount.toFixed(2);
             document.getElementById('shipping-amount').textContent = shipping.toFixed(2);
 
@@ -1541,17 +1575,49 @@
             window.paypalTotal = finalTotal;
 
             console.log('Updated display values:', {
+                subtotal: subtotal.toFixed(2),
+                discount: appliedDiscount.toFixed(2),
+                tpsTax: TPStaxAmount.toFixed(2),
+                tvqTax: TVQtaxAmount.toFixed(2),
                 shippingAmount: document.getElementById('shipping-amount').textContent,
                 finalTotal: document.getElementById('final-total-amount').textContent
             });
+
+            // Update the discount type text
+            updateDiscountTypeText();
+        }
+
+        /**
+         * Updates the discount type text in the order summary
+         */
+        function updateDiscountTypeText() {
+            if (discountType === 'coupon') {
+                $('#discount-type-text').text('(Coupon)');
+            } else if (discountType === 'volume') {
+                $('#discount-type-text').text('(Volume)');
+            } else {
+                $('#discount-type-text').text('');
+            }
         }
 
         function getSubtotal() {
-            let subtotal = 0;
+            let originalSubtotal = 0;
+
             $('.item-total-price').each(function() {
-                subtotal += parseFloat($(this).text().replace(/[^0-9.]/g, ''));
+                const itemId = $(this).data('item-id');
+                const quantity = parseInt($(this).closest('tr').find('td:eq(1)').text());
+
+                // Calculate the original price without discount
+                const originalItemTotal = sellingPrice * quantity +
+                    (customizationPrice * quantity) +
+                    (pompomPrice * quantity) +
+                    (printingPrice * quantity) +
+                    (deliveryPrice * quantity);
+
+                originalSubtotal += originalItemTotal;
             });
-            return subtotal;
+
+            return originalSubtotal;
         }
 
         function calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts) {
@@ -1578,8 +1644,8 @@
         function updatePriceDisplay(itemId, quantity) {
             const result = calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts);
             const discountedItemPrice = result.discountedPrice * quantity;
-            const totalCustomizationPrice = (customizationPrice * quantity) + (pompomPrice * quantity) + (printingPrice *
-                quantity) + (deliveryPrice * quantity);
+            const totalCustomizationPrice = (customizationPrice * quantity) + (pompomPrice * quantity) + (
+                printingPrice * quantity) + (deliveryPrice * quantity);
             const totalItemPrice = discountedItemPrice + totalCustomizationPrice;
 
             // Update all price displays
@@ -1603,12 +1669,45 @@
         }
 
         function updateOrderSummary() {
-            let subtotal = 0;
+            let originalSubtotal = 0;
+            let discountedSubtotal = 0;
+            let totalVolumeDiscount = 0;
+
             $('.item-total-price').each(function() {
-                subtotal += parseFloat($(this).text().replace(/[^0-9.]/g, ''));
+                const itemId = $(this).data('item-id');
+                const quantity = parseInt($(this).closest('tr').find('td:eq(1)').text());
+
+                // Calculate the original price without discount
+                const originalItemTotal = sellingPrice * quantity +
+                    (customizationPrice * quantity) +
+                    (pompomPrice * quantity) +
+                    (printingPrice * quantity) +
+                    (deliveryPrice * quantity);
+
+                // Get the current displayed total price with discount applied
+                const currentItemTotal = parseFloat($(this).text().replace(/[^0-9.]/g, ''));
+
+                // The difference is the discount amount
+                const itemDiscount = Math.max(0, originalItemTotal - currentItemTotal);
+                totalVolumeDiscount += itemDiscount;
+
+                originalSubtotal += originalItemTotal;
+                discountedSubtotal += currentItemTotal;
             });
-            $('.cart-subtotal').text(subtotal.toFixed(2));
-            updateTaxAndTotal(subtotal, appliedDiscount, parseFloat($('#shipping-amount').text()) || 0);
+
+            // Update the subtotal display to show original price before discounts
+            $('.cart-subtotal').text(originalSubtotal.toFixed(2));
+
+            // If no other discount is applied (like a coupon) and we have volume discount
+            if (discountType !== 'coupon' && totalVolumeDiscount > 0) {
+                appliedDiscount = totalVolumeDiscount;
+                discountType = 'volume';
+                $('#discount-amount').text(totalVolumeDiscount.toFixed(2));
+                $('#discount-type-text').text('(Volume)');
+            }
+
+            // Pass the original subtotal and the discount amount to updateTaxAndTotal
+            updateTaxAndTotal(originalSubtotal, appliedDiscount, parseFloat($('#shipping-amount').text()) || 0);
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -1619,8 +1718,8 @@
                 updatePriceDisplay(itemId, quantity);
             });
 
-            // Initial update
-            updateTaxAndTotal(getSubtotal(), 0, 0);
+            // Calculate initial subtotal and volume discount using the updateOrderSummary function
+            updateOrderSummary();
 
             // Handle shipping calculation
             $('#address, #country').on('change', calculateShippingLive);
