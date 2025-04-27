@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\Order;
 use App\Models\OrderShippingRate;
+use App\Helpers\CartHelper;
 
 class StallionExpressService
 {
@@ -60,6 +61,14 @@ class StallionExpressService
                     'response_body' => $responseData,
                     'raw_response' => $response->body()
                 ]);
+
+                // Track shipping error in cart errors table
+                $errorMessage = isset($responseData['errors']) && is_array($responseData['errors'])
+                    ? implode('; ', $responseData['errors'])
+                    : ($responseData['message'] ?? 'Failed to fetch shipping rates');
+
+                CartHelper::trackError('shipping', 'Stallion Express API error: ' . $errorMessage);
+
                 return [
                     'success' => false,
                     'message' => $responseData['message'] ?? 'Failed to fetch shipping rates',
@@ -74,6 +83,10 @@ class StallionExpressService
                 'url' => $this->baseUrl . '/rates',
                 'trace' => $e->getTraceAsString()
             ]);
+
+            // Track exception in cart errors table
+            CartHelper::trackError('shipping', 'Shipping rate calculation error: ' . $e->getMessage());
+
             return [
                 'success' => false,
                 'message' => $e->getMessage()
@@ -212,6 +225,14 @@ class StallionExpressService
                     'status' => $response->status(),
                     'error' => $responseData
                 ]);
+
+                // Track shipment creation error
+                $errorMessage = isset($responseData['errors']) && is_array($responseData['errors'])
+                    ? implode('; ', $responseData['errors'])
+                    : ($responseData['message'] ?? 'Unknown error');
+
+                CartHelper::trackError('shipping', 'Failed to create shipment: ' . $errorMessage);
+
                 throw new \Exception('Failed to create shipment: ' . ($responseData['message'] ?? 'Unknown error'));
             }
 
@@ -261,11 +282,17 @@ class StallionExpressService
 
             return $responseData;
         } catch (\Exception $e) {
+            // Track exception in cart errors table
+            CartHelper::trackError('shipping', 'Shipment creation error: ' . $e->getMessage());
+
+            // Log the error
             Log::error('Stallion Express Shipment Creation Error:', [
                 'error' => $e->getMessage(),
                 'payload' => $payload,
                 'order_id' => $orderId
             ]);
+
+            // Re-throw the exception to be handled by the caller
             throw $e;
         }
     }

@@ -12,5 +12,6 @@ class AbandonCartError extends Model
     protected $fillable = [
         'user_id',
         'error_status',
+        'error_status_detail',
     ];
 }

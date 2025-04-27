@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Main;
 
+use App\Helpers\CartHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -36,6 +37,12 @@ class ShippingController extends Controller
             Log::error('Validation failed for shipping calculation', [
                 'errors' => $validator->errors()->all()
             ]);
+
+            // Record the validation error
+            CartHelper::trackError(
+                'shipping',
+                'Validation error: ' . implode(', ', $validator->errors()->all())
+            );
 
             return response()->json([
                 'success' => false,
@@ -235,6 +242,16 @@ class ShippingController extends Controller
                     'response_body' => $response
                 ]);
 
+                // Make sure error is recorded in cart errors
+                $errorMessage = isset($response['errors']) && is_array($response['errors'])
+                    ? implode('; ', $response['errors'])
+                    : ($response['message'] ?? 'Failed to fetch shipping rates');
+
+                CartHelper::trackError(
+                    'shipping',
+                    'Shipping rate service error: ' . $errorMessage
+                );
+
                 return response()->json([
                     'success' => false,
                     'message' => 'Failed to fetch shipping rate.',
@@ -247,9 +264,15 @@ class ShippingController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
 
+            // Record the shipping error
+            CartHelper::trackError(
+                'shipping',
+                'Failed to calculate shipping rates: ' . $e->getMessage()
+            );
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while calculating shipping.',
+                'message' => 'Failed to calculate shipping rates.',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -289,6 +312,12 @@ class ShippingController extends Controller
             Log::error('Validation failed for shipment creation', [
                 'errors' => $validator->errors()->all()
             ]);
+
+            // Record the validation error
+            CartHelper::trackError(
+                'shipping',
+                'Validation error in shipment creation: ' . implode(', ', $validator->errors()->all())
+            );
 
             return response()->json([
                 'success' => false,
@@ -392,7 +421,7 @@ class ShippingController extends Controller
 
         try {
             $stallionService = new \App\Services\StallionExpressService();
-            $response = $stallionService->createShipment($payload);
+            $response = $stallionService->createShipment($payload, $validated['order_id']);
 
             if (isset($response['success']) && $response['success']) {
                 // Save shipment details to database
@@ -433,9 +462,15 @@ class ShippingController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
 
+            // Record the shipping error
+            CartHelper::trackError(
+                'shipping',
+                'Failed to create shipment: ' . $e->getMessage()
+            );
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while creating the shipment.',
+                'message' => 'Failed to create shipment.',
                 'error' => $e->getMessage()
             ], 500);
         }
