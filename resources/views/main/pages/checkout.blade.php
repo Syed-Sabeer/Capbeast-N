@@ -1081,9 +1081,21 @@
                                                 $totalPrintingPrice = $printingPrice * $item->quantity;
                                                 $totalDeliveryPrice = $deliveryPrice * $item->quantity;
 
+                                                // Calculate volume discount
+                                                $volumeDiscount = 0;
+                                                $volumeDiscounts = $item->product->productVolumeDiscount->sortBy(
+                                                    'quantity',
+                                                );
+                                                foreach ($volumeDiscounts as $discount) {
+                                                    if ($item->quantity >= $discount->quantity) {
+                                                        $volumeDiscount = $discount->discount;
+                                                    }
+                                                }
+                                                $discountedPrice = $basePrice * (1 - $volumeDiscount / 100);
+
                                                 // Calculate item total
                                                 $itemTotal =
-                                                    $basePrice * $item->quantity +
+                                                    $discountedPrice * $item->quantity +
                                                     $totalCustomizationPrice +
                                                     $totalPompomPrice +
                                                     $totalPrintingPrice +
@@ -1092,14 +1104,14 @@
                                                 $subtotal += $itemTotal;
                                             @endphp
 
-                                            <script>
-                                                const volumeDiscounts = @json($item->product->productVolumeDiscount->sortBy('quantity')->values());
-                                                const sellingPrice = {{ $item->product->selling_price }};
-                                                const customizationPrice = {{ $customizationPrice }};
-                                                const pompomPrice = {{ $pompomPrice }};
-                                                const printingPrice = {{ $printingPrice }};
-                                                const deliveryPrice = {{ $deliveryPrice }};
-                                            </script>
+                                            <div class="price-data d-none" data-item-id="{{ $item->id }}"
+                                                data-selling-price="{{ $basePrice }}"
+                                                data-customization-price="{{ $customizationPrice }}"
+                                                data-pompom-price="{{ $pompomPrice }}"
+                                                data-printing-price="{{ $printingPrice }}"
+                                                data-delivery-price="{{ $deliveryPrice }}"
+                                                data-volume-discounts="{{ json_encode($volumeDiscounts->values()) }}">
+                                            </div>
 
                                             <tr>
                                                 <td class="text-start">
@@ -1123,8 +1135,6 @@
                                                                     ) }}"
                                                                         alt="" class="avatar-xs">
                                                                 @endif
-                                                                {{-- <img src="{{ asset('storage/' . ($item->color->front_image ?? ($item->color->right_image ?? ($item->color->left_image ?? ($item->color->back_image ?? 'ProductImages/default.jpg'))))) }}"
-                                                                    alt="" class="avatar-xs"> --}}
                                                             </div>
                                                         </div>
                                                         <div class="flex-grow-1">
@@ -1135,10 +1145,16 @@
                                                                     style="text-decoration: line-through;">${{ number_format($basePrice, 2) }}</span>
                                                                 <span class="discounted-price"
                                                                     data-item-id="{{ $item->id }}"
-                                                                    style="color: #28a745;"></span>
+                                                                    style="color: #28a745;">${{ number_format($discountedPrice, 2) }}</span>
                                                             </p>
-                                                            <div id="discount-info-{{ $item->id }}"
-                                                                class="text-success fs-13 fw-medium"></div>
+                                                            @if ($volumeDiscount > 0)
+                                                                <div id="discount-info-{{ $item->id }}"
+                                                                    class="text-success fs-13 fw-medium">You're saving
+                                                                    {{ $volumeDiscount }}%!</div>
+                                                            @else
+                                                                <div id="discount-info-{{ $item->id }}"
+                                                                    class="text-success fs-13 fw-medium"></div>
+                                                            @endif
                                                             <div id="next-tier-info-{{ $item->id }}"
                                                                 class="text-muted fs-12"></div>
                                                         </div>
@@ -1150,7 +1166,7 @@
                                                 </td>
                                                 <td class="text-end">
                                                     <span class="item-price"
-                                                        data-item-id="{{ $item->id }}">${{ number_format($basePrice, 2) }}</span>
+                                                        data-item-id="{{ $item->id }}">${{ number_format($discountedPrice, 2) }}</span>
                                                 </td>
                                                 <td class="text-end">
                                                     ${{ number_format($customizationPrice, 2) }}
