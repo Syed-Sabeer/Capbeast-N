@@ -92,9 +92,10 @@
         }).on('select2:select', function(e) {
             const countryCode = $(this).val();
             loadStates(countryCode);
-            if (countryCode) {
-                debounceShippingCalculation();
-            }
+            // Remove automatic shipping calculation when country is selected
+            // if (countryCode) {
+            //     debounceShippingCalculation();
+            // }
             updateTaxRowsVisibility();
         });
 
@@ -105,9 +106,10 @@
             theme: 'classic'
         }).on('select2:select', function(e) {
             lastValidState = $(this).val();
-            if (lastValidState) {
-                debounceShippingCalculation();
-            }
+            // Remove the automatic shipping calculation when state is selected
+            // if (lastValidState) {
+            //     debounceShippingCalculation();
+            // }
         });
 
         // Function to debounce shipping calculation
@@ -416,9 +418,10 @@
 
         // Add event listeners for all address fields
         $('#postal_code, #address').on('change keyup', function() {
-            if (lastValidState) {
-                debounceShippingCalculation();
-            }
+            // Remove automatic shipping calculation when postal code or address changes
+            // if (lastValidState) {
+            //     debounceShippingCalculation();
+            // }
         });
 
         // Function to update tax and total
@@ -956,7 +959,16 @@
                         }
                     } else {
                         $('#shipping-methods-container').html(
-                            '<div class="alert alert-danger">Unable to calculate shipping rates. Please try again later or contact support.</div>'
+                            '<div class="alert alert-danger">' +
+                            '<strong>Unable to calculate shipping rates.</strong><br>' +
+                            'The shipping provider (Stallion Express) was unable to provide rates for your address.<br>' +
+                            'Please try the following:<br>' +
+                            '<ul>' +
+                            '<li>Verify your address is correctly formatted</li>' +
+                            '<li>Make sure your postal code is valid (e.g., H1H 5A6 for Canada)</li>' +
+                            '<li>Try a different address if possible</li>' +
+                            '</ul>' +
+                            '</div>'
                         );
                         $('#shipping-amount').text('0.00');
                         updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
@@ -965,7 +977,16 @@
                 .catch(err => {
                     console.error('Shipping calculation error:', err);
                     $('#shipping-methods-container').html(
-                        '<div class="alert alert-danger">Error calculating shipping rates. Please try again later or contact support.</div>'
+                        '<div class="alert alert-danger">' +
+                        '<strong>Error calculating shipping rates.</strong><br>' +
+                        'The shipping provider (Stallion Express) returned an error. This may be a temporary issue.<br>' +
+                        'Please try the following:<br>' +
+                        '<ul>' +
+                        '<li>Double-check your address and postal code</li>' +
+                        '<li>Try again in a few minutes</li>' +
+                        '<li>If the problem persists, please contact our support team</li>' +
+                        '</ul>' +
+                        '</div>'
                     );
                     $('#shipping-amount').text('0.00');
                     updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
@@ -1081,21 +1102,9 @@
                                                 $totalPrintingPrice = $printingPrice * $item->quantity;
                                                 $totalDeliveryPrice = $deliveryPrice * $item->quantity;
 
-                                                // Calculate volume discount
-                                                $volumeDiscount = 0;
-                                                $volumeDiscounts = $item->product->productVolumeDiscount->sortBy(
-                                                    'quantity',
-                                                );
-                                                foreach ($volumeDiscounts as $discount) {
-                                                    if ($item->quantity >= $discount->quantity) {
-                                                        $volumeDiscount = $discount->discount;
-                                                    }
-                                                }
-                                                $discountedPrice = $basePrice * (1 - $volumeDiscount / 100);
-
                                                 // Calculate item total
                                                 $itemTotal =
-                                                    $discountedPrice * $item->quantity +
+                                                    $basePrice * $item->quantity +
                                                     $totalCustomizationPrice +
                                                     $totalPompomPrice +
                                                     $totalPrintingPrice +
@@ -1104,14 +1113,21 @@
                                                 $subtotal += $itemTotal;
                                             @endphp
 
-                                            <div class="price-data d-none" data-item-id="{{ $item->id }}"
-                                                data-selling-price="{{ $basePrice }}"
-                                                data-customization-price="{{ $customizationPrice }}"
-                                                data-pompom-price="{{ $pompomPrice }}"
-                                                data-printing-price="{{ $printingPrice }}"
-                                                data-delivery-price="{{ $deliveryPrice }}"
-                                                data-volume-discounts="{{ json_encode($volumeDiscounts->values()) }}">
-                                            </div>
+                                            <script>
+                                                // Ensure these variables are unique per product item
+                                                document.addEventListener('DOMContentLoaded', function() {
+                                                    // Create item-specific variables using the item ID as a suffix
+                                                    window['volumeDiscounts_{{ $item->id }}'] = @json($item->product->productVolumeDiscount->sortBy('quantity')->values());
+                                                    window['sellingPrice_{{ $item->id }}'] = {{ $item->product->selling_price }};
+                                                    window['customizationPrice_{{ $item->id }}'] = {{ $customizationPrice }};
+                                                    window['pompomPrice_{{ $item->id }}'] = {{ $pompomPrice }};
+                                                    window['printingPrice_{{ $item->id }}'] = {{ $printingPrice }};
+                                                    window['deliveryPrice_{{ $item->id }}'] = {{ $deliveryPrice }};
+
+                                                    // Initialize the price display for this specific item
+                                                    updateItemPriceDisplay('{{ $item->id }}', {{ $item->quantity }});
+                                                });
+                                            </script>
 
                                             <tr>
                                                 <td class="text-start">
@@ -1145,16 +1161,10 @@
                                                                     style="text-decoration: line-through;">${{ number_format($basePrice, 2) }}</span>
                                                                 <span class="discounted-price"
                                                                     data-item-id="{{ $item->id }}"
-                                                                    style="color: #28a745;">${{ number_format($discountedPrice, 2) }}</span>
+                                                                    style="color: #28a745;"></span>
                                                             </p>
-                                                            @if ($volumeDiscount > 0)
-                                                                <div id="discount-info-{{ $item->id }}"
-                                                                    class="text-success fs-13 fw-medium">You're saving
-                                                                    {{ $volumeDiscount }}%!</div>
-                                                            @else
-                                                                <div id="discount-info-{{ $item->id }}"
-                                                                    class="text-success fs-13 fw-medium"></div>
-                                                            @endif
+                                                            <div id="discount-info-{{ $item->id }}"
+                                                                class="text-success fs-13 fw-medium"></div>
                                                             <div id="next-tier-info-{{ $item->id }}"
                                                                 class="text-muted fs-12"></div>
                                                         </div>
@@ -1166,10 +1176,12 @@
                                                 </td>
                                                 <td class="text-end">
                                                     <span class="item-price"
-                                                        data-item-id="{{ $item->id }}">${{ number_format($discountedPrice, 2) }}</span>
+                                                        data-item-id="{{ $item->id }}">${{ number_format($basePrice, 2) }}</span>
                                                 </td>
                                                 <td class="text-end">
-                                                    ${{ number_format($customizationPrice, 2) }}
+                                                    <span class="cust-price" data-item-id="{{ $item->id }}">
+                                                        ${{ number_format($customizationPrice, 2) }}
+                                                    </span>
                                                 </td>
                                                 <td class="text-end">
                                                     <span class="item-total-price"
@@ -1265,8 +1277,20 @@
                                     </div>
 
                                 </div>
+
+                                <!-- Add Calculate Shipping Button -->
+                                <div class="mb-3 text-center">
+                                    <button type="button" id="calculateShippingBtn" class="btn btn-primary btn-lg w-75">
+                                        <i class="fas fa-shipping-fast me-2"></i> Calculate Shipping
+                                    </button>
+                                </div>
+
                                 <div id="shipping-methods-container" class="mb-4">
-                                    <!-- Shipping methods will be loaded here -->
+                                    <!-- Add initial message telling users to click the button -->
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i> Please fill in all address fields and click
+                                        the "Calculate Shipping" button above to see available shipping options.
+                                    </div>
                                 </div>
 
                                 <div class="alert alert-warning"
@@ -1542,6 +1566,39 @@
         let discountPercentage = 0;
         const cartItems = @json($cart);
 
+        // Function to update price display for a specific item
+        function updateItemPriceDisplay(itemId, quantity) {
+            // Get item-specific variables
+            const volumeDiscounts = window['volumeDiscounts_' + itemId];
+            const sellingPrice = window['sellingPrice_' + itemId];
+            const customizationPrice = window['customizationPrice_' + itemId];
+            const pompomPrice = window['pompomPrice_' + itemId];
+            const printingPrice = window['printingPrice_' + itemId];
+            const deliveryPrice = window['deliveryPrice_' + itemId];
+
+            const result = calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts);
+            const discountedItemPrice = result.discountedPrice * quantity;
+            const totalCustomizationPrice = (customizationPrice * quantity) + (pompomPrice * quantity) +
+                (printingPrice * quantity) + (deliveryPrice * quantity);
+            const totalItemPrice = discountedItemPrice + totalCustomizationPrice;
+
+            // Update all price displays
+            $(`.item-price[data-item-id="${itemId}"]`).text(`$${result.discountedPrice.toFixed(2)}`);
+            $(`.cust-price[data-item-id="${itemId}"]`).text(`$${totalCustomizationPrice.toFixed(2)}`);
+            $(`.item-total-price[data-item-id="${itemId}"]`).text(`$${totalItemPrice.toFixed(2)}`);
+
+            if (result.discount > 0) {
+                $(`#discount-info-${itemId}`).text(`You're saving ${result.discount}%!`);
+                $(`.original-price[data-item-id="${itemId}"]`).show().text(`$${sellingPrice.toFixed(2)}`);
+                $(`.discounted-price[data-item-id="${itemId}"]`).show().text(
+                    `$${result.discountedPrice.toFixed(2)}`);
+            } else {
+                $(`#discount-info-${itemId}`).text('');
+                $(`.original-price[data-item-id="${itemId}"]`).hide();
+                $(`.discounted-price[data-item-id="${itemId}"]`).text(`$${sellingPrice.toFixed(2)}`);
+            }
+        }
+
         function updateTaxAndTotal(subtotal, appliedDiscount = 0, shipping = 0) {
             console.log('Updating tax and total:', {
                 subtotal: subtotal,
@@ -1616,12 +1673,20 @@
             }
         }
 
+        // Function to get subtotal
         function getSubtotal() {
             let originalSubtotal = 0;
 
             $('.item-total-price').each(function() {
                 const itemId = $(this).data('item-id');
                 const quantity = parseInt($(this).closest('tr').find('td:eq(1)').text());
+
+                // Get item-specific variables
+                const sellingPrice = window['sellingPrice_' + itemId];
+                const customizationPrice = window['customizationPrice_' + itemId];
+                const pompomPrice = window['pompomPrice_' + itemId];
+                const printingPrice = window['printingPrice_' + itemId];
+                const deliveryPrice = window['deliveryPrice_' + itemId];
 
                 // Calculate the original price without discount
                 const originalItemTotal = sellingPrice * quantity +
@@ -1657,33 +1722,6 @@
             };
         }
 
-        function updatePriceDisplay(itemId, quantity) {
-            const result = calculateVolumeDiscount(quantity, sellingPrice, volumeDiscounts);
-            const discountedItemPrice = result.discountedPrice * quantity;
-            const totalCustomizationPrice = (customizationPrice * quantity) + (pompomPrice * quantity) + (
-                printingPrice * quantity) + (deliveryPrice * quantity);
-            const totalItemPrice = discountedItemPrice + totalCustomizationPrice;
-
-            // Update all price displays
-            $(`.item-price[data-item-id="${itemId}"]`).text(`$${result.discountedPrice.toFixed(2)}`);
-            $(`.cust-price[data-item-id="${itemId}"]`).text(`$${totalCustomizationPrice.toFixed(2)}`);
-            $(`.item-total-price[data-item-id="${itemId}"]`).text(`$${totalItemPrice.toFixed(2)}`);
-
-            if (result.discount > 0) {
-                $(`#discount-info-${itemId}`).text(`You're saving ${result.discount}%!`);
-                $(`.original-price[data-item-id="${itemId}"]`).show().text(`$${sellingPrice.toFixed(2)}`);
-                $(`.discounted-price[data-item-id="${itemId}"]`).show().text(
-                    `$${result.discountedPrice.toFixed(2)}`);
-            } else {
-                $(`#discount-info-${itemId}`).text('');
-                $(`.original-price[data-item-id="${itemId}"]`).hide();
-                $(`.discounted-price[data-item-id="${itemId}"]`).text(`$${sellingPrice.toFixed(2)}`);
-            }
-
-            // Update order summary
-            updateOrderSummary();
-        }
-
         function updateOrderSummary() {
             let originalSubtotal = 0;
             let discountedSubtotal = 0;
@@ -1692,6 +1730,13 @@
             $('.item-total-price').each(function() {
                 const itemId = $(this).data('item-id');
                 const quantity = parseInt($(this).closest('tr').find('td:eq(1)').text());
+
+                // Get item-specific variables
+                const sellingPrice = window['sellingPrice_' + itemId];
+                const customizationPrice = window['customizationPrice_' + itemId];
+                const pompomPrice = window['pompomPrice_' + itemId];
+                const printingPrice = window['printingPrice_' + itemId];
+                const deliveryPrice = window['deliveryPrice_' + itemId];
 
                 // Calculate the original price without discount
                 const originalItemTotal = sellingPrice * quantity +
@@ -1727,867 +1772,897 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize price displays for all items
-            $('.item-price, .item-total-price').each(function() {
-                const itemId = $(this).data('item-id');
-                const quantity = parseInt($(this).closest('tr').find('td:eq(1)').text());
-                updatePriceDisplay(itemId, quantity);
-            });
-
             // Calculate initial subtotal and volume discount using the updateOrderSummary function
             updateOrderSummary();
+        });
 
-            // Handle shipping calculation
-            $('#address, #country').on('change', calculateShippingLive);
+        function calculateShippingLive() {
+            const country = $('#country').val();
+            const state = $('#state').val();
+            const postalCode = $('#postal_code').val();
+            const address = $('#address').val();
+            const city = $('#city').val();
 
-            function calculateShippingLive() {
-                const country = $('#country').val();
-                const state = $('#state').val();
-                const postalCode = $('#postal_code').val();
-                const address = $('#address').val();
-                const city = $('#city').val();
-
-                if (!country || !state || !postalCode || !address || !city) {
-                    $('#shipping-methods-container').html(
-                        '<div class="alert alert-warning">Please fill in all required shipping fields</div>');
-                    $('#shipping-amount').text('0.00');
-                    return;
-                }
-
-                // Validate address fields
-                if (address.length < 5 || city.length < 2) {
-                    $('#shipping-methods-container').html(
-                        '<div class="alert alert-warning">Please enter a valid address and city</div>');
-                    $('#shipping-amount').text('0.00');
-                    return;
-                }
-
-                // Show loading state
+            if (!country || !state || !postalCode || !address || !city) {
                 $('#shipping-methods-container').html(
-                    '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Calculating shipping rates...</p></div>'
-                );
-
-                // Prepare products data
-                const products = cartItems?.map(item => {
-                    const product = item.product;
-
-                    // Handle missing product data (dimensions or weight)
-                    if (!product.weight || !product.length || !product.width || !product.height) {
-                        console.log("Missing product data:", product);
-                        return null;
-                    }
-
-                    // Validate product dimensions
-                    const weight = parseFloat(product.weight) || 0;
-                    const length = parseFloat(product.length) || 0;
-                    const width = parseFloat(product.width) || 0;
-                    const height = parseFloat(product.height) || 0;
-
-                    if (weight <= 0 || length <= 0 || width <= 0 || height <= 0) {
-                        console.log("Invalid product dimensions:", product);
-                        return null;
-                    }
-
-                    // Convert weight to lbs if needed
-                    let weightInLbs = weight;
-                    if (product.weight_unit === 'kg') {
-                        weightInLbs = weight * 2.20462;
-                    }
-
-                    return {
-                        weight: weightInLbs.toFixed(2),
-                        weight_unit: 'lbs',
-                        length: length,
-                        width: width,
-                        height: height,
-                        size_unit: 'cm',
-                        quantity: item.quantity
-                    };
-                }).filter(item => item !== null);
-
-                if (products.length === 0) {
-                    $('#shipping-methods-container').html(
-                        '<div class="alert alert-warning">No valid items in the cart to calculate shipping.</div>'
-                    );
-                    $('#shipping-amount').text('0.00');
-                    return;
-                }
-
-                // Calculate total package dimensions
-                let totalWeight = 0;
-                let maxLength = 0;
-                let maxWidth = 0;
-                let maxHeight = 0;
-
-                products.forEach(product => {
-                    totalWeight += parseFloat(product.weight) * product.quantity;
-                    maxLength = Math.max(maxLength, product.length);
-                    maxWidth = Math.max(maxWidth, product.width);
-                    maxHeight = Math.max(maxHeight, product.height);
-                });
-
-                // Validate total package dimensions
-                if (totalWeight > 30) { // 30lbs max weight
-                    $('#shipping-methods-container').html(
-                        '<div class="alert alert-warning">Package weight exceeds maximum limit. Please contact support for large orders.</div>'
-                    );
-                    $('#shipping-amount').text('0.00');
-                    return;
-                }
-
-                if (maxLength > 100 || maxWidth > 100 || maxHeight > 100) { // 100cm max dimension
-                    $('#shipping-methods-container').html(
-                        '<div class="alert alert-warning">Package dimensions exceed maximum limits. Please contact support for large orders.</div>'
-                    );
-                    $('#shipping-amount').text('0.00');
-                    return;
-                }
-
-                // Prepare the shipping request payload
-                const payload = {
-                    destination: {
-                        country: country,
-                        state: state,
-                        postal_code: postalCode,
-                        address: address,
-                        city: city
-                    },
-                    products: products,
-                    package: {
-                        weight: totalWeight.toFixed(2),
-                        weight_unit: 'lbs',
-                        length: maxLength,
-                        width: maxWidth,
-                        height: maxHeight,
-                        size_unit: 'cm'
-                    }
-                };
-
-                fetch("{{ route('shipping.calculate') }}", {
-                        method: "POST",
-                        headers: {
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(payload)
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success && data.shipping?.data?.length) {
-                            const shippingAmount = data.shipping.data[0].rate;
-                            document.getElementById('shipping-amount').textContent = shippingAmount.toFixed(2);
-                            updateTaxAndTotal(getSubtotal(), appliedDiscount, shippingAmount);
-
-                            // Display shipping methods
-                            let shippingHtml = '<div class="shipping-methods-list">';
-                            data.shipping.data.forEach(rate => {
-                                const rateUSD = (rate.total * 0.75).toFixed(2);
-                                shippingHtml += `
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input shipping-method-radio" type="radio"
-                                            name="shipping_method"
-                                            value="${rate.postage_type_id}"
-                                            id="shipping_${rate.postage_type_id}"
-                                            data-price="${rateUSD}"
-                                            data-service="${rate.postage_type}"
-                                            data-days="${rate.delivery_days}">
-                                        <label class="form-check-label" for="shipping_${rate.postage_type_id}">
-                                            ${rate.postage_type} - $${rateUSD} USD
-                                            <br>
-                                            <small class="text-muted">Estimated delivery: ${rate.delivery_days} days</small>
-                                        </label>
-                                    </div>
-                                `;
-                            });
-                            shippingHtml += '</div>';
-                            $('#shipping-methods-container').html(shippingHtml);
-
-                            // Add event handler for shipping method selection
-                            $('.shipping-method-radio').on('change', function() {
-                                const selectedPrice = $(this).data('price');
-                                const selectedService = $(this).data('service');
-                                const selectedDays = $(this).data('days');
-
-                                // Update shipping amount display
-                                $('#shipping-amount').text(selectedPrice);
-
-                                // Store selected shipping details
-                                window.selectedShipping = {
-                                    method: $(this).val(),
-                                    price: selectedPrice,
-                                    service: selectedService,
-                                    estimated_days: selectedDays
-                                };
-
-                                // Update total with new shipping price
-                                updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(
-                                    selectedPrice));
-                            });
-
-                            // Select the first shipping method by default
-                            if (data.shipping.data.length > 0) {
-                                const firstRate = data.shipping.data[0];
-                                const firstRateUSD = (firstRate.total * 0.75).toFixed(2);
-                                console.log('Selecting first shipping method:', {
-                                    rate: firstRate,
-                                    price: firstRateUSD
-                                });
-                                $(`#shipping_${firstRate.postage_type_id}`).prop('checked', true).trigger(
-                                    'change');
-                            }
-                        } else {
-                            $('#shipping-methods-container').html(
-                                '<div class="alert alert-danger">Unable to calculate shipping rates. Please try again later or contact support.</div>'
-                            );
-                            $('#shipping-amount').text('0.00');
-                            updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Shipping calculation error:', err);
-                        $('#shipping-methods-container').html(
-                            '<div class="alert alert-danger">Error calculating shipping rates. Please try again later or contact support.</div>'
-                        );
-                        $('#shipping-amount').text('0.00');
-                        updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
-                    });
+                    '<div class="alert alert-warning">Please fill in all required shipping fields</div>');
+                $('#shipping-amount').text('0.00');
+                return;
             }
 
-            // Handle coupon application
-            document.getElementById('applyCoupon').addEventListener('click', function() {
-                let couponCode = document.getElementById('couponCode').value;
+            // Validate address fields
+            if (address.length < 5 || city.length < 2) {
+                $('#shipping-methods-container').html(
+                    '<div class="alert alert-warning">Please enter a valid address and city</div>');
+                $('#shipping-amount').text('0.00');
+                return;
+            }
 
-                if (!couponCode) {
-                    alert('Please enter a coupon code');
-                    return;
+            // Show loading state
+            $('#shipping-methods-container').html(
+                '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Calculating shipping rates...</p></div>'
+            );
+
+            // Prepare products data
+            const products = cartItems?.map(item => {
+                const product = item.product;
+
+                // Handle missing product data (dimensions or weight)
+                if (!product.weight || !product.length || !product.width || !product.height) {
+                    console.log("Missing product data:", product);
+                    return null;
                 }
 
-                fetch("{{ route('apply.discount') }}", {
-                        method: "POST",
-                        headers: {
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            coupon_code: couponCode
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.success) {
-                            const couponDiscount = parseFloat(result.discount) || 0;
+                // Validate product dimensions
+                const weight = parseFloat(product.weight) || 0;
+                const length = parseFloat(product.length) || 0;
+                const width = parseFloat(product.width) || 0;
+                const height = parseFloat(product.height) || 0;
 
-                            // Calculate volume discount
-                            let volumeDiscountAmount = 0;
-                            let volumeDiscountPercentage = 0;
-                            $('.item-total-price').each(function() {
-                                const itemId = $(this).data('item-id');
-                                const quantity = parseInt($(this).closest('tr').find('td:eq(1)')
-                                    .text());
-                                const result = calculateVolumeDiscount(quantity, sellingPrice,
-                                    volumeDiscounts);
-                                if (result.discount > 0) {
-                                    const originalTotal = sellingPrice * quantity;
-                                    const discountedTotal = result.discountedPrice * quantity;
-                                    volumeDiscountAmount += (originalTotal - discountedTotal);
-                                    volumeDiscountPercentage = result.discount;
-                                }
-                            });
+                if (weight <= 0 || length <= 0 || width <= 0 || height <= 0) {
+                    console.log("Invalid product dimensions:", product);
+                    return null;
+                }
 
-                            // Check if both volume discount and coupon discount are available
-                            if (volumeDiscountAmount > 0 && couponDiscount > 0) {
-                                // Create and show modal for discount selection
-                                showDiscountSelectionModal(couponDiscount, result.discountId,
-                                    volumeDiscountAmount, volumeDiscountPercentage);
-                            } else {
-                                // Just apply the coupon discount if no volume discount
-                                appliedDiscount = couponDiscount;
-                                discountId = result.discountId ?? null;
-                                discountType = 'coupon';
-                                discountPercentage = result.percentage || 0;
+                // Convert weight to lbs if needed
+                let weightInLbs = weight;
+                if (product.weight_unit === 'kg') {
+                    weightInLbs = weight * 2.20462;
+                }
 
-                                document.getElementById('discount-amount').textContent = appliedDiscount
-                                    .toFixed(2);
-                                updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(document
-                                    .getElementById('shipping-amount').textContent) || 0);
+                return {
+                    weight: weightInLbs.toFixed(2),
+                    weight_unit: 'lbs',
+                    length: length,
+                    width: width,
+                    height: height,
+                    size_unit: 'cm',
+                    quantity: item.quantity
+                };
+            }).filter(item => item !== null);
 
-                                // Update the discount type text display
-                                updateDiscountTypeText();
+            if (products.length === 0) {
+                $('#shipping-methods-container').html(
+                    '<div class="alert alert-warning">No valid items in the cart to calculate shipping.</div>'
+                );
+                $('#shipping-amount').text('0.00');
+                return;
+            }
 
-                                alert(result.message);
-                            }
-                        } else {
-                            alert(result.message);
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
+            // Calculate total package dimensions
+            let totalWeight = 0;
+            let maxLength = 0;
+            let maxWidth = 0;
+            let maxHeight = 0;
+
+            products.forEach(product => {
+                totalWeight += parseFloat(product.weight) * product.quantity;
+                maxLength = Math.max(maxLength, product.length);
+                maxWidth = Math.max(maxWidth, product.width);
+                maxHeight = Math.max(maxHeight, product.height);
             });
 
-            // Function to show discount selection modal
-            function showDiscountSelectionModal(couponDiscount, couponId, volumeDiscount,
-                volumeDiscountPercentage) {
-                // If modal doesn't exist, create it
-                if (!document.getElementById('discountSelectionModal')) {
-                    const modalHtml = `
-                        <div class="modal fade" id="discountSelectionModal" tabindex="-1" aria-labelledby="discountSelectionModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="discountSelectionModalLabel">Choose Discount</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p>You have two possible discounts available. Please choose one:</p>
-                                        <div class="form-check mb-3">
-                                            <input class="form-check-input" type="radio" name="discountChoice" id="volumeDiscountChoice" value="volume">
-                                            <label class="form-check-label" for="volumeDiscountChoice">
-                                                Volume Discount: $<span id="volumeDiscountAmount"></span> (${volumeDiscountPercentage}% off)
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="discountChoice" id="couponDiscountChoice" value="coupon">
-                                            <label class="form-check-label" for="couponDiscountChoice">
-                                                Coupon Discount: $<span id="couponDiscountAmount"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <button type="button" class="btn btn-primary" id="applySelectedDiscount">Apply Selected Discount</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-
-                    document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-                    // Add event listener for applying the selected discount
-                    document.getElementById('applySelectedDiscount').addEventListener('click', function() {
-                        const selectedDiscountType = document.querySelector(
-                            'input[name="discountChoice"]:checked')?.value;
-
-                        if (!selectedDiscountType) {
-                            alert('Please select a discount type');
-                            return;
-                        }
-
-                        if (selectedDiscountType === 'volume') {
-                            // Apply volume discount
-                            appliedDiscount = volumeDiscount;
-                            discountId = null;
-                            discountType = 'volume';
-                            discountPercentage = volumeDiscountPercentage;
-                        } else {
-                            // Apply coupon discount
-                            appliedDiscount = couponDiscount;
-                            discountId = couponId;
-                            discountType = 'coupon';
-                            discountPercentage = couponDiscount / getSubtotal() * 100;
-                        }
-
-                        document.getElementById('discount-amount').textContent = appliedDiscount.toFixed(2);
-                        updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(document
-                            .getElementById('shipping-amount').textContent) || 0);
-
-                        // Update the discount type text display
-                        updateDiscountTypeText();
-
-                        // Close the modal
-                        const modalElement = document.getElementById('discountSelectionModal');
-                        const modal = bootstrap.Modal.getInstance(modalElement);
-                        modal.hide();
-
-                        alert('Discount applied successfully!');
-                    });
-                }
-
-                // Update discount amounts in the modal
-                document.getElementById('volumeDiscountAmount').textContent = volumeDiscount.toFixed(2);
-                document.getElementById('couponDiscountAmount').textContent = couponDiscount.toFixed(2);
-
-                // Select the higher discount by default
-                if (volumeDiscount >= couponDiscount) {
-                    document.getElementById('volumeDiscountChoice').checked = true;
-                } else {
-                    document.getElementById('couponDiscountChoice').checked = true;
-                }
-
-                // Show the modal
-                const modalElement = document.getElementById('discountSelectionModal');
-                const modal = new bootstrap.Modal(modalElement);
-                modal.show();
+            // Validate total package dimensions
+            if (totalWeight > 30) { // 30lbs max weight
+                $('#shipping-methods-container').html(
+                    '<div class="alert alert-warning">Package weight exceeds maximum limit. Please contact support for large orders.</div>'
+                );
+                $('#shipping-amount').text('0.00');
+                return;
             }
 
-            // Handle shipping calculation
-            $('#address, #country').on('change', calculateShippingLive);
-
-            function calculateShippingLive() {
-                const country = $('#country').val();
-                const state = $('#state').val();
-                const postalCode = $('#postal_code').val();
-                const address = $('#address').val();
-                const city = $('#city').val();
-
-                if (!country || !state || !postalCode || !address || !city) {
-                    $('#shipping-methods-container').html(
-                        '<div class="alert alert-warning">Please fill in all required shipping fields</div>');
-                    $('#shipping-amount').text('0.00');
-                    return;
-                }
-
-                // Validate address fields
-                if (address.length < 5 || city.length < 2) {
-                    $('#shipping-methods-container').html(
-                        '<div class="alert alert-warning">Please enter a valid address and city</div>');
-                    $('#shipping-amount').text('0.00');
-                    return;
-                }
-
-                // Show loading state
+            if (maxLength > 100 || maxWidth > 100 || maxHeight > 100) { // 100cm max dimension
                 $('#shipping-methods-container').html(
-                    '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Calculating shipping rates...</p></div>'
+                    '<div class="alert alert-warning">Package dimensions exceed maximum limits. Please contact support for large orders.</div>'
                 );
+                $('#shipping-amount').text('0.00');
+                return;
+            }
 
-                // Prepare products data
-                const products = cartItems?.map(item => {
-                    const product = item.product;
-
-                    // Handle missing product data (dimensions or weight)
-                    if (!product.weight || !product.length || !product.width || !product.height) {
-                        console.log("Missing product data:", product);
-                        return null;
-                    }
-
-                    // Validate product dimensions
-                    const weight = parseFloat(product.weight) || 0;
-                    const length = parseFloat(product.length) || 0;
-                    const width = parseFloat(product.width) || 0;
-                    const height = parseFloat(product.height) || 0;
-
-                    if (weight <= 0 || length <= 0 || width <= 0 || height <= 0) {
-                        console.log("Invalid product dimensions:", product);
-                        return null;
-                    }
-
-                    // Convert weight to lbs if needed
-                    let weightInLbs = weight;
-                    if (product.weight_unit === 'kg') {
-                        weightInLbs = weight * 2.20462;
-                    }
-
-                    return {
-                        weight: weightInLbs.toFixed(2),
-                        weight_unit: 'lbs',
-                        length: length,
-                        width: width,
-                        height: height,
-                        size_unit: 'cm',
-                        quantity: item.quantity
-                    };
-                }).filter(item => item !== null);
-
-                if (products.length === 0) {
-                    $('#shipping-methods-container').html(
-                        '<div class="alert alert-warning">No valid items in the cart to calculate shipping.</div>'
-                    );
-                    $('#shipping-amount').text('0.00');
-                    return;
+            // Prepare the shipping request payload
+            const payload = {
+                destination: {
+                    country: country,
+                    state: state,
+                    postal_code: postalCode,
+                    address: address,
+                    city: city
+                },
+                products: products,
+                package: {
+                    weight: totalWeight.toFixed(2),
+                    weight_unit: 'lbs',
+                    length: maxLength,
+                    width: maxWidth,
+                    height: maxHeight,
+                    size_unit: 'cm'
                 }
+            };
 
-                // Calculate total package dimensions
-                let totalWeight = 0;
-                let maxLength = 0;
-                let maxWidth = 0;
-                let maxHeight = 0;
-
-                products.forEach(product => {
-                    totalWeight += parseFloat(product.weight) * product.quantity;
-                    maxLength = Math.max(maxLength, product.length);
-                    maxWidth = Math.max(maxWidth, product.width);
-                    maxHeight = Math.max(maxHeight, product.height);
-                });
-
-                // Validate total package dimensions
-                if (totalWeight > 30) { // 30lbs max weight
-                    $('#shipping-methods-container').html(
-                        '<div class="alert alert-warning">Package weight exceeds maximum limit. Please contact support for large orders.</div>'
-                    );
-                    $('#shipping-amount').text('0.00');
-                    return;
-                }
-
-                if (maxLength > 100 || maxWidth > 100 || maxHeight > 100) { // 100cm max dimension
-                    $('#shipping-methods-container').html(
-                        '<div class="alert alert-warning">Package dimensions exceed maximum limits. Please contact support for large orders.</div>'
-                    );
-                    $('#shipping-amount').text('0.00');
-                    return;
-                }
-
-                // Prepare the shipping request payload
-                const payload = {
-                    destination: {
-                        country: country,
-                        state: state,
-                        postal_code: postalCode,
-                        address: address,
-                        city: city
+            fetch("{{ route('shipping.calculate') }}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Content-Type": "application/json"
                     },
-                    products: products,
-                    package: {
-                        weight: totalWeight.toFixed(2),
-                        weight_unit: 'lbs',
-                        length: maxLength,
-                        width: maxWidth,
-                        height: maxHeight,
-                        size_unit: 'cm'
-                    }
-                };
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.shipping?.data?.length) {
+                        const shippingAmount = data.shipping.data[0].rate;
+                        document.getElementById('shipping-amount').textContent = shippingAmount.toFixed(2);
+                        updateTaxAndTotal(getSubtotal(), appliedDiscount, shippingAmount);
 
-                fetch("{{ route('shipping.calculate') }}", {
-                        method: "POST",
-                        headers: {
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(payload)
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success && data.shipping?.data?.length) {
-                            const shippingAmount = data.shipping.data[0].rate;
-                            document.getElementById('shipping-amount').textContent = shippingAmount.toFixed(2);
-                            updateTaxAndTotal(getSubtotal(), appliedDiscount, shippingAmount);
+                        // Display shipping methods
+                        let shippingHtml = '<div class="shipping-methods-list">';
+                        data.shipping.data.forEach(rate => {
+                            const rateUSD = (rate.total * 0.75).toFixed(2);
+                            shippingHtml += `
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input shipping-method-radio" type="radio"
+                                        name="shipping_method"
+                                        value="${rate.postage_type_id}"
+                                        id="shipping_${rate.postage_type_id}"
+                                        data-price="${rateUSD}"
+                                        data-service="${rate.postage_type}"
+                                        data-days="${rate.delivery_days}">
+                                    <label class="form-check-label" for="shipping_${rate.postage_type_id}">
+                                        ${rate.postage_type} - $${rateUSD} USD
+                                        <br>
+                                        <small class="text-muted">Estimated delivery: ${rate.delivery_days} days</small>
+                                    </label>
+                                </div>
+                            `;
+                        });
+                        shippingHtml += '</div>';
+                        $('#shipping-methods-container').html(shippingHtml);
 
-                            // Display shipping methods
-                            let shippingHtml = '<div class="shipping-methods-list">';
-                            data.shipping.data.forEach(rate => {
-                                const rateUSD = (rate.total * 0.75).toFixed(2);
-                                shippingHtml += `
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input shipping-method-radio" type="radio"
-                                            name="shipping_method"
-                                            value="${rate.postage_type_id}"
-                                            id="shipping_${rate.postage_type_id}"
-                                            data-price="${rateUSD}"
-                                            data-service="${rate.postage_type}"
-                                            data-days="${rate.delivery_days}">
-                                        <label class="form-check-label" for="shipping_${rate.postage_type_id}">
-                                            ${rate.postage_type} - $${rateUSD} USD
-                                            <br>
-                                            <small class="text-muted">Estimated delivery: ${rate.delivery_days} days</small>
-                                        </label>
-                                    </div>
-                                `;
+                        // Add event handler for shipping method selection
+                        $('.shipping-method-radio').on('change', function() {
+                            const selectedPrice = $(this).data('price');
+                            const selectedService = $(this).data('service');
+                            const selectedDays = $(this).data('days');
+
+                            // Update shipping amount display
+                            $('#shipping-amount').text(selectedPrice);
+
+                            // Store selected shipping details
+                            window.selectedShipping = {
+                                method: $(this).val(),
+                                price: selectedPrice,
+                                service: selectedService,
+                                estimated_days: selectedDays
+                            };
+
+                            // Update total with new shipping price
+                            updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(
+                                selectedPrice));
+                        });
+
+                        // Select the first shipping method by default
+                        if (data.shipping.data.length > 0) {
+                            const firstRate = data.shipping.data[0];
+                            const firstRateUSD = (firstRate.total * 0.75).toFixed(2);
+                            console.log('Selecting first shipping method:', {
+                                rate: firstRate,
+                                price: firstRateUSD
                             });
-                            shippingHtml += '</div>';
-                            $('#shipping-methods-container').html(shippingHtml);
-
-                            // Add event handler for shipping method selection
-                            $('.shipping-method-radio').on('change', function() {
-                                const selectedPrice = $(this).data('price');
-                                const selectedService = $(this).data('service');
-                                const selectedDays = $(this).data('days');
-
-                                // Update shipping amount display
-                                $('#shipping-amount').text(selectedPrice);
-
-                                // Store selected shipping details
-                                window.selectedShipping = {
-                                    method: $(this).val(),
-                                    price: selectedPrice,
-                                    service: selectedService,
-                                    estimated_days: selectedDays
-                                };
-
-                                // Update total with new shipping price
-                                updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(
-                                    selectedPrice));
-                            });
-
-                            // Select the first shipping method by default
-                            if (data.shipping.data.length > 0) {
-                                const firstRate = data.shipping.data[0];
-                                const firstRateUSD = (firstRate.total * 0.75).toFixed(2);
-                                console.log('Selecting first shipping method:', {
-                                    rate: firstRate,
-                                    price: firstRateUSD
-                                });
-                                $(`#shipping_${firstRate.postage_type_id}`).prop('checked', true).trigger(
-                                    'change');
-                            }
-                        } else {
-                            $('#shipping-methods-container').html(
-                                '<div class="alert alert-danger">Unable to calculate shipping rates. Please try again later or contact support.</div>'
-                            );
-                            $('#shipping-amount').text('0.00');
-                            updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
+                            $(`#shipping_${firstRate.postage_type_id}`).prop('checked', true).trigger(
+                                'change');
                         }
-                    })
-                    .catch(err => {
-                        console.error('Shipping calculation error:', err);
+                    } else {
                         $('#shipping-methods-container').html(
-                            '<div class="alert alert-danger">Error calculating shipping rates. Please try again later or contact support.</div>'
+                            '<div class="alert alert-danger">' +
+                            '<strong>Unable to calculate shipping rates.</strong><br>' +
+                            'The shipping provider (Stallion Express) was unable to provide rates for your address.<br>' +
+                            'Please try the following:<br>' +
+                            '<ul>' +
+                            '<li>Verify your address is correctly formatted</li>' +
+                            '<li>Make sure your postal code is valid (e.g., H1H 5A6 for Canada)</li>' +
+                            '<li>Try a different address if possible</li>' +
+                            '</ul>' +
+                            '</div>'
                         );
                         $('#shipping-amount').text('0.00');
                         updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
-                    });
+                    }
+                })
+                .catch(err => {
+                    console.error('Shipping calculation error:', err);
+                    $('#shipping-methods-container').html(
+                        '<div class="alert alert-danger">' +
+                        '<strong>Error calculating shipping rates.</strong><br>' +
+                        'The shipping provider (Stallion Express) returned an error. This may be a temporary issue.<br>' +
+                        'Please try the following:<br>' +
+                        '<ul>' +
+                        '<li>Double-check your address and postal code</li>' +
+                        '<li>Try again in a few minutes</li>' +
+                        '<li>If the problem persists, please contact our support team</li>' +
+                        '</ul>' +
+                        '</div>'
+                    );
+                    $('#shipping-amount').text('0.00');
+                    updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
+                });
+        }
+
+        // Handle coupon application
+        document.getElementById('applyCoupon').addEventListener('click', function() {
+            let couponCode = document.getElementById('couponCode').value;
+
+            if (!couponCode) {
+                alert('Please enter a coupon code');
+                return;
             }
 
-            // Handle coupon application
-            document.getElementById('applyCoupon').addEventListener('click', function() {
-                let couponCode = document.getElementById('couponCode').value;
-
-
-                fetch("{{ route('apply.discount') }}", {
-                        method: "POST",
-                        headers: {
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            coupon_code: couponCode
-                        })
+            fetch("{{ route('apply.discount') }}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        coupon_code: couponCode
                     })
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.success) {
-                            alert(result.message);
-                            appliedDiscount = parseFloat(result.discount) || 0;
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        const couponDiscount = parseFloat(result.discount) || 0;
+
+                        // Calculate volume discount
+                        let volumeDiscountAmount = 0;
+                        let volumeDiscountPercentage = 0;
+                        $('.item-total-price').each(function() {
+                            const itemId = $(this).data('item-id');
+                            const quantity = parseInt($(this).closest('tr').find('td:eq(1)')
+                                .text());
+                            const result = calculateVolumeDiscount(quantity, sellingPrice,
+                                volumeDiscounts);
+                            if (result.discount > 0) {
+                                const originalTotal = sellingPrice * quantity;
+                                const discountedTotal = result.discountedPrice * quantity;
+                                volumeDiscountAmount += (originalTotal - discountedTotal);
+                                volumeDiscountPercentage = result.discount;
+                            }
+                        });
+
+                        // Check if both volume discount and coupon discount are available
+                        if (volumeDiscountAmount > 0 && couponDiscount > 0) {
+                            // Create and show modal for discount selection
+                            showDiscountSelectionModal(couponDiscount, result.discountId,
+                                volumeDiscountAmount, volumeDiscountPercentage);
+                        } else {
+                            // Just apply the coupon discount if no volume discount
+                            appliedDiscount = couponDiscount;
                             discountId = result.discountId ?? null;
+                            discountType = 'coupon';
+                            discountPercentage = result.percentage || 0;
 
                             document.getElementById('discount-amount').textContent = appliedDiscount
                                 .toFixed(2);
                             updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(document
                                 .getElementById('shipping-amount').textContent) || 0);
-                        } else {
+
+                            // Update the discount type text display
+                            updateDiscountTypeText();
+
                             alert(result.message);
                         }
-                    })
-                    .catch(error => console.error('Error:', error));
+                    } else {
+                        alert(result.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        // Function to show discount selection modal
+        function showDiscountSelectionModal(couponDiscount, couponId, volumeDiscount,
+            volumeDiscountPercentage) {
+            // If modal doesn't exist, create it
+            if (!document.getElementById('discountSelectionModal')) {
+                const modalHtml = `
+                    <div class="modal fade" id="discountSelectionModal" tabindex="-1" aria-labelledby="discountSelectionModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="discountSelectionModalLabel">Choose Discount</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>You have two possible discounts available. Please choose one:</p>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="radio" name="discountChoice" id="volumeDiscountChoice" value="volume">
+                                        <label class="form-check-label" for="volumeDiscountChoice">
+                                            Volume Discount: $<span id="volumeDiscountAmount"></span> (${volumeDiscountPercentage}% off)
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="discountChoice" id="couponDiscountChoice" value="coupon">
+                                        <label class="form-check-label" for="couponDiscountChoice">
+                                            Coupon Discount: $<span id="couponDiscountAmount"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-primary" id="applySelectedDiscount">Apply Selected Discount</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+                // Add event listener for applying the selected discount
+                document.getElementById('applySelectedDiscount').addEventListener('click', function() {
+                    const selectedDiscountType = document.querySelector(
+                        'input[name="discountChoice"]:checked')?.value;
+
+                    if (!selectedDiscountType) {
+                        alert('Please select a discount type');
+                        return;
+                    }
+
+                    if (selectedDiscountType === 'volume') {
+                        // Apply volume discount
+                        appliedDiscount = volumeDiscount;
+                        discountId = null;
+                        discountType = 'volume';
+                        discountPercentage = volumeDiscountPercentage;
+                    } else {
+                        // Apply coupon discount
+                        appliedDiscount = couponDiscount;
+                        discountId = couponId;
+                        discountType = 'coupon';
+                        discountPercentage = couponDiscount / getSubtotal() * 100;
+                    }
+
+                    document.getElementById('discount-amount').textContent = appliedDiscount.toFixed(2);
+                    updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(document
+                        .getElementById('shipping-amount').textContent) || 0);
+
+                    // Update the discount type text display
+                    updateDiscountTypeText();
+
+                    // Close the modal
+                    const modalElement = document.getElementById('discountSelectionModal');
+                    const modal = bootstrap.Modal.getInstance(modalElement);
+                    modal.hide();
+
+                    alert('Discount applied successfully!');
+                });
+            }
+
+            // Update discount amounts in the modal
+            document.getElementById('volumeDiscountAmount').textContent = volumeDiscount.toFixed(2);
+            document.getElementById('couponDiscountAmount').textContent = couponDiscount.toFixed(2);
+
+            // Select the higher discount by default
+            if (volumeDiscount >= couponDiscount) {
+                document.getElementById('volumeDiscountChoice').checked = true;
+            } else {
+                document.getElementById('couponDiscountChoice').checked = true;
+            }
+
+            // Show the modal
+            const modalElement = document.getElementById('discountSelectionModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        }
+
+        // Handle shipping calculation
+        // Remove or comment out this line that automatically triggers shipping calculation
+        // $('#address, #country').on('change', calculateShippingLive);
+
+        // Add event listener for the calculate shipping button
+        $('#calculateShippingBtn').on('click', calculateShippingLive);
+
+        function calculateShippingLive() {
+            const country = $('#country').val();
+            const state = $('#state').val();
+            const postalCode = $('#postal_code').val();
+            const address = $('#address').val();
+            const city = $('#city').val();
+
+            if (!country || !state || !postalCode || !address || !city) {
+                $('#shipping-methods-container').html(
+                    '<div class="alert alert-warning">Please fill in all required shipping fields</div>');
+                $('#shipping-amount').text('0.00');
+                return;
+            }
+
+            // Validate address fields
+            if (address.length < 5 || city.length < 2) {
+                $('#shipping-methods-container').html(
+                    '<div class="alert alert-warning">Please enter a valid address and city</div>');
+                $('#shipping-amount').text('0.00');
+                return;
+            }
+
+            // Show loading state
+            $('#shipping-methods-container').html(
+                '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Calculating shipping rates...</p></div>'
+            );
+
+            // Prepare products data
+            const products = cartItems?.map(item => {
+                const product = item.product;
+
+                // Handle missing product data (dimensions or weight)
+                if (!product.weight || !product.length || !product.width || !product.height) {
+                    console.log("Missing product data:", product);
+                    return null;
+                }
+
+                // Validate product dimensions
+                const weight = parseFloat(product.weight) || 0;
+                const length = parseFloat(product.length) || 0;
+                const width = parseFloat(product.width) || 0;
+                const height = parseFloat(product.height) || 0;
+
+                if (weight <= 0 || length <= 0 || width <= 0 || height <= 0) {
+                    console.log("Invalid product dimensions:", product);
+                    return null;
+                }
+
+                // Convert weight to lbs if needed
+                let weightInLbs = weight;
+                if (product.weight_unit === 'kg') {
+                    weightInLbs = weight * 2.20462;
+                }
+
+                return {
+                    weight: weightInLbs.toFixed(2),
+                    weight_unit: 'lbs',
+                    length: length,
+                    width: width,
+                    height: height,
+                    size_unit: 'cm',
+                    quantity: item.quantity
+                };
+            }).filter(item => item !== null);
+
+            if (products.length === 0) {
+                $('#shipping-methods-container').html(
+                    '<div class="alert alert-warning">No valid items in the cart to calculate shipping.</div>'
+                );
+                $('#shipping-amount').text('0.00');
+                return;
+            }
+
+            // Calculate total package dimensions
+            let totalWeight = 0;
+            let maxLength = 0;
+            let maxWidth = 0;
+            let maxHeight = 0;
+
+            products.forEach(product => {
+                totalWeight += parseFloat(product.weight) * product.quantity;
+                maxLength = Math.max(maxLength, product.length);
+                maxWidth = Math.max(maxWidth, product.width);
+                maxHeight = Math.max(maxHeight, product.height);
             });
 
+            // Validate total package dimensions
+            if (totalWeight > 30) { // 30lbs max weight
+                $('#shipping-methods-container').html(
+                    '<div class="alert alert-warning">Package weight exceeds maximum limit. Please contact support for large orders.</div>'
+                );
+                $('#shipping-amount').text('0.00');
+                return;
+            }
 
-            function proceedToCheckout(event) {
-                event?.preventDefault();
+            if (maxLength > 100 || maxWidth > 100 || maxHeight > 100) { // 100cm max dimension
+                $('#shipping-methods-container').html(
+                    '<div class="alert alert-warning">Package dimensions exceed maximum limits. Please contact support for large orders.</div>'
+                );
+                $('#shipping-amount').text('0.00');
+                return;
+            }
 
-                // Validate required fields
-                const requiredFields = ['firstname', 'lastname', 'country', 'state', 'city', 'postal_code',
-                    'address', 'email', 'phone'
-                ];
-                const missingFields = [];
+            // Prepare the shipping request payload
+            const payload = {
+                destination: {
+                    country: country,
+                    state: state,
+                    postal_code: postalCode,
+                    address: address,
+                    city: city
+                },
+                products: products,
+                package: {
+                    weight: totalWeight.toFixed(2),
+                    weight_unit: 'lbs',
+                    length: maxLength,
+                    width: maxWidth,
+                    height: maxHeight,
+                    size_unit: 'cm'
+                }
+            };
 
-                requiredFields.forEach(field => {
-                    const value = document.getElementById(field).value;
-                    if (!value) {
-                        missingFields.push(field);
+            fetch("{{ route('shipping.calculate') }}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.shipping?.data?.length) {
+                        const shippingAmount = data.shipping.data[0].rate;
+                        document.getElementById('shipping-amount').textContent = shippingAmount.toFixed(2);
+                        updateTaxAndTotal(getSubtotal(), appliedDiscount, shippingAmount);
+
+                        // Display shipping methods
+                        let shippingHtml = '<div class="shipping-methods-list">';
+                        data.shipping.data.forEach(rate => {
+                            const rateUSD = (rate.total * 0.75).toFixed(2);
+                            shippingHtml += `
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input shipping-method-radio" type="radio"
+                                        name="shipping_method"
+                                        value="${rate.postage_type_id}"
+                                        id="shipping_${rate.postage_type_id}"
+                                        data-price="${rateUSD}"
+                                        data-service="${rate.postage_type}"
+                                        data-days="${rate.delivery_days}">
+                                    <label class="form-check-label" for="shipping_${rate.postage_type_id}">
+                                        ${rate.postage_type} - $${rateUSD} USD
+                                        <br>
+                                        <small class="text-muted">Estimated delivery: ${rate.delivery_days} days</small>
+                                    </label>
+                                </div>
+                            `;
+                        });
+                        shippingHtml += '</div>';
+                        $('#shipping-methods-container').html(shippingHtml);
+
+                        // Add event handler for shipping method selection
+                        $('.shipping-method-radio').on('change', function() {
+                            const selectedPrice = $(this).data('price');
+                            const selectedService = $(this).data('service');
+                            const selectedDays = $(this).data('days');
+
+                            // Update shipping amount display
+                            $('#shipping-amount').text(selectedPrice);
+
+                            // Store selected shipping details
+                            window.selectedShipping = {
+                                method: $(this).val(),
+                                price: selectedPrice,
+                                service: selectedService,
+                                estimated_days: selectedDays
+                            };
+
+                            // Update total with new shipping price
+                            updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(
+                                selectedPrice));
+                        });
+
+                        // Select the first shipping method by default
+                        if (data.shipping.data.length > 0) {
+                            const firstRate = data.shipping.data[0];
+                            const firstRateUSD = (firstRate.total * 0.75).toFixed(2);
+                            console.log('Selecting first shipping method:', {
+                                rate: firstRate,
+                                price: firstRateUSD
+                            });
+                            $(`#shipping_${firstRate.postage_type_id}`).prop('checked', true).trigger(
+                                'change');
+                        }
+                    } else {
+                        $('#shipping-methods-container').html(
+                            '<div class="alert alert-danger">' +
+                            '<strong>Unable to calculate shipping rates.</strong><br>' +
+                            'The shipping provider (Stallion Express) was unable to provide rates for your address.<br>' +
+                            'Please try the following:<br>' +
+                            '<ul>' +
+                            '<li>Verify your address is correctly formatted</li>' +
+                            '<li>Make sure your postal code is valid (e.g., H1H 5A6 for Canada)</li>' +
+                            '<li>Try a different address if possible</li>' +
+                            '</ul>' +
+                            '</div>'
+                        );
+                        $('#shipping-amount').text('0.00');
+                        updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
                     }
+                })
+                .catch(err => {
+                    console.error('Shipping calculation error:', err);
+                    $('#shipping-methods-container').html(
+                        '<div class="alert alert-danger">' +
+                        '<strong>Error calculating shipping rates.</strong><br>' +
+                        'The shipping provider (Stallion Express) returned an error. This may be a temporary issue.<br>' +
+                        'Please try the following:<br>' +
+                        '<ul>' +
+                        '<li>Double-check your address and postal code</li>' +
+                        '<li>Try again in a few minutes</li>' +
+                        '<li>If the problem persists, please contact our support team</li>' +
+                        '</ul>' +
+                        '</div>'
+                    );
+                    $('#shipping-amount').text('0.00');
+                    updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
                 });
+        }
 
-                if (missingFields.length > 0) {
-                    alert('Please fill in all required fields: ' + missingFields.join(', '));
-                    return;
+        // Handle coupon application
+        document.getElementById('applyCoupon').addEventListener('click', function() {
+            let couponCode = document.getElementById('couponCode').value;
+
+
+            fetch("{{ route('apply.discount') }}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        coupon_code: couponCode
+                    })
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        alert(result.message);
+                        appliedDiscount = parseFloat(result.discount) || 0;
+                        discountId = result.discountId ?? null;
+
+                        document.getElementById('discount-amount').textContent = appliedDiscount
+                            .toFixed(2);
+                        updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(document
+                            .getElementById('shipping-amount').textContent) || 0);
+                    } else {
+                        alert(result.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+
+        function proceedToCheckout(event) {
+            event?.preventDefault();
+
+            // Validate required fields
+            const requiredFields = ['firstname', 'lastname', 'country', 'state', 'city', 'postal_code',
+                'address', 'email', 'phone'
+            ];
+            const missingFields = [];
+
+            requiredFields.forEach(field => {
+                const value = document.getElementById(field).value;
+                if (!value) {
+                    missingFields.push(field);
                 }
+            });
 
-                if (!window.selectedShipping || !window.selectedShipping.method) {
-                    alert('Please select a shipping method before proceeding.');
-                    return;
-                }
+            if (missingFields.length > 0) {
+                alert('Please fill in all required fields: ' + missingFields.join(', '));
+                return;
+            }
 
-                if (confirm('Are you sure you want to proceed to checkout?')) {
-                    let checkoutButton = document.getElementById('checkoutButton');
-                    checkoutButton.innerHTML =
-                        'Processing... <span class="spinner-border spinner-border-sm"></span>';
-                    checkoutButton.disabled = true;
+            if (!window.selectedShipping || !window.selectedShipping.method) {
+                alert('Please select a shipping method before proceeding.');
+                return;
+            }
 
-
-                    let subtotal = getSubtotal();
-
-
-                    let TPStaxElement = document.querySelector('.tps-cart-tax');
-                    let TPStaxAmount = parseFloat(TPStaxElement.innerText.replace(/[^0-9.]/g, '')) || 0;
-                    let TPStaxNumber = TPStaxElement.getAttribute('tps-data-taxno');
-                    let TPStaxPercentage = TPStaxElement.getAttribute('tps-data-percentage');
+            if (confirm('Are you sure you want to proceed to checkout?')) {
+                let checkoutButton = document.getElementById('checkoutButton');
+                checkoutButton.innerHTML =
+                    'Processing... <span class="spinner-border spinner-border-sm"></span>';
+                checkoutButton.disabled = true;
 
 
-                    let TVQtaxElement = document.querySelector('.tvq-cart-tax');
-                    let TVQtaxAmount = parseFloat(TVQtaxElement.innerText.replace(/[^0-9.]/g, '')) || 0;
-                    let TVQtaxNumber = TVQtaxElement.getAttribute('tvq-data-taxno');
-                    let TVQtaxPercentage = TVQtaxElement.getAttribute('tvq-data-percentage');
+                let subtotal = getSubtotal();
 
 
-                    // Use the USD total for PayPal
-                    let finalTotal = window.paypalTotal || (subtotal - appliedDiscount + TPStaxAmount +
-                        TVQtaxAmount) * 0.75;
+                let TPStaxElement = document.querySelector('.tps-cart-tax');
+                let TPStaxAmount = parseFloat(TPStaxElement.innerText.replace(/[^0-9.]/g, '')) || 0;
+                let TPStaxNumber = TPStaxElement.getAttribute('tps-data-taxno');
+                let TPStaxPercentage = TPStaxElement.getAttribute('tps-data-percentage');
 
 
-                    const formData = {
-                        firstname: document.getElementById('firstname').value,
-                        lastname: document.getElementById('lastname').value,
-                        companyname: document.getElementById('companyname').value,
-                        country: document.getElementById('country').value,
-                        state: document.getElementById('state').value,
-                        city: document.getElementById('city').value,
-                        postal_code: document.getElementById('postal_code').value,
-                        address: document.getElementById('address').value,
-                        email: document.getElementById('email').value,
-                        phone: document.getElementById('phone').value,
-                        additional_info: document.getElementById('additional_info').value,
-                        paymentMethod: document.querySelector('input[name="paymentMethod"]:checked')?.value,
-                        DiscountAmount: appliedDiscount,
-                        discountId: discountId ? discountId : null,
-                        discount_type: discountType,
-                        discount_percentage: discountPercentage,
-                        subtotal: subtotal,
-                        TPStaxAmount: TPStaxAmount,
-                        TPStaxNumber: TPStaxNumber,
-                        TVQtaxAmount: TVQtaxAmount,
-                        TPStaxPercentage: TPStaxPercentage,
-                        TVQtaxPercentage: TVQtaxPercentage,
-                        TVQtaxNumber: TVQtaxNumber,
-                        finalTotal: finalTotal,
-                        shipping_method: window.selectedShipping.method,
-                        shipping_price: window.selectedShipping.price,
-                        shipping_service: window.selectedShipping.service,
-                        shipping_estimated_days: window.selectedShipping.estimated_days
+                let TVQtaxElement = document.querySelector('.tvq-cart-tax');
+                let TVQtaxAmount = parseFloat(TVQtaxElement.innerText.replace(/[^0-9.]/g, '')) || 0;
+                let TVQtaxNumber = TVQtaxElement.getAttribute('tvq-data-taxno');
+                let TVQtaxPercentage = TVQtaxElement.getAttribute('tvq-data-percentage');
+
+
+                // Use the USD total for PayPal
+                let finalTotal = window.paypalTotal || (subtotal - appliedDiscount + TPStaxAmount +
+                    TVQtaxAmount) * 0.75;
+
+
+                const formData = {
+                    firstname: document.getElementById('firstname').value,
+                    lastname: document.getElementById('lastname').value,
+                    companyname: document.getElementById('companyname').value,
+                    country: document.getElementById('country').value,
+                    state: document.getElementById('state').value,
+                    city: document.getElementById('city').value,
+                    postal_code: document.getElementById('postal_code').value,
+                    address: document.getElementById('address').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    additional_info: document.getElementById('additional_info').value,
+                    paymentMethod: document.querySelector('input[name="paymentMethod"]:checked')?.value,
+                    DiscountAmount: appliedDiscount,
+                    discountId: discountId ? discountId : null,
+                    discount_type: discountType,
+                    discount_percentage: discountPercentage,
+                    subtotal: subtotal,
+                    TPStaxAmount: TPStaxAmount,
+                    TPStaxNumber: TPStaxNumber,
+                    TVQtaxAmount: TVQtaxAmount,
+                    TPStaxPercentage: TPStaxPercentage,
+                    TVQtaxPercentage: TVQtaxPercentage,
+                    TVQtaxNumber: TVQtaxNumber,
+                    finalTotal: finalTotal,
+                    shipping_method: window.selectedShipping.method,
+                    shipping_price: window.selectedShipping.price,
+                    shipping_service: window.selectedShipping.service,
+                    shipping_estimated_days: window.selectedShipping.estimated_days
+                };
+
+                // Add Authorize.Net card details if that payment method is selected
+                if (formData.paymentMethod === 'authorize_net') {
+                    // Validate card details
+                    const cardNumber = document.getElementById('cardNumber').value;
+                    const cardName = document.getElementById('cardName').value;
+                    const expiryDate = document.getElementById('expiryDate').value;
+                    const cvv = document.getElementById('cvv').value;
+
+                    if (!cardNumber || !cardName || !expiryDate || !cvv) {
+                        alert('Please fill in all card details');
+                        checkoutButton.innerHTML = 'Proceed to Pay';
+                        checkoutButton.disabled = false;
+                        return;
+                    }
+
+                    // Format expiry date MM/YY to MM/YYYY for API
+                    let formattedExpiryDate = expiryDate;
+                    if (expiryDate.length === 5 && expiryDate.indexOf('/') === 2) {
+                        const parts = expiryDate.split('/');
+                        formattedExpiryDate = parts[0] + '/20' + parts[1];
+                    }
+
+                    // Add card details to form data
+                    formData.cardDetails = {
+                        cardNumber: cardNumber.replace(/\s+/g, ''), // Remove any spaces
+                        cardName: cardName,
+                        expiryDate: formattedExpiryDate,
+                        cvv: cvv
                     };
 
-                    // Add Authorize.Net card details if that payment method is selected
-                    if (formData.paymentMethod === 'authorize_net') {
-                        // Validate card details
-                        const cardNumber = document.getElementById('cardNumber').value;
-                        const cardName = document.getElementById('cardName').value;
-                        const expiryDate = document.getElementById('expiryDate').value;
-                        const cvv = document.getElementById('cvv').value;
-
-                        if (!cardNumber || !cardName || !expiryDate || !cvv) {
-                            alert('Please fill in all card details');
-                            checkoutButton.innerHTML = 'Proceed to Pay';
-                            checkoutButton.disabled = false;
-                            return;
-                        }
-
-                        // Format expiry date MM/YY to MM/YYYY for API
-                        let formattedExpiryDate = expiryDate;
-                        if (expiryDate.length === 5 && expiryDate.indexOf('/') === 2) {
-                            const parts = expiryDate.split('/');
-                            formattedExpiryDate = parts[0] + '/20' + parts[1];
-                        }
-
-                        // Add card details to form data
-                        formData.cardDetails = {
-                            cardNumber: cardNumber.replace(/\s+/g, ''), // Remove any spaces
-                            cardName: cardName,
-                            expiryDate: formattedExpiryDate,
-                            cvv: cvv
-                        };
-
-                        // Log card details being sent (except sensitive info)
-                        console.log('Sending payment with card details', {
-                            cardName: formData.cardDetails.cardName,
-                            expiryDate: formData.cardDetails.expiryDate,
-                            cardNumberLength: formData.cardDetails.cardNumber.length
-                        });
-                    }
+                    // Log card details being sent (except sensitive info)
+                    console.log('Sending payment with card details', {
+                        cardName: formData.cardDetails.cardName,
+                        expiryDate: formData.cardDetails.expiryDate,
+                        cardNumberLength: formData.cardDetails.cardNumber.length
+                    });
+                }
 
 
 
 
-                    fetch("{{ route('checkout.add') }}", {
-                            method: "POST",
-                            headers: {
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(formData),
-                        })
-                        .then(response => response.json())
-                        .then(result => {
-                            if (result.success) {
-                                if (formData.paymentMethod === 'paypal') {
-                                    window.location.href = result.paypalUrl;
-                                } else if (formData.paymentMethod === 'authorize_net') {
-                                    // For Authorize.net, redirect to the success page with order ID
-                                    window.location.href = "{{ route('main.pages.success') }}?orderId=" +
-                                        result.orderId;
-                                } else {
-                                    window.location.href = "{{ route('main.pages.success') }}?orderId=" +
-                                        result.orderId;
-                                }
+                fetch("{{ route('checkout.add') }}", {
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(formData),
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            if (formData.paymentMethod === 'paypal') {
+                                window.location.href = result.paypalUrl;
+                            } else if (formData.paymentMethod === 'authorize_net') {
+                                // For Authorize.net, redirect to the success page with order ID
+                                window.location.href = "{{ route('main.pages.success') }}?orderId=" +
+                                    result.orderId;
                             } else {
-                                // Handle error with more details
-                                let errorMsg = result.message || 'Payment processing failed. Please try again.';
-                                console.error('Payment error:', errorMsg);
-                                alert(errorMsg);
-                                checkoutButton.innerHTML = 'Proceed to Pay';
-                                checkoutButton.disabled = false;
+                                window.location.href = "{{ route('main.pages.success') }}?orderId=" +
+                                    result.orderId;
                             }
-                        })
-                        .catch(error => {
-                            alert('An error occurred during checkout. Please try again.');
+                        } else {
+                            // Handle error with more details
+                            let errorMsg = result.message || 'Payment processing failed. Please try again.';
+                            console.error('Payment error:', errorMsg);
+                            alert(errorMsg);
                             checkoutButton.innerHTML = 'Proceed to Pay';
                             checkoutButton.disabled = false;
-                        });
+                        }
+                    })
+                    .catch(error => {
+                        alert('An error occurred during checkout. Please try again.');
+                        checkoutButton.innerHTML = 'Proceed to Pay';
+                        checkoutButton.disabled = false;
+                    });
+            }
+        }
+
+
+        const countriesRoute = "{{ route('countries.index') }}";
+        let countrySelect = document.getElementById('country');
+        let tpsTaxRow = document.querySelector('.tps-cart-tax').parentElement;
+        let tvqTaxRow = document.querySelector('.tvq-cart-tax').parentElement;
+
+
+        function setLoading(selectElement) {
+            selectElement.innerHTML = '<option value="">Loading...</option>';
+            selectElement.disabled = true;
+        }
+
+
+        function removeLoading(selectElement, placeholder) {
+            selectElement.innerHTML = `<option value="">${placeholder}</option>`;
+            selectElement.disabled = false;
+        }
+
+
+        setLoading(countrySelect);
+        fetch(countriesRoute)
+            .then(response => response.json())
+            .then(data => {
+                removeLoading(countrySelect, "Select Country");
+                for (const [code, name] of Object.entries(data)) {
+                    countrySelect.innerHTML += `<option value="${code}">${name}</option>`;
                 }
-            }
-
-
-            const countriesRoute = "{{ route('countries.index') }}";
-            let countrySelect = document.getElementById('country');
-            let tpsTaxRow = document.querySelector('.tps-cart-tax').parentElement;
-            let tvqTaxRow = document.querySelector('.tvq-cart-tax').parentElement;
-
-
-            function setLoading(selectElement) {
-                selectElement.innerHTML = '<option value="">Loading...</option>';
-                selectElement.disabled = true;
-            }
-
-
-            function removeLoading(selectElement, placeholder) {
-                selectElement.innerHTML = `<option value="">${placeholder}</option>`;
-                selectElement.disabled = false;
-            }
-
-
-            setLoading(countrySelect);
-            fetch(countriesRoute)
-                .then(response => response.json())
-                .then(data => {
-                    removeLoading(countrySelect, "Select Country");
-                    for (const [code, name] of Object.entries(data)) {
-                        countrySelect.innerHTML += `<option value="${code}">${name}</option>`;
-                    }
-                    updateTaxRowsVisibility();
-                })
-                .catch(error => {
-                    removeLoading(countrySelect, "Failed to load countries, Kindly Refresh the page");
-                    console.error(error);
-                });
-
-
-            function updateTaxRowsVisibility() {
-                if (countrySelect.value === "CA") {
-                    tpsTaxRow.style.display = 'table-row';
-                    tvqTaxRow.style.display = 'table-row';
-                    updateTaxAndTotal(getSubtotal(), appliedDiscount);
-                } else {
-                    tpsTaxRow.style.display = 'none';
-                    tvqTaxRow.style.display = 'none';
-                }
-            }
-
-
-            $('#country').on('change', function() {
-                console.log("Selected country code:", $(this).val());
                 updateTaxRowsVisibility();
+            })
+            .catch(error => {
+                removeLoading(countrySelect, "Failed to load countries, Kindly Refresh the page");
+                console.error(error);
             });
 
 
+        function updateTaxRowsVisibility() {
+            if (countrySelect.value === "CA") {
+                tpsTaxRow.style.display = 'table-row';
+                tvqTaxRow.style.display = 'table-row';
+                updateTaxAndTotal(getSubtotal(), appliedDiscount);
+            } else {
+                tpsTaxRow.style.display = 'none';
+                tvqTaxRow.style.display = 'none';
+            }
+        }
+
+
+        $('#country').on('change', function() {
+            console.log("Selected country code:", $(this).val());
             updateTaxRowsVisibility();
-            document.getElementById('checkoutButton').addEventListener('click', proceedToCheckout);
         });
+
+
+        updateTaxRowsVisibility();
+        document.getElementById('checkoutButton').addEventListener('click', proceedToCheckout);
     </script>
 
     <script>

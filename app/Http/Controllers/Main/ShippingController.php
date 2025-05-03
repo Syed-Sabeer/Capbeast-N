@@ -84,9 +84,17 @@ class ShippingController extends Controller
             ],
             'is_return' => false,
             'weight_unit' => 'lbs',
-            'weight' => min(array_sum(array_map(function ($product) {
-                return floatval($product['weight']) * (intval($product['quantity'] ?? 1));
-            }, $products)) * 2.20462, 30),
+            'weight' => isset($request->package) && isset($request->package['weight'])
+                ? floatval($request->package['weight'])
+                : array_sum(array_map(function ($product) {
+                    $weight = floatval($product['weight']);
+                    $quantity = intval($product['quantity'] ?? 1);
+                    // Convert to lbs if needed
+                    if (isset($product['weight_unit']) && strtolower($product['weight_unit']) === 'kg') {
+                        $weight *= 2.20462; // Convert kg to lbs
+                    }
+                    return $weight * $quantity;
+                }, $products)),
             'length' => min(max(array_map(function ($product) {
                 return floatval($product['length']);
             }, $products)), 100),
@@ -136,90 +144,151 @@ class ShippingController extends Controller
                 $rates = $response;
                 Log::info('Stallion Express response received', $rates);
 
-                // If rates array is empty for Canadian addresses, add default options
-                if (
-                    isset($rates['rates']) && empty($rates['rates']) &&
-                    isset($payload['to_address']['country_code']) &&
-                    $payload['to_address']['country_code'] === 'CA'
-                ) {
+                // Check if rates are empty or missing
+                $hasRates = isset($rates['rates']) && !empty($rates['rates']);
+                if (!$hasRates) {
+                    // Get country code to determine fallback rates
+                    $country = isset($payload['to_address']['country_code'])
+                        ? strtoupper($payload['to_address']['country_code'])
+                        : 'UNKNOWN';
 
-                    Log::info('Adding fallback shipping rates for Canadian address', $payload);
+                    Log::info('No shipping rates returned by API, using fallback rates for country: ' . $country);
 
-                    // Add fallback shipping options for Canada
+                    // Get package weight for price calculations
+                    $weight = $payload['weight'] ?? 16; // Default to 16 lbs if not specified
+
+                    // Base price calculation (increases with weight but capped)
+                    $basePrice = min(20 + ($weight * 0.5), 60);
+
+                    // Default to USD
+                    $currency = 'USD';
+
+                    // Adjust price and currency based on destination country
+                    if ($country === 'CA') {
+                        $currency = 'CAD';
+                        $basePrice *= 1.2; // 20% higher for Canada
+                    } else if (in_array($country, ['GB', 'DE', 'FR', 'IT', 'ES'])) {
+                        $currency = 'EUR';
+                        $basePrice *= 1.5; // 50% higher for Europe
+                    } else if (in_array($country, ['AU', 'NZ'])) {
+                        $currency = 'AUD';
+                        $basePrice *= 1.8; // 80% higher for Oceania
+                    } else if ($country !== 'US') {
+                        // All other international destinations
+                        $basePrice *= 2.0; // Double price for international
+                    }
+
+                    // Calculate tiered prices
+                    $standardPrice = floor($basePrice) - 0.01; // $19.99 format
+                    $expeditedPrice = floor($basePrice * 1.5) - 0.01;
+                    $expressPrice = floor($basePrice * 2.0) - 0.01;
+
+                    // Default carrier name and prefix
+                    $carrierName = 'International';
+                    $servicePrefix = strtolower($country) . '_';
+
+                    // Customize carrier name for major countries
+                    if ($country === 'US') {
+                        $carrierName = 'USPS';
+                        // Fixed prices for US
+                        $standardPrice = 24.99;
+                        $expeditedPrice = 34.99;
+                        $expressPrice = 49.99;
+                    } else if ($country === 'CA') {
+                        $carrierName = 'Canada Post';
+                        // Fixed prices for Canada
+                        $standardPrice = 19.99;
+                        $expeditedPrice = 29.99;
+                        $expressPrice = 39.99;
+                    } else if (in_array($country, ['GB', 'DE', 'FR', 'IT', 'ES'])) {
+                        $carrierName = 'European';
+                    }
+
+                    // Prepare fallback shipping rates
                     $rates['rates'] = [
                         [
-                            'postage_type_id' => 'ca_standard',
-                            'postage_type' => 'Canada Post Standard',
+                            'postage_type_id' => $servicePrefix . 'standard',
+                            'postage_type' => $carrierName . ' Standard',
                             'trackable' => true,
                             'package_type' => 'Parcel',
-                            'base_rate' => 15.99,
+                            'base_rate' => $standardPrice,
                             'add_ons' => [
                                 [
                                     'name' => 'Insurance',
                                     'type' => 'insurance',
-                                    'cost' => 3.00,
-                                    'currency' => 'CAD'
+                                    'cost' => 0,
+                                    'currency' => $currency
                                 ]
                             ],
-                            'rate' => 18.99,
-                            'gst' => 0.95,
+                            'rate' => $standardPrice,
+                            'gst' => 0,
                             'pst' => 0,
                             'hst' => 0,
                             'qst' => 0,
-                            'tax' => 0.95,
-                            'total' => 19.94,
-                            'currency' => 'CAD',
+                            'tax' => 0,
+                            'total' => $standardPrice,
+                            'currency' => $currency,
+                            'delivery_days' => '7-14'
+                        ],
+                        [
+                            'postage_type_id' => $servicePrefix . 'expedited',
+                            'postage_type' => $carrierName . ' Expedited',
+                            'trackable' => true,
+                            'package_type' => 'Parcel',
+                            'base_rate' => $expeditedPrice,
+                            'add_ons' => [
+                                [
+                                    'name' => 'Insurance',
+                                    'type' => 'insurance',
+                                    'cost' => 0,
+                                    'currency' => $currency
+                                ]
+                            ],
+                            'rate' => $expeditedPrice,
+                            'gst' => 0,
+                            'pst' => 0,
+                            'hst' => 0,
+                            'qst' => 0,
+                            'tax' => 0,
+                            'total' => $expeditedPrice,
+                            'currency' => $currency,
+                            'delivery_days' => '5-10'
+                        ],
+                        [
+                            'postage_type_id' => $servicePrefix . 'express',
+                            'postage_type' => $carrierName . ' Express',
+                            'trackable' => true,
+                            'package_type' => 'Parcel',
+                            'base_rate' => $expressPrice,
+                            'add_ons' => [
+                                [
+                                    'name' => 'Insurance',
+                                    'type' => 'insurance',
+                                    'cost' => 0,
+                                    'currency' => $currency
+                                ]
+                            ],
+                            'rate' => $expressPrice,
+                            'gst' => 0,
+                            'pst' => 0,
+                            'hst' => 0,
+                            'qst' => 0,
+                            'tax' => 0,
+                            'total' => $expressPrice,
+                            'currency' => $currency,
                             'delivery_days' => '3-7'
-                        ],
-                        [
-                            'postage_type_id' => 'ca_express',
-                            'postage_type' => 'Canada Post Expedited',
-                            'trackable' => true,
-                            'package_type' => 'Parcel',
-                            'base_rate' => 22.99,
-                            'add_ons' => [
-                                [
-                                    'name' => 'Insurance',
-                                    'type' => 'insurance',
-                                    'cost' => 3.00,
-                                    'currency' => 'CAD'
-                                ]
-                            ],
-                            'rate' => 25.99,
-                            'gst' => 1.30,
-                            'pst' => 0,
-                            'hst' => 0,
-                            'qst' => 0,
-                            'tax' => 1.30,
-                            'total' => 27.29,
-                            'currency' => 'CAD',
-                            'delivery_days' => '2-4'
-                        ],
-                        [
-                            'postage_type_id' => 'ca_priority',
-                            'postage_type' => 'Canada Post Priority',
-                            'trackable' => true,
-                            'package_type' => 'Parcel',
-                            'base_rate' => 34.99,
-                            'add_ons' => [
-                                [
-                                    'name' => 'Insurance',
-                                    'type' => 'insurance',
-                                    'cost' => 3.00,
-                                    'currency' => 'CAD'
-                                ]
-                            ],
-                            'rate' => 37.99,
-                            'gst' => 1.90,
-                            'pst' => 0,
-                            'hst' => 0,
-                            'qst' => 0,
-                            'tax' => 1.90,
-                            'total' => 39.89,
-                            'currency' => 'CAD',
-                            'delivery_days' => '1-3'
                         ]
                     ];
+
+                    // Also set data field for frontend compatibility
+                    $rates['data'] = $rates['rates'];
+                    $rates['note'] = 'Using estimated shipping rates';
+
+                    Log::info('Generated fallback shipping rates', [
+                        'country' => $country,
+                        'weight' => $weight,
+                        'rates' => $rates['rates']
+                    ]);
                 }
 
                 // Convert rates to USD if needed
@@ -249,14 +318,162 @@ class ShippingController extends Controller
 
                 CartHelper::trackError(
                     'shipping',
-                    'Shipping rate service error: ' . $errorMessage
+                    'Stallion Express API error: ' . $errorMessage
                 );
 
+                // Add fallback shipping options for all countries when API fails
+                if (isset($payload['to_address']['country_code'])) {
+                    $country = $payload['to_address']['country_code'];
+                    $weight = $payload['weight'] ?? 0;
+
+                    // Base prices that scale with weight
+                    $basePrice = min(20 + ($weight * 0.5), 60); // Price increases with weight but caps at 60
+
+                    // Determine currency based on country
+                    $currency = 'USD';
+                    if ($country === 'CA') {
+                        $currency = 'CAD';
+                        // For Canada, apply a slight increase
+                        $basePrice *= 1.2;
+                    } else if (in_array($country, ['GB', 'DE', 'FR', 'IT', 'ES'])) {
+                        // European countries
+                        $currency = 'EUR';
+                        $basePrice *= 1.5; // European shipping costs more
+                    } else if (in_array($country, ['AU', 'NZ'])) {
+                        // Australia and New Zealand
+                        $currency = 'AUD';
+                        $basePrice *= 1.8; // Oceania shipping costs more
+                    } else if (in_array($country, ['JP', 'KR', 'CN', 'HK', 'SG'])) {
+                        // Asian countries
+                        $basePrice *= 1.7; // Asian shipping costs more
+                    } else if ($country !== 'US') {
+                        // Rest of the world
+                        $basePrice *= 2.0; // International shipping costs more
+                    }
+
+                    // Round to nearest .99
+                    $standardPrice = floor($basePrice) - 0.01;
+                    $expeditedPrice = floor($basePrice * 1.5) - 0.01;
+                    $expressPrice = floor($basePrice * 2.0) - 0.01;
+
+                    $servicePrefix = strtolower($country) . '_';
+                    $carrierName = 'International';
+
+                    // Override for specific countries
+                    if ($country === 'US') {
+                        $carrierName = 'USPS';
+                    } else if ($country === 'CA') {
+                        $carrierName = 'Canada Post';
+                    } else if (in_array($country, ['GB', 'DE', 'FR', 'IT', 'ES'])) {
+                        $carrierName = 'European';
+                    }
+
+                    // Prepare fallback rates
+                    $fallbackRates = [
+                        'success' => true,
+                        'data' => [
+                            [
+                                'postage_type_id' => $servicePrefix . 'standard',
+                                'postage_type' => $carrierName . ' Standard',
+                                'rate' => $standardPrice,
+                                'total' => $standardPrice,
+                                'currency' => $currency,
+                                'delivery_days' => '7-14'
+                            ],
+                            [
+                                'postage_type_id' => $servicePrefix . 'expedited',
+                                'postage_type' => $carrierName . ' Expedited',
+                                'rate' => $expeditedPrice,
+                                'total' => $expeditedPrice,
+                                'currency' => $currency,
+                                'delivery_days' => '5-10'
+                            ],
+                            [
+                                'postage_type_id' => $servicePrefix . 'express',
+                                'postage_type' => $carrierName . ' Express',
+                                'rate' => $expressPrice,
+                                'total' => $expressPrice,
+                                'currency' => $currency,
+                                'delivery_days' => '3-7'
+                            ]
+                        ]
+                    ];
+
+                    // Specially handle US and CA for better customer experience
+                    if ($country === 'US') {
+                        $fallbackRates['data'] = [
+                            [
+                                'postage_type_id' => 'us_standard',
+                                'postage_type' => 'USPS Standard',
+                                'rate' => 24.99,
+                                'total' => 24.99,
+                                'currency' => 'USD',
+                                'delivery_days' => '5-8'
+                            ],
+                            [
+                                'postage_type_id' => 'us_priority',
+                                'postage_type' => 'USPS Priority',
+                                'rate' => 34.99,
+                                'total' => 34.99,
+                                'currency' => 'USD',
+                                'delivery_days' => '3-5'
+                            ],
+                            [
+                                'postage_type_id' => 'us_express',
+                                'postage_type' => 'USPS Express',
+                                'rate' => 49.99,
+                                'total' => 49.99,
+                                'currency' => 'USD',
+                                'delivery_days' => '1-3'
+                            ]
+                        ];
+                    } else if ($country === 'CA') {
+                        $fallbackRates['data'] = [
+                            [
+                                'postage_type_id' => 'ca_standard',
+                                'postage_type' => 'Canada Post Standard',
+                                'rate' => 19.99,
+                                'total' => 19.99,
+                                'currency' => 'CAD',
+                                'delivery_days' => '5-7'
+                            ],
+                            [
+                                'postage_type_id' => 'ca_expedited',
+                                'postage_type' => 'Canada Post Expedited',
+                                'rate' => 29.99,
+                                'total' => 29.99,
+                                'currency' => 'CAD',
+                                'delivery_days' => '3-5'
+                            ],
+                            [
+                                'postage_type_id' => 'ca_express',
+                                'postage_type' => 'Canada Post Express',
+                                'rate' => 39.99,
+                                'total' => 39.99,
+                                'currency' => 'CAD',
+                                'delivery_days' => '1-3'
+                            ]
+                        ];
+                    }
+
+                    Log::info('Using fallback shipping rates', [
+                        'country' => $country,
+                        'rates' => $fallbackRates
+                    ]);
+
+                    return response()->json([
+                        'success' => true,
+                        'shipping' => $fallbackRates,
+                        'note' => 'Using estimated rates due to carrier API error'
+                    ]);
+                }
+
+                // If we can't determine the country, return error
                 return response()->json([
                     'success' => false,
-                    'message' => 'Failed to fetch shipping rate.',
-                    'details' => $response
-                ], 500);
+                    'message' => 'Failed to fetch shipping rates.',
+                    'errors' => isset($response['errors']) ? $response['errors'] : ['An error occurred while retrieving rates.']
+                ]);
             }
         } catch (\Exception $e) {
             Log::critical('Exception during shipping rate calculation', [
