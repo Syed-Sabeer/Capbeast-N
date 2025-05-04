@@ -22,6 +22,15 @@
     <script src="{{ asset('assets/vendor/libs/@form-validation/umd/plugin-auto-focus/index.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/sweetalert2/sweetalert2.js') }}"></script>
 @endsection
+@php
+            if (!function_exists('decodeFontJson')) {
+                function decodeFontJson($fontData)
+                {
+                    $decoded = json_decode($fontData, true);
+                    return is_array($decoded) ? $decoded : [];
+                }
+            }
+        @endphp
 
 @section('page-script')
     <script src="{{ asset('assets/js/app-ecommerce-order-details.js') }}"></script>
@@ -286,12 +295,12 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         @php
-                                                            function decodeFontJson($fontData)
-                                                            {
-                                                                $decoded = json_decode($fontData, true);
-                                                                return is_array($decoded) ? $decoded : [];
-                                                            }
- 
+                                                            // function decodeFontJson($fontData)
+                                                            // {
+                                                            //     $decoded = json_decode($fontData, true);
+                                                            //     return is_array($decoded) ? $decoded : [];
+                                                            // }
+
                                                             $fontParts = [
                                                                 'Front Font' => $item->userCustomization->front_font,
                                                                 'Back Font' => $item->userCustomization->back_font,
@@ -299,7 +308,7 @@
                                                                 'Right Font' => $item->userCustomization->right_font,
                                                             ];
                                                         @endphp
- 
+
                                                         @foreach ($fontParts as $label => $json)
                                                             @if (!empty($json))
                                                                 <h6>{{ $label }}:</h6>
@@ -341,7 +350,7 @@
                                             </div>
                                         </div>
                                     @endif
- 
+
 
 
                                     {{-- Modal --}}
@@ -530,8 +539,17 @@
 
                             <div class="ms-3"> <!-- Add margin-left for spacing between the image and text -->
                                 <h6>{{ $item->title }}</h6>
-                                <a href="{{ asset('storage/'.$item->file) }}" class="fs-12 fw-500 color-primary"
-                                    download>Download</a>
+                                {{-- <a href="{{ asset('storage/'.$item->file) }}" class="fs-12 fw-500 color-primary"
+                                    download>Download</a> --}}
+                                <a href="{{ asset('storage/'.$item->file) }}"
+                                  class="fs-12 fw-500 color-primary"
+                                  download="{{ \Illuminate\Support\Str::slug($item->title) . '.' . pathinfo($item->file, PATHINFO_EXTENSION) }}">
+                                  Download
+                                </a>
+                                <a href="{{ route($prefix . '.order.file.delete', $item->id) }}"
+                                  class="fs-12 fw-500 delete_confirm" style="color: red;">
+                                   Remove
+                                </a>
                             </div>
                         </div>
                     @endforeach
@@ -562,7 +580,7 @@
                     enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
-                        <!-- Title Field -->
+                        {{-- <!-- Title Field -->
                         <div class="mb-3">
                             <label for="title" class="form-label">Title</label>
                             <input type="text" class="form-control" id="title" name="title"
@@ -572,7 +590,26 @@
                         <div class="mb-3">
                             <label for="file" class="form-label">Select File</label>
                             <input type="file" class="form-control" id="file" name="file" required>
-                        </div>
+                        </div> --}}
+                      <div id="file-upload-container">
+                          <!-- First group (static or prefilled) -->
+                          <div class="file-upload-group mb-3">
+                            <div class="d-flex justify-content-between align-items-baseline">
+                              <label class="form-label">Title</label>
+                              <button type="button" class="btn btn-outline-danger btn-sm remove-btn" style="display: none !important;">
+                                <i class="ti ti-trash"></i> Remove
+                              </button>
+                            </div>
+                              <input type="text" class="form-control mb-2" name="title[]" placeholder="Enter file title" required>
+                              <label class="form-label">Select File</label>
+                              <input type="file" class="form-control" name="file[]" required>
+                          </div>
+                      </div>
+
+                      <!-- Add More Button -->
+                      <button type="button" class="btn btn-outline-secondary btn-sm mb-3" id="addMoreFiles">
+                          <i class="ti ti-plus"></i> Add More
+                      </button>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -585,4 +622,44 @@
 
     {{-- @include('admin._partials/_modals/modal-edit-user')
             @include('admin._partials/_modals/modal-add-new-address') --}}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function () {
+          $('.remove-btn').hide();
+          function updateRemoveButtons() {
+            const groups = $('.file-upload-group');
+            if (groups.length > 1) {
+              groups.find('.remove-btn').show();
+            } else {
+              groups.find('.remove-btn').hide();
+            }
+          }
+
+          $('#addMoreFiles').on('click', function () {
+              const group = `
+                  <div class="file-upload-group mb-3">
+                      <div class="d-flex justify-content-between align-items-baseline">
+                        <label class="form-label">Title</label>
+                        <button type="button" class="btn btn-outline-danger btn-sm remove-btn" style="display: none;"><i class="ti ti-trash"></i> Remove</button>
+                      </div>
+                      <input type="text" class="form-control mb-2" name="title[]" placeholder="Enter file title" required>
+
+                      <label class="form-label">Select File</label>
+                      <input type="file" class="form-control mb-2" name="file[]" required>
+
+                  </div>
+              `;
+              $('#file-upload-container').append(group);
+              updateRemoveButtons();
+          });
+
+          // Handle remove click
+          $(document).on('click', '.remove-btn', function () {
+              $(this).closest('.file-upload-group').remove();
+              updateRemoveButtons();
+          });
+
+          updateRemoveButtons(); // Call on load
+      });
+  </script>
 @endsection

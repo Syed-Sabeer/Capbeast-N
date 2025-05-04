@@ -7,11 +7,14 @@
 <script src="{{ asset(mix('assets/vendor/libs/hammer/hammer.js')) }}"></script>
 <script src="{{ asset(mix('assets/vendor/libs/typeahead-js/typeahead.js')) }}"></script>
 <script src="{{ asset(mix('assets/vendor/js/menu.js')) }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
 @yield('vendor-script')
 <!-- END: Page Vendor JS-->
 <!-- BEGIN: Theme JS-->
 <script src="{{ asset(mix('assets/js/main.js')) }}"></script>
+
+<script src="{{ asset(mix('assets/vendor/libs/sweetalert2/sweetalert2.js')) }}"></script>
+<script src="{{ asset(mix('assets/js/extended-ui-sweetalert2.js')) }}"></script>
 
 <!-- END: Theme JS-->
 <!-- Pricing Modal JS-->
@@ -24,34 +27,33 @@
 <script>
     @if (Session::has('success'))
         Swal.fire({
+            title: '{{__("Success!")}}',
+            text: "{{ __(Session::get('success')) }}",
             icon: 'success',
-            title: 'Success!',
-            text: "{{ Session::get('success') }}",
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'OK'
-        });
-    @endif
-
-    @if (Session::has('error'))
-        Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: "{{ Session::get('error') }}",
-            confirmButtonColor: '#d33',
-            confirmButtonText: 'OK'
+            timer: 2000,
+            showConfirmButton: false
         });
     @endif
 
     @if (Session::has('message'))
         Swal.fire({
+            title: '{{__("Info!")}}',
+            text: "{{ __(Session::get('message')) }}",
             icon: 'info',
-            title: 'Info!',
-            text: "{{ Session::get('message') }}",
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'OK'
+            timer: 2000,
+            showConfirmButton: false
         });
     @endif
 
+    @if (Session::has('error'))
+        Swal.fire({
+            title: '{{__("Error!")}}',
+            text: "{{ __(Session::get('error')) }}",
+            icon: 'error',
+            timer: 2000,
+            showConfirmButton: false
+        });
+    @endif
     // Delete confirmation with cancel message
     document.querySelectorAll('.delete_confirm').forEach(button => {
         button.addEventListener('click', function(e) {
@@ -60,23 +62,26 @@
             const url = this.getAttribute('href'); // Get the href link
 
             Swal.fire({
-                title: "Are you sure?",
-                text: "You won't be able to revert this!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Yes, delete it!",
-                cancelButtonText: "No, keep it"
+              title: '{{__("Are you sure?")}}',
+              text: '{{__("You would not be able to revert this!")}}',
+              icon: 'warning',
+              showCancelButton: true,
+              cancelButtonText: '{{__("Cancel")}}',
+              confirmButtonText: '{{__("Yes, delete it!")}}',
+              customClass: {
+                  confirmButton: 'btn btn-primary me-3 waves-effect waves-light',
+                  cancelButton: 'btn btn-label-secondary waves-effect waves-light'
+              },
+              buttonsStyling: false
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.location.href = url; // Redirect to delete URL
                 } else if (result.dismiss === Swal.DismissReason.cancel) {
                     Swal.fire({
-                        icon: "info",
-                        title: "Cancelled",
-                        text: "Your data is safe!",
-                        confirmButtonColor: "#3085d6"
+                      title: "{{ __('Your data is safe!') }}",
+                      icon: "info",
+                      timer: 2000,
+                      showConfirmButton: false
                     });
                 }
             });

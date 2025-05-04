@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\OrderFiles;
 use App\Models\InternalStatus;
 use App\Models\OrderInternalStatus;
+use Illuminate\Support\Facades\File;
 
 class EcommerceOrderDetails extends Controller
 {
@@ -91,40 +92,78 @@ class EcommerceOrderDetails extends Controller
 
 
   public function orderfileupload(Request $request, $id)
-{
-    $request->validate([
-        'title' => 'required|string|max:255',
-        'file' => 'required|file|max:2048',
-    ]);
+  {
+    // dd($request->all());
+      $request->validate([
+          'title' => 'required|array',
+          'title.*' => 'string|max:255',
+          'file' => 'required|array',
+          'file.*' => 'file|max:2048',
+      ]);
 
-    $allowedExtensions = [
-        'jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx', 'zip',
-        'xls', 'xlsm', 'xlsx', 'xltx',
-        'dst', 'emb', 'exp', 'hus', 'jef', 'dgt', 'vp3', 'xxx', 'pcs', 'pes', 'sew'
-    ];
+      $allowedExtensions = [
+          'jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx', 'zip',
+          'xls', 'xlsm', 'xlsx', 'xltx',
+          'dst', 'emb', 'exp', 'hus', 'jef', 'dgt', 'vp3', 'xxx', 'pcs', 'pes', 'sew'
+      ];
 
-    $file = $request->file('file');
-    $extension = strtolower($file->getClientOriginalExtension());
+      foreach ($request->file('file') as $index => $file) {
+          // Get the file extension
+          $extension = strtolower($file->getClientOriginalExtension());
 
-    if (!in_array($extension, $allowedExtensions)) {
-        return back()->withErrors(['file' => 'This file type is not allowed.']);
-    }
+          // Check if the file extension is allowed
+          if (!in_array($extension, $allowedExtensions)) {
+              return back()->withErrors(['file' => 'One or more files have an invalid file type.'])->with('error','One or more files have an invalid file type.');
+          }
 
-    // Create a unique file name with original extension
-    $filename = uniqid('orderfile_') . '.' . $extension;
+          // Create a unique file name with the original extension
+          $filename = uniqid('orderfile_') . '.' . $extension;
 
-    // Store the file with original extension
-    $filePath = $file->storeAs('OrderFiles', $filename, 'public');
+          // Store the file
+          $filePath = $file->storeAs('OrderFiles', $filename, 'public');
 
-    // Save file details in DB
-    OrderFiles::create([
-        'order_id' => $id,
-        'title' => $request->input('title'),
-        'file' => $filePath,
-    ]);
+          // Save the file details in the database
+          OrderFiles::create([
+              'order_id' => $id,
+              'title' => $request->title[$index], // Get corresponding title for the file
+              'file' => $filePath,
+          ]);
+      }
 
-    return back()->with('success', 'File uploaded successfully!');
-}
+      // $file = $request->file('file');
+      // $extension = strtolower($file->getClientOriginalExtension());
 
-  
+      // if (!in_array($extension, $allowedExtensions)) {
+      //     return back()->withErrors(['file' => 'This file type is not allowed.']);
+      // }
+
+      // // Create a unique file name with original extension
+      // $filename = uniqid('orderfile_') . '.' . $extension;
+
+      // // Store the file with original extension
+      // $filePath = $file->storeAs('OrderFiles', $filename, 'public');
+
+      // // Save file details in DB
+      // OrderFiles::create([
+      //     'order_id' => $id,
+      //     'title' => $request->input('title'),
+      //     'file' => $filePath,
+      // ]);
+
+      return back()->with('success', 'File uploaded successfully!');
+  }
+
+  public function orderfiledelete($id)
+  {
+      $orderFile = OrderFiles::findOrFail($id);
+      $filePath = public_path('storage/' . $orderFile->file);
+      if (File::exists($filePath)) {
+          File::delete($filePath);
+      }
+      $orderFile->delete();
+
+      return back()->with('success', 'File deleted successfully!');
+  }
+
+
 }
