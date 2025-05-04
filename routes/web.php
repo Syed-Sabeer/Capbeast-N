@@ -67,7 +67,7 @@ Route::get('/cache', function() {
   $exitCode = Artisan::call('optimize');
   $exitCode = Artisan::call('optimize:clear');
   $exitCode = Artisan::call('route:cache');
-  
+
 
   return "Cache is cleared"; // you can replce your redirect
 });
@@ -210,7 +210,7 @@ foreach ($roles as $role => $prefix) {
         Route::get('/abandoncart/list', [EcommerceAbandonCartController::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-abandon-cart-list'));
         Route::get('/abandoncart/detail/{cartId}', [EcommerceAbandonCartController::class, 'view'])->name(Route::prefixed($prefix, 'app-ecommerce-abandon-cart-detail'));
         Route::post('/admin/abandoncart/{id}/status', [EcommerceAbandonCartController::class, 'updateStatusCart'])->name(Route::prefixed($prefix, 'admin.abandoncart.updateStatus'));
-        
+
 
         Route::post('/abandon-cart-comment', [EcommerceAbandonCartController::class, 'store'])->name('abandonCartComment.store');
 
@@ -329,10 +329,11 @@ foreach ($roles as $role => $prefix) {
         Route::get('/order/list', [EcommerceOrderList::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-order-list'));
         Route::get('/order/detail/{orderId}', [EcommerceOrderDetails::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-order-detail'));
         Route::post('/order/upload-file/{id}', [EcommerceOrderDetails::class, 'orderfileupload'])->name(Route::prefixed($prefix, 'order.file.upload'));
+        Route::get('/order/upload-file/delete/{id}', [EcommerceOrderDetails::class, 'orderfileDelete'])->name(Route::prefixed($prefix, 'order.file.delete'));
         Route::post('/order/{orderId}/update-status', [EcommerceOrderDetails::class, 'updateOrderStatus'])->name(Route::prefixed($prefix, 'order-status.update'));
 
         Route::post('/admin/orders/{id}/status', [EcommerceOrderList::class, 'updateStatus'])->name(Route::prefixed($prefix, 'admin.orders.updateStatus'));
-      
+
 
         Route::get('/customer/all', [EcommerceCustomerAll::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-customer-all'));
         Route::get('/customer/{id}', [EcommerceCustomerDetailsOverview::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-customer-detail'));
