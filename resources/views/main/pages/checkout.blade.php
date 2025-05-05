@@ -396,6 +396,9 @@
                             updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(
                                 firstRateUSD));
                         }
+
+                        // Hide the calculate shipping button since we have shipping options now
+                        $('#calculateShippingBtn').hide();
                     } else {
                         $('#shipping-methods-container').html(
                             '<div class="alert alert-danger">Unable to calculate shipping rates</div>'
@@ -956,6 +959,9 @@
                             });
                             $(`#shipping_${firstRate.postage_type_id}`).prop('checked', true).trigger(
                                 'change');
+
+                            // Hide the calculate shipping button since we have shipping options now
+                            $('#calculateShippingBtn').hide();
                         }
                     } else {
                         $('#shipping-methods-container').html(
@@ -1970,6 +1976,9 @@
                             });
                             $(`#shipping_${firstRate.postage_type_id}`).prop('checked', true).trigger(
                                 'change');
+
+                            // Hide the calculate shipping button since we have shipping options now
+                            $('#calculateShippingBtn').hide();
                         }
                     } else {
                         $('#shipping-methods-container').html(
@@ -2374,6 +2383,9 @@
                             });
                             $(`#shipping_${firstRate.postage_type_id}`).prop('checked', true).trigger(
                                 'change');
+
+                            // Hide the calculate shipping button since we have shipping options now
+                            $('#calculateShippingBtn').hide();
                         }
                     } else {
                         $('#shipping-methods-container').html(
@@ -2663,6 +2675,39 @@
 
         updateTaxRowsVisibility();
         document.getElementById('checkoutButton').addEventListener('click', proceedToCheckout);
+
+        // Function to reset shipping options when address changes
+        function resetShippingOptions() {
+            // Clear selected shipping method
+            $('#shipping-methods-container').html(
+                '<div class="alert alert-info">' +
+                '<i class="fas fa-info-circle me-2"></i> Please fill in all address fields and click the "Calculate Shipping" button above to see available shipping options.' +
+                '</div>'
+            );
+            // Reset shipping amount
+            $('#shipping-amount').text('0.00');
+            // Clear stored shipping selection
+            window.selectedShipping = null;
+            // Update totals
+            updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
+
+            // Show calculate shipping button again if it was hidden
+            $('#calculateShippingBtn').show();
+        }
+
+        // Add event listeners for all address fields
+        $('#postal_code, #address, #city, #state, #country').on('change', function() {
+            resetShippingOptions();
+        });
+
+        // Also reset when Select2 dropdowns change
+        $('#country').on('select2:select', function() {
+            resetShippingOptions();
+        });
+
+        $('#state').on('select2:select', function() {
+            resetShippingOptions();
+        });
     </script>
 
     <script>
