@@ -22,7 +22,7 @@ class Cart extends Model
   public function product()
   {
     return $this->belongsTo(Product::class, 'product_id')
-      ->select(['id', 'title', 'slug', 'selling_price', 'visibility',]);
+      ->select(['id', 'title','sku', 'slug', 'selling_price', 'visibility',]);
   }
   public function userCustomization()
   {

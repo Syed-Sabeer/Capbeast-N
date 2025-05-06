@@ -30,7 +30,7 @@ class OrderItem extends Model
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id')
-            ->select(['id', 'title', 'description']);
+            ->select(['id', 'title','sku', 'description']);
     }
 
     public function color()

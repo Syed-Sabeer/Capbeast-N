@@ -209,6 +209,7 @@
                                                                         <th>Price</th>
                                                                         <th>Quantity</th>
                                                                         <th>Size</th>
+                                                                        <th>SKU</th>
                                                                         <th>Color</th>
                                                                         <th>Customization Price</th>
                                                                         <th>Subtotal</th>
@@ -241,6 +242,7 @@
                                                                                 </td>
                                                                                 <td>{{ $quantity }}</td>
                                                                                 <td>{{ $cartItem->size ?? 'OSFA' }}</td>
+                                                                                <td>{{ $cartItem->product->sku ?? 'No SKU Found' }}</td>
                                                                                 <td>
                                                                                     {{ $cartItem->color->color_name_2 ? $cartItem->color->color_name_1 . ' & ' . $cartItem->color->color_name_2 : $cartItem->color->color_name_1 ?? 'N/A' }}
                                                                                 </td>

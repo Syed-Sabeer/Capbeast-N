@@ -201,6 +201,7 @@
                             <tr>
                                 <th></th>
                                 <th>Products</th>
+                                <th>SKU</th>
                                 <th>Qty</th>
                                 <th>Size</th>
                                 <th>Color</th>
@@ -214,8 +215,10 @@
                             @foreach ($order->items as $item)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $item->product->title }}</td>
-                                    <td>{{ $item->quantity }}</td>
+                                    {{-- @dd($item) --}}
+                                    <td>{{ $item->product->title ?? 'No Title Found' }}</td>
+                                    <td>{{ $item->product->sku ?? 'No SKU Found' }}</td>
+                                    <td>{{ $item->quantity ?? 'No Quantity Found' }}</td>
                                     <td>{{ $item->size ?? 'OSFA' }}</td>
                                     <td>
                                         {{ $item->color->color_name_2 ? $item->color->color_name_1 . ' & ' . $item->color->color_name_2 : $item->color->color_name_1 }}

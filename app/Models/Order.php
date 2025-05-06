@@ -61,7 +61,7 @@ class Order extends Model
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id')
-            ->select(['id', 'title', 'description', 'visibility']);
+            ->select(['id', 'title','sku', 'description', 'visibility']);
     }
 
     public function Order_files()
