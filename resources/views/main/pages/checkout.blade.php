@@ -898,14 +898,14 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success && data.shipping?.data?.length) {
-                        const shippingAmount = data.shipping.data[0].rate;
+                    if (data.success && data.shipping?.rates?.length) {
+                        const shippingAmount = data.shipping.rates[0].rate;
                         document.getElementById('shipping-amount').textContent = shippingAmount.toFixed(2);
                         updateTaxAndTotal(getSubtotal(), appliedDiscount, shippingAmount);
 
                         // Display shipping methods
                         let shippingHtml = '<div class="shipping-methods-list">';
-                        data.shipping.data.forEach(rate => {
+                        data.shipping.rates.forEach(rate => {
                             const rateUSD = (rate.total * 0.75).toFixed(2);
                             shippingHtml += `
                                 <div class="form-check mb-2">
@@ -950,8 +950,8 @@
                         });
 
                         // Select the first shipping method by default
-                        if (data.shipping.data.length > 0) {
-                            const firstRate = data.shipping.data[0];
+                        if (data.shipping.rates.length > 0) {
+                            const firstRate = data.shipping.rates[0];
                             const firstRateUSD = (firstRate.total * 0.75).toFixed(2);
                             console.log('Selecting first shipping method:', {
                                 rate: firstRate,
@@ -998,6 +998,44 @@
                     updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
                 });
         }
+
+        // Function to reset shipping options when address changes
+        function resetShippingOptions() {
+            // Clear selected shipping method
+            $('#shipping-methods-container').html(
+                '<div class="alert alert-info">' +
+                '<i class="fas fa-info-circle me-2"></i> Please fill in all address fields and click the "Calculate Shipping" button above to see available shipping options.' +
+                '</div>'
+            );
+            // Reset shipping amount
+            $('#shipping-amount').text('0.00');
+            // Clear stored shipping selection
+            window.selectedShipping = null;
+            // Update totals
+            updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
+
+            // Show calculate shipping button again if it was hidden
+            $('#calculateShippingBtn').show();
+        }
+
+        // Add event listeners for all address fields
+        $('#postal_code, #address, #city, #state, #country').on('change', function() {
+            resetShippingOptions();
+        });
+
+        // Also reset when Select2 dropdowns change
+        $('#country').on('select2:select', function() {
+            resetShippingOptions();
+        });
+
+        $('#state').on('select2:select', function() {
+            resetShippingOptions();
+        });
+
+        // Connect Calculate Shipping button to the shipping calculation function
+        $('#calculateShippingBtn').on('click', function() {
+            calculateShippingLive();
+        });
     });
 </script>
 
@@ -1915,14 +1953,14 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success && data.shipping?.data?.length) {
-                        const shippingAmount = data.shipping.data[0].rate;
+                    if (data.success && data.shipping?.rates?.length) {
+                        const shippingAmount = data.shipping.rates[0].rate;
                         document.getElementById('shipping-amount').textContent = shippingAmount.toFixed(2);
                         updateTaxAndTotal(getSubtotal(), appliedDiscount, shippingAmount);
 
                         // Display shipping methods
                         let shippingHtml = '<div class="shipping-methods-list">';
-                        data.shipping.data.forEach(rate => {
+                        data.shipping.rates.forEach(rate => {
                             const rateUSD = (rate.total * 0.75).toFixed(2);
                             shippingHtml += `
                                 <div class="form-check mb-2">
@@ -1962,20 +2000,18 @@
                             };
 
                             // Update total with new shipping price
-                            updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(
-                                selectedPrice));
+                            updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(selectedPrice));
                         });
 
                         // Select the first shipping method by default
-                        if (data.shipping.data.length > 0) {
-                            const firstRate = data.shipping.data[0];
+                        if (data.shipping.rates.length > 0) {
+                            const firstRate = data.shipping.rates[0];
                             const firstRateUSD = (firstRate.total * 0.75).toFixed(2);
                             console.log('Selecting first shipping method:', {
                                 rate: firstRate,
                                 price: firstRateUSD
                             });
-                            $(`#shipping_${firstRate.postage_type_id}`).prop('checked', true).trigger(
-                                'change');
+                            $(`#shipping_${firstRate.postage_type_id}`).prop('checked', true).trigger('change');
 
                             // Hide the calculate shipping button since we have shipping options now
                             $('#calculateShippingBtn').hide();
@@ -2015,6 +2051,44 @@
                     updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
                 });
         }
+
+        // Function to reset shipping options when address changes
+        function resetShippingOptions() {
+            // Clear selected shipping method
+            $('#shipping-methods-container').html(
+                '<div class="alert alert-info">' +
+                '<i class="fas fa-info-circle me-2"></i> Please fill in all address fields and click the "Calculate Shipping" button above to see available shipping options.' +
+                '</div>'
+            );
+            // Reset shipping amount
+            $('#shipping-amount').text('0.00');
+            // Clear stored shipping selection
+            window.selectedShipping = null;
+            // Update totals
+            updateTaxAndTotal(getSubtotal(), appliedDiscount, 0);
+
+            // Show calculate shipping button again if it was hidden
+            $('#calculateShippingBtn').show();
+        }
+
+        // Add event listeners for all address fields
+        $('#postal_code, #address, #city, #state, #country').on('change', function() {
+            resetShippingOptions();
+        });
+
+        // Also reset when Select2 dropdowns change
+        $('#country').on('select2:select', function() {
+            resetShippingOptions();
+        });
+
+        $('#state').on('select2:select', function() {
+            resetShippingOptions();
+        });
+
+        // Connect Calculate Shipping button to the shipping calculation function
+        $('#calculateShippingBtn').on('click', function() {
+            calculateShippingLive();
+        });
 
         // Handle coupon application
         document.getElementById('applyCoupon').addEventListener('click', function() {
@@ -2322,14 +2396,14 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success && data.shipping?.data?.length) {
-                        const shippingAmount = data.shipping.data[0].rate;
+                    if (data.success && data.shipping?.rates?.length) {
+                        const shippingAmount = data.shipping.rates[0].rate;
                         document.getElementById('shipping-amount').textContent = shippingAmount.toFixed(2);
                         updateTaxAndTotal(getSubtotal(), appliedDiscount, shippingAmount);
 
                         // Display shipping methods
                         let shippingHtml = '<div class="shipping-methods-list">';
-                        data.shipping.data.forEach(rate => {
+                        data.shipping.rates.forEach(rate => {
                             const rateUSD = (rate.total * 0.75).toFixed(2);
                             shippingHtml += `
                                 <div class="form-check mb-2">
@@ -2369,20 +2443,18 @@
                             };
 
                             // Update total with new shipping price
-                            updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(
-                                selectedPrice));
+                            updateTaxAndTotal(getSubtotal(), appliedDiscount, parseFloat(selectedPrice));
                         });
 
                         // Select the first shipping method by default
-                        if (data.shipping.data.length > 0) {
-                            const firstRate = data.shipping.data[0];
+                        if (data.shipping.rates.length > 0) {
+                            const firstRate = data.shipping.rates[0];
                             const firstRateUSD = (firstRate.total * 0.75).toFixed(2);
                             console.log('Selecting first shipping method:', {
                                 rate: firstRate,
                                 price: firstRateUSD
                             });
-                            $(`#shipping_${firstRate.postage_type_id}`).prop('checked', true).trigger(
-                                'change');
+                            $(`#shipping_${firstRate.postage_type_id}`).prop('checked', true).trigger('change');
 
                             // Hide the calculate shipping button since we have shipping options now
                             $('#calculateShippingBtn').hide();
@@ -2707,6 +2779,11 @@
 
         $('#state').on('select2:select', function() {
             resetShippingOptions();
+        });
+
+        // Connect Calculate Shipping button to the shipping calculation function
+        $('#calculateShippingBtn').on('click', function() {
+            calculateShippingLive();
         });
     </script>
 

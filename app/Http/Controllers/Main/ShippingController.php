@@ -155,7 +155,7 @@ class ShippingController extends Controller
                     Log::info('No shipping rates returned by API, using fallback rates for country: ' . $country);
 
                     // Get package weight for price calculations
-                    $weight = $payload['weight'] ?? 16; // Default to 16 lbs if not specified
+                    $weight = $payload['weight'] ?? 0; // Use actual weight instead of hardcoded value
 
                     // Base price calculation (increases with weight but capped)
                     $basePrice = min(20 + ($weight * 0.5), 60);
