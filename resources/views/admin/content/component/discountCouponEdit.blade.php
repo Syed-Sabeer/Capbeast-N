@@ -78,23 +78,23 @@
                         <input type="text" name="code" class="form-control" value="{{ $discountCoupon->code }}" required>
                     </div>
 
-                    <div class="mb-3">
+                    {{-- <div class="mb-3">
                         <label class="form-label">Coupon Country</label>
                         <select name="coupon_country" class="select2 form-select form-select-lg">
                             <option value="0" {{ $discountCoupon->coupon_country == 0 ? 'selected' : '' }}>All</option>
                             <option value="1" {{ $discountCoupon->coupon_country == 1 ? 'selected' : '' }}>CANADA</option>
                             <option value="2" {{ $discountCoupon->coupon_country == 2 ? 'selected' : '' }}>USA</option>  
                         </select>
-                    </div>
+                    </div> --}}
 
-                    <div class="mb-3">
+                    {{-- <div class="mb-3">
                         <label class="form-label">Coupon User</label>
                         <select name="coupon_user" class="select2 form-select form-select-lg">
                             <option value="0" {{ $discountCoupon->coupon_user == 0 ? 'selected' : '' }}>Both</option>
                             <option value="1" {{ $discountCoupon->coupon_user == 1 ? 'selected' : '' }}>Reseller</option>
                             <option value="2" {{ $discountCoupon->coupon_user == 2 ? 'selected' : '' }}>Regular Customer</option>  
                         </select>
-                    </div>
+                    </div> --}}
 
                     <div class="mb-3">
                         <label class="form-label">Coupon For</label>

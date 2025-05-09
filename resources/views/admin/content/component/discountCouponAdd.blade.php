@@ -79,7 +79,7 @@
                             <input type="text" name="code" class="form-control" placeholder="Enter title" required>
                         </div>
 
-                        <div class="mb-3">
+                        {{-- <div class="mb-3">
                             <label class="form-label">Coupon Country</label>
                             <select name="coupon_country" id="couponCountry" class="select2 form-select form-select-lg" required>
                                 <option value="0">All</option>
@@ -87,14 +87,14 @@
                                     <option value="{{ $code }}">{{ $name }}</option>
                                 @endforeach
                             </select>
-                        </div>
+                        </div> --}}
                        
 
                         <div class="mb-3">
                             <label class="form-label">Coupon For</label>
                             <select name="discount_type" id="couponFor" class="select2 form-select form-select-lg">
                                 <option value="">Select Status</option>
-                                <option value="1">Products</option>
+                                <option value="1">Products + Digitization</option>
                                 {{-- <option value="3">Printing</option>   --}}
                             </select>
                         </div>

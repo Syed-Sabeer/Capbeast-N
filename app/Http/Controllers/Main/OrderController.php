@@ -1022,11 +1022,12 @@ class OrderController extends Controller
 
       if ($coupon->is_all == 1) {
         // Apply the discount for all products, even if product_id is null
-        $currentDiscount = ($item->product->selling_price * $coupon->percentage / 100) * $item->quantity;
+        //                        28 + 12 = 40
+        $currentDiscount = ((($item->product->selling_price) +($item->userCustomization->price)) * ($coupon->percentage / 100)) * $item->quantity;
       } else {
         // Apply discount only for specific product
         if ($item->product_id == $coupon->discountable_id) {
-          $currentDiscount = ($item->product->selling_price * $coupon->percentage / 100) * $item->quantity;
+          $currentDiscount = ((($item->product->selling_price) +($item->userCustomization->price)) * ($coupon->percentage / 100)) * $item->quantity;
         }
       }
 

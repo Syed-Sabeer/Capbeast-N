@@ -45,7 +45,7 @@ class DiscountCouponsController extends Controller
             $request->validate([
                 'title' => 'required|string',
                 'code' => 'required|string|unique:discount_coupon',
-                'coupon_country' => 'required|string',
+                'coupon_country' => 'nullable|string',
 
                 'discount_type' => 'required|integer|in:1,3',
                 'item_id' => 'required|integer',
