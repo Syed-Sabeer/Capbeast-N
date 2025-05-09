@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin\Apps;
 
 use App\Http\Controllers\Controller;
+use App\Models\InternalStatus;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderComment;
+use App\Models\OrderInternalStatus;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -21,10 +23,14 @@ class EcommerceOrderList extends Controller
     $shippedCount = Order::where('status', 3)->count();
     $canceledCount = Order::where('status', 4)->count();
 
-    // Fetch orders with related user and comments
-    $orders = Order::with(['user', 'comments' => function ($query) {
-      $query->with('admin')->latest();
-    }])->paginate(25);
+    
+    $orders = Order::with([
+      'user',
+      'comments' => function ($query) {
+          $query->with('admin')->latest();
+      },
+      'latestInternalStatus.internalStatus'
+  ])->paginate(25);
 
     // Pass all required variables to the view
     return view('admin.content.apps.app-ecommerce-order-list', compact(

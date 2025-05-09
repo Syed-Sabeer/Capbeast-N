@@ -111,6 +111,7 @@
           <th>order placed at</th>
           <th>customers</th>
           <th>Total Amount</th>
+          <th>internal status</th>
            <th>user status</th>
          {{-- <th>method</th> --}}
           <th>actions</th>
@@ -125,6 +126,15 @@
           <td>{{$order->created_at}}</td>
           <td>{{$order->user->email}}</td> <!-- Displaying user's email -->
           <td>{{$order->total_price}} $</td>
+          <td>
+            <!-- Using the OrderStatus component -->
+            @if ($order->latestInternalStatus && $order->latestInternalStatus->internalStatus)
+            <span class="badge bg-label-info">{{ $order->latestInternalStatus->internalStatus->title }}</span>
+        @else
+            <span class="badge bg-label-warning">No Status Set</span>
+        @endif
+        
+          </td>
           <td>
             <!-- Using the OrderStatus component -->
             <x-order-status :status="$order->status" />

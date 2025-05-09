@@ -91,4 +91,10 @@ class Order extends Model
     {
         return $this->hasMany(OrderComment::class, 'order_id');
     }
+
+    public function latestInternalStatus()
+{
+    return $this->hasOne(OrderInternalStatus::class)->latestOfMany('updated_at');
+}
+
 }
