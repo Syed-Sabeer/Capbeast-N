@@ -6,12 +6,12 @@
         href="https://fonts.googleapis.com/css?family=Aldrich|Allan|Allerta|Allerta+Stencil|Anton|Archivo+Black|Arvo|Atomic+Age|Audiowide|Bangers|Berkshire+Swash|Bitter|Black+Ops+One|Butcherman|Calligraffitti|Ceviche+One|Changa+One|Chewy|Comfortaa|Coming+Soon|Contrail+One|Courgette|Coustard|Crafty+Girls|Domine|Fjalla+One|Fontdiner+Swanky|Francois+One|Geostar+Fill|Gloria+Hallelujah|Graduate|Grand+Hotel|Griffy|Hanalei+Fill|Indie+Flower|Jockey+One|Kaushan+Script|Keania+One|La+Belle+Aurore|Leckerli+One|Lilita+One|Lily+Script+One|Lobster|Marck+Script|Merienda+One|Mountains+of+Christmas|Mr+Dafoe|Nosifer|Nunito|Orbitron|Pacifico|Passero+One|Pathway+Gothic+One|Permanent+Marker|Piedra|Pirata+One|Plaster|Playball|Press+Start+2P|Quantico|Racing+Sans+One|Rationale|Rock+Salt|Ruslan+Display|Sancreek|Shadows+Into+Light+Two|Shojumaru|Sigmar+One|Six+Caps|Slackey|Special+Elite|UnifrakturCook|UnifrakturMaguntia|Waiting+for+the+Sunrise|Yanone+Kaffeesatz">
 
 
-    @component('main.components.breadcrumb', [
+    {{-- @component('main.components.breadcrumb', [
         'pageTitle' => 'Product Details',
         'pageRoute' => '',
         'imageURL' => asset('assetsMain/images/PDetails.jpg'), // Evaluated here
     ])
-    @endcomponent
+    @endcomponent --}}
 
     <style>
         .avatar-xs {
@@ -100,7 +100,7 @@
 
     <section class="section">
         <div class="container">
-            <div class="row gx-2">
+            <div class="row gx-2" style="margin-top: 5%">
                 <div class="slider-container mt-3">
                     {{-- <button class="ProductSliderArrow left" onclick="changeSlide(-1)">&lt;</button> --}}
 
