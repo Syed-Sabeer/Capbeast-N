@@ -120,10 +120,16 @@
 </div>
 
 
-                            <div class="col-lg-12">
+                            <div class="col-lg-6">
                                 <div class="form-group mt-3">
                                     <label for="email" class="form-label">Email Address<span class="text-danger">*</span></label>
                                     <input type="email" class="form-control"  placeholder="Enter Email" name="email">
+                                </div>
+                            </div>
+                             <div class="col-lg-6">
+                                <div class="form-group mt-3">
+                                    <label for="phone" class="form-label">Phone<span class="text-danger">*</span></label>
+                                    <input type="phone" class="form-control"  placeholder="Enter Phone" name="phone">
                                 </div>
                             </div>
                              <div class="col-lg-12">
