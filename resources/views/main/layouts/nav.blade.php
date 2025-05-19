@@ -95,6 +95,10 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('home') }}" data-key="t-contact">Home</a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('quote') }}" data-key="t-quote">Request A Quote</a>
+                        </li>
                    
                         <li class="nav-item dropdown dropdown-hover dropdown-mega-full">
                             <a class="nav-link dropdown-toggle" href="{{ url('products/category') }}" role="button">

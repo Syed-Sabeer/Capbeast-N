@@ -51,6 +51,7 @@ use App\Http\Controllers\Admin\components\InternalStatusController;
 use App\Http\Controllers\Admin\components\DiscountCouponsController;
 use App\Http\Controllers\Main\DeliveryInfoController;
 use App\Http\Controllers\Main\PrivacyPolicyController;
+use App\Http\Controllers\Main\QuoteController;
 use App\Http\Controllers\Main\ReturnController;
 use App\Http\Controllers\Main\ShippingController;
 use App\Http\Controllers\Main\ShipmentController;
@@ -79,6 +80,9 @@ Route::middleware(['web'])->group(function () {
   Route::middleware('auth')->group(function () {
 
 
+    Route::get('/customizer/prepare', [CustomizerController::class, 'prepareFromQuote'])->name('customizer.prepare');
+
+
 
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
     Route::post('/cart/update', [CartController::class, 'updateQuantity'])->name('cart.update');
@@ -102,6 +106,11 @@ Route::middleware(['web'])->group(function () {
     Route::get('/shipping/countries', [ShippingController::class, 'getCountries'])->name('shipping.countries');
     Route::post('/shipping/address/validate', [ShippingController::class, 'validateAddress'])->name('shipping.validate.address');
     Route::post('/shipping/discount', [ShippingController::class, 'applyShippingDiscount'])->name('shipping.discount');
+
+    Route::get('/quote', [QuoteController::class, 'index'])->name('quote');
+Route::post('/quote/submit', [QuoteController::class, 'submit'])->name('quote.submit');
+Route::get('/get-product-colors/{id}', [QuoteController::class, 'getProductColors'])->name('get.product.colors');
+
 
 
 
@@ -168,6 +177,7 @@ Route::middleware(['web'])->group(function () {
   Route::get('/delivery-info', [DeliveryInfoController::class, 'index'])->name('deliveryinfo');
   Route::get('/home', [HomeController::class, 'index'])->name('home');
   Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+  
   Route::get('/faqs', [FAQsController::class, 'index'])->name('faqs');
 
   // Routes for registration that do not require authentication

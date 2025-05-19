@@ -992,10 +992,30 @@
                                 </strong>
                             </span>
                         </div>
-                        <button class="btn btn-primary add-to-cart-btn" style="width: 35%">
-                            <i class="fas fa-shopping-cart me-2"></i>ADD TO CART <br> $<span
-                                id="total-price">{{ isset($product) ? $product->selling_price : '0.00' }}</span>
-                        </button>
+
+@if($userCustomization->is_quote)
+<div class="d-block">
+    <div class="mb-3" style="width: 100%">
+        <button class="btn btn-success w-100">
+            <i class="fas fa-save me-2"></i>Auto Saved Successfully !
+        </button>
+    </div>
+
+    <div style="width: 100%">
+        <a href="{{ route('home') }}" class="btn btn-primary w-100">
+            <i class="fas fa-home me-2"></i>Go To Home
+        </a>
+    </div>
+</div>
+
+
+@else
+    <button class="btn btn-primary add-to-cart-btn" style="width: 35%">
+        <i class="fas fa-shopping-cart me-2"></i>ADD TO CART <br> $<span
+            id="total-price">{{ isset($product) ? $product->selling_price : '0.00' }}</span>
+    </button>
+@endif
+
                     </div>
 
                     <div class="mt-4 p-3 bg-light rounded" style="margin-bottom: 100px !important;">

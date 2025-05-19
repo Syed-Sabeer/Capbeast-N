@@ -80,35 +80,10 @@ class CustomizerController extends Controller
         $userCustomization->product_id = $product->id;
         $userCustomization->quantity = $request->quantity;
         $userCustomization->size = $request->size;
+      if ($request->has('from_quote') && $request->get('from_quote') == 1) {
+    $userCustomization->is_quote = 1;
+}
 
-        // Image fields from product_color table
-        // $imageFields = ['front_image', 'back_image', 'left_image', 'right_image'];
-        // foreach ($imageFields as $imageField) {
-        //   // Check if the productColor has an image path for the current field
-        //   if ($productColor->$imageField) {
-        //     // Get the full path to the current image (storage path)
-        //     $currentImagePath = public_path('storage/' . $productColor->$imageField);
-
-        //     // If the image exists, copy it to the 'customizations' folder
-        //     if (file_exists($currentImagePath)) {
-        //       $newImageName = time() . '_' . basename($productColor->$imageField);
-        //       $customizationDirectory = public_path('storage/customizations');
-
-        //       // Ensure the customizations directory exists
-        //       if (!is_dir($customizationDirectory)) {
-        //         mkdir($customizationDirectory, 0755, true);
-        //       }
-
-        //       // Copy the file to the customizations folder
-        //       copy($currentImagePath, $customizationDirectory . '/' . $newImageName);
-
-        //       // Save the new path to the user_customizations table
-        //       $userCustomization->$imageField = 'storage/customizations/' . $newImageName;
-        //     } else {
-        //       throw new \Exception("Image file does not exist at the specified path: " . $currentImagePath);
-        //     }
-        //   }
-        // }
 
         $imageFields = [
           'front_image' => 'is_front',
@@ -146,6 +121,20 @@ class CustomizerController extends Controller
 
         // Save the user customization record
         $userCustomization->save();
+        // Check if this was a quote submission
+if ($userCustomization->is_quote == 1 && session()->has('quote_form')) {
+    $quoteData = session('quote_form');
+
+    // Attach the customization ID to the quote data
+    $quoteData['customization_id'] = $userCustomization->id;
+
+    // Save the quote
+    \App\Models\Quote::create($quoteData); // Make sure you imported the Quote model at the top
+
+    // Clear session data to avoid duplicate quote creation
+    session()->forget('quote_form');
+}
+
       }
 
       return response()->json([
