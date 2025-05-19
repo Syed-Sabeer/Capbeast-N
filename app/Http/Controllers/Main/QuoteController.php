@@ -46,6 +46,15 @@ class QuoteController extends Controller
             'color_id' => 'required|exists:product_color,id',
             'quantity' => 'sometimes|integer|min:1',
             'size' => 'sometimes|string|nullable',
+            'firstname' => 'required|string',
+            'lastname' => 'required|string',
+            'email' => 'required|email',
+            'address' => 'required|string',
+            'country' => 'required|string',
+            'state' => 'required|string',
+            'city' => 'required|string',
+            'zip' => 'required|string',
+            'details' => 'required|string',
         ]);
 
         $userId = auth()->id();
@@ -74,17 +83,29 @@ class QuoteController extends Controller
 
         // Call the CustomizerController's add method
         $response = app(CustomizerController::class)->add($customizerRequest);
-
-        // Handle response and redirect
-        $data = $response->getData(true);
-        if (!empty($data['redirect_url'])) {
-            return redirect($data['redirect_url']);
+        
+        // Get the response data
+        $responseData = $response->getData(true);
+        
+        // Handle error responses
+        if (isset($responseData['success']) && !$responseData['success']) {
+            throw new Exception($responseData['message'] ?? 'Failed to process customization');
         }
 
-        return redirect()->route('customizer.index', ['id' => $data['data']['id']]);
+        // Handle successful response
+        if (isset($responseData['redirect_url'])) {
+            return redirect($responseData['redirect_url']);
+        }
+
+        if (isset($responseData['data']['id'])) {
+            return redirect()->route('customizer.index', ['id' => $responseData['data']['id']]);
+        }
+
+        throw new Exception('Invalid response from customizer');
+
     } catch (Exception $e) {
         \Log::error('QuoteController@submit error: ' . $e->getMessage());
-        return redirect()->back()->with('error', 'An error occurred while submitting the quote.');
+        return redirect()->back()->with('error', 'An error occurred while submitting the quote.')->withInput();
     }
 }
 
