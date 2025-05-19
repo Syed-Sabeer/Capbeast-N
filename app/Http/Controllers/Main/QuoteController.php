@@ -38,7 +38,7 @@ class QuoteController extends Controller
         }
     }
 
- public function submit(Request $request)
+public function submit(Request $request)
 {
     try {
         $request->validate([
@@ -81,13 +81,7 @@ class QuoteController extends Controller
             return redirect($data['redirect_url']);
         }
 
-        if (isset($data['data']['id'])) {
-    return redirect()->route('customizer.index', ['id' => $data['data']['id']]);
-} else {
-    \Log::error('QuoteController@submit error: Missing "id" in CustomizerController response', ['response_data' => $data]);
-    return redirect()->back()->with('error', 'Something went wrong while processing your customization.');
-}
-
+        return redirect()->route('customizer.index', ['id' => $data['data']['id']]);
     } catch (Exception $e) {
         \Log::error('QuoteController@submit error: ' . $e->getMessage());
         return redirect()->back()->with('error', 'An error occurred while submitting the quote.');
