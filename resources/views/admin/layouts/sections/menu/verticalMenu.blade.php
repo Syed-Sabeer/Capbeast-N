@@ -235,6 +235,19 @@
                 </a>
             </li>
 
+
+             <li
+                class="menu-item {{ in_array($currentRouteName, [
+                    Route::prefixed($prefix, 'app-ecommerce-quote-list'),
+                    Route::prefixed($prefix, 'app-ecommerce-quote-detail'),
+                ])
+                    ? 'active open'
+                    : '' }}">
+                <a href="{{ url("backend/$prefix/quote/list") }}" class="menu-link">
+                    <div>Quote</div>
+                </a>
+            </li>
+
             {{-- Customer --}}
             <li
                 class="menu-item {{ in_array($currentRouteName, [

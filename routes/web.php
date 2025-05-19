@@ -45,6 +45,7 @@ use App\Http\Controllers\Admin\apps\CustomizerDesignController;
 use App\Http\Controllers\Admin\apps\CustomizerColorController;
 use App\Http\Controllers\Admin\apps\CustomizerPriceController;
 use App\Http\Controllers\Admin\apps\EcommerceAbandonCartController;
+use App\Http\Controllers\Admin\Apps\EcommerceQuoteController;
 use App\Http\Controllers\Admin\components\TVQTaxPricingController;
 use App\Http\Controllers\Admin\components\TPSTaxPricingController;
 use App\Http\Controllers\Admin\components\InternalStatusController;
@@ -223,6 +224,9 @@ foreach ($roles as $role => $prefix) {
 
 
         Route::post('/abandon-cart-comment', [EcommerceAbandonCartController::class, 'store'])->name('abandonCartComment.store');
+
+             Route::get('/quote/list', [EcommerceQuoteController::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-quote-list'));
+        Route::get('/quote/detail/{cartId}', [EcommerceQuoteController::class, 'view'])->name(Route::prefixed($prefix, 'app-ecommerce-quote-detail'));
 
         Route::get('/category', [EcommerceProductCategory::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-product-category'));
         Route::get('/category/add', [EcommerceProductCategory::class, 'create'])->name(Route::prefixed($prefix, 'category.add'));
