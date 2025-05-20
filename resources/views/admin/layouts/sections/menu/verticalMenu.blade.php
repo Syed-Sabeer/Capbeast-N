@@ -239,7 +239,7 @@
              <li
                 class="menu-item {{ in_array($currentRouteName, [
                     Route::prefixed($prefix, 'app-ecommerce-quote-list'),
-                    Route::prefixed($prefix, 'app-ecommerce-quote-detail'),
+                    
                 ])
                     ? 'active open'
                     : '' }}">

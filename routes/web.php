@@ -226,7 +226,7 @@ foreach ($roles as $role => $prefix) {
         Route::post('/abandon-cart-comment', [EcommerceAbandonCartController::class, 'store'])->name('abandonCartComment.store');
 
              Route::get('/quote/list', [EcommerceQuoteController::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-quote-list'));
-        Route::get('/quote/detail/{quoteId}', [EcommerceQuoteController::class, 'view'])->name(Route::prefixed($prefix, 'app-ecommerce-quote-detail'));
+        
 
         Route::get('/category', [EcommerceProductCategory::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-product-category'));
         Route::get('/category/add', [EcommerceProductCategory::class, 'create'])->name(Route::prefixed($prefix, 'category.add'));

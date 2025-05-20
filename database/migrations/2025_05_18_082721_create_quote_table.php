@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('state')->nullable();
             $table->string('city')->nullable();
             $table->string('zip')->nullable();
+            $table->string('qty')->nullable();
             $table->string('phone')->nullable();
             $table->text('details')->nullable();
             

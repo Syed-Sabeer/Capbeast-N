@@ -98,7 +98,7 @@
                                     <input name="lastname"  type="text" class="form-control" placeholder="Enter Last Name" required>
                                 </div>
                             </div>
-                            <div class="col-lg-12">
+                            <div class="col-lg-8">
     <div class="form-group mt-3">
         <label for="product_id" class="form-label">Select Product<span class="text-danger">*</span></label>
       <select name="product_id" id="select2Basic" class="select2 form-select form-select-lg">
@@ -113,6 +113,12 @@
                             </select>
     </div>
 </div>
+<div class="col-lg-4">
+                                <div class="form-group mt-3">
+                                    <label for="qty" class="form-label">Quantity<span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control"  placeholder="Enter Quantity" name="qty">
+                                </div>
+                            </div>
 
 <div class="col-lg-12 mt-4" id="product-images-container" style="display: none;">
     <h5>Available Colors:</h5>
