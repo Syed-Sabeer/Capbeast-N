@@ -45,7 +45,7 @@ use App\Http\Controllers\Admin\apps\CustomizerDesignController;
 use App\Http\Controllers\Admin\apps\CustomizerColorController;
 use App\Http\Controllers\Admin\apps\CustomizerPriceController;
 use App\Http\Controllers\Admin\apps\EcommerceAbandonCartController;
-use App\Http\Controllers\Admin\Apps\EcommerceQuoteController;
+use App\Http\Controllers\Admin\apps\EcommerceQuoteController;
 use App\Http\Controllers\Admin\components\TVQTaxPricingController;
 use App\Http\Controllers\Admin\components\TPSTaxPricingController;
 use App\Http\Controllers\Admin\components\InternalStatusController;
