@@ -631,23 +631,26 @@
         .align-btn:hover {
             background: #2b6bcc;
         }
+
         /* .option-bar .align-area, .product-details-area, .add-to-cart-btn{
-            width: 80%;
-          } */
+                    width: 80%;
+                  } */
         @media (max-width: 768px) {
-          .option-bar {
-            flex-direction: column;
-          }
-          .option-bar .align-area, .product-details-area, .add-to-cart-btn{
-            width: 80% !important;
-          }
+            .option-bar {
+                flex-direction: column;
+            }
 
-          .align-btn {
-              padding: 6px 8px;
-              font-size: 16px;
-          }
-      }
+            .option-bar .align-area,
+            .product-details-area,
+            .add-to-cart-btn {
+                width: 80% !important;
+            }
 
+            .align-btn {
+                padding: 6px 8px;
+                font-size: 16px;
+            }
+        }
     </style>
     <section class="section">
         <div class="container-fluid">
@@ -951,22 +954,22 @@
                                 @endif
                             @endif
                         </div>
-                      </div>
-                      <div class="option-bar mt-4 d-flex justify-content-between align-items-center p-3">
+                    </div>
+                    <div class="option-bar mt-4 d-flex justify-content-between align-items-center p-3">
                         <div class="align-area" style="width: 30%">
-                          <div class="row">
-                            <div class="col-12 d-flex justify-content-center mb-2">
-                              <button class="align-btn" data-align="top">↑</button>
+                            <div class="row">
+                                <div class="col-12 d-flex justify-content-center mb-2">
+                                    <button class="align-btn" data-align="top">↑</button>
+                                </div>
+                                <div class="col-12 d-flex justify-content-center">
+                                    <button class="align-btn" data-align="left">←</button>
+                                    <button class="align-btn" data-align="center">⨀</button>
+                                    <button class="align-btn" data-align="right">→</button>
+                                </div>
+                                <div class="col-12 d-flex justify-content-center mt-2">
+                                    <button class="align-btn" data-align="bottom">↓</button>
+                                </div>
                             </div>
-                            <div class="col-12 d-flex justify-content-center">
-                              <button class="align-btn" data-align="left">←</button>
-                              <button class="align-btn" data-align="center">⨀</button>
-                              <button class="align-btn" data-align="right">→</button>
-                            </div>
-                            <div class="col-12 d-flex justify-content-center mt-2">
-                              <button class="align-btn" data-align="bottom">↓</button>
-                            </div>
-                          </div>
                         </div>
                         <div class="product-details-area" style="width: 35%">
                             <span>Product:
@@ -993,28 +996,26 @@
                             </span>
                         </div>
 
-@if($userCustomization->is_quote)
-<div class="d-block">
-    <div class="mb-3" style="width: 100%">
-        <button class="btn btn-success w-100">
-            <i class="fas fa-save me-2"></i>Auto Saved Successfully !
-        </button>
-    </div>
+                        @if ($userCustomization->is_quote)
+                            <div class="d-block">
+                                <div class="mb-3" style="width: 100%">
+                                    <button class="btn btn-success w-100">
+                                        <i class="fas fa-save me-2"></i>Auto Saved Successfully !
+                                    </button>
+                                </div>
 
-    <div style="width: 100%">
-        <a href="{{ route('home') }}" class="btn btn-primary w-100">
-            <i class="fas fa-home me-2"></i>Go To Home
-        </a>
-    </div>
-</div>
-
-
-@else
-    <button class="btn btn-primary add-to-cart-btn" style="width: 35%">
-        <i class="fas fa-shopping-cart me-2"></i>ADD TO CART <br> $<span
-            id="total-price">{{ isset($product) ? $product->selling_price : '0.00' }}</span>
-    </button>
-@endif
+                                <div style="width: 100%">
+                                    <a href="{{ route('home') }}" class="btn btn-primary w-100">
+                                        <i class="fas fa-home me-2"></i>Go To Home
+                                    </a>
+                                </div>
+                            </div>
+                        @else
+                            <button class="btn btn-primary add-to-cart-btn" style="width: 35%">
+                                <i class="fas fa-shopping-cart me-2"></i>ADD TO CART <br> $<span
+                                    id="total-price">{{ isset($product) ? $product->selling_price : '0.00' }}</span>
+                            </button>
+                        @endif
 
                     </div>
 
@@ -2690,6 +2691,104 @@
                 }
 
                 updateTotalPrice();
+
+                // Auto-save the customization if it's a quote
+                @if (isset($userCustomization) && $userCustomization->is_quote == 1)
+                    // Use debounce to avoid too frequent saves
+                    if (window.saveTimeout) clearTimeout(window.saveTimeout);
+                    window.saveTimeout = setTimeout(() => {
+                        autoSaveQuoteDesign();
+                    }, 1000); // Wait 1 second after last change before saving
+                @endif
+            }
+
+            // Function to auto-save quote designs in real-time
+            async function autoSaveQuoteDesign() {
+                // Save current view state to restore later
+                const originalView = designState.currentView;
+                const previews = {};
+                const texts = {};
+
+                // Collect views that have designs
+                const viewsToCapture = Object.keys(priceState.views).filter(view => priceState.views[view]
+                    .hasDesign);
+
+                // Process each view one by one
+                for (const view of viewsToCapture) {
+                    // Switch to the view
+                    $(`.view-option[data-view="${view}"]`).trigger('click');
+
+                    // Wait for the current-view image to load
+                    await new Promise(resolve => {
+                        const img = $('#current-view')[0];
+                        if (img.complete) resolve();
+                        else {
+                            img.onload = resolve;
+                            img.onerror = resolve;
+                        }
+                    });
+
+                    // Generate preview image for this view
+                    const dataUrl = await generatePreview();
+                    previews[view] = dataUrl;
+
+                    // Capture all text elements from the view
+                    const textElements = designState.views[view].elements
+                        .filter(el => el.type === 'text')
+                        .map(el => ({
+                            ...el
+                        }));
+
+                    texts[view] = textElements;
+                }
+
+                // Switch back to original view
+                $(`.view-option[data-view="${originalView}"]`).trigger('click');
+
+                // Send to server
+                $.ajax({
+                    url: "{{ route('customizer.quote.update', $userCustomization->id) }}",
+                    method: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        previews: previews,
+                        texts: texts
+                    },
+                    success: function(response) {
+                        // Optional: Show a small notification that changes were saved
+                        if (response.success) {
+                            showSaveNotification();
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error saving quote design:', xhr.responseText);
+                    }
+                });
+            }
+
+            // Show a small notification that changes were auto-saved
+            function showSaveNotification() {
+                // Create notification element if it doesn't exist
+                if (!$('#save-notification').length) {
+                    $('<div id="save-notification">').css({
+                        position: 'fixed',
+                        bottom: '20px',
+                        right: '20px',
+                        background: 'rgba(0, 128, 0, 0.8)',
+                        color: 'white',
+                        padding: '8px 15px',
+                        borderRadius: '4px',
+                        zIndex: 9999,
+                        opacity: 0,
+                        transition: 'opacity 0.3s'
+                    }).text('Changes auto-saved').appendTo('body');
+                }
+
+                // Show and hide notification
+                $('#save-notification').css('opacity', 1);
+                setTimeout(() => {
+                    $('#save-notification').css('opacity', 0);
+                }, 2000);
             }
 
             // Initialize the design area

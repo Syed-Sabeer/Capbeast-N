@@ -61,7 +61,7 @@ Route::get('/', function () {
   return redirect()->route('home');
 });
 
-Route::get('/cache', function() {
+Route::get('/cache', function () {
   $exitCode = Artisan::call('cache:clear');
   $exitCode = Artisan::call('config:clear');
   $exitCode = Artisan::call('route:clear');
@@ -109,8 +109,9 @@ Route::middleware(['web'])->group(function () {
     Route::post('/shipping/discount', [ShippingController::class, 'applyShippingDiscount'])->name('shipping.discount');
 
     Route::get('/quote', [QuoteController::class, 'index'])->name('quote');
-Route::post('/quote/submit', [QuoteController::class, 'submit'])->name('quote.submit');
-Route::get('/get-product-colors/{id}', [QuoteController::class, 'getProductColors'])->name('get.product.colors');
+    Route::post('/quote/submit', [QuoteController::class, 'submit'])->name('quote.submit');
+    Route::get('/get-product-colors/{id}', [QuoteController::class, 'getProductColors'])->name('get.product.colors');
+    Route::post('/customizer/quote/update/{id}', [CustomizerController::class, 'updateQuote'])->name('customizer.quote.update');
 
 
 
@@ -135,7 +136,7 @@ Route::get('/get-product-colors/{id}', [QuoteController::class, 'getProductColor
 
   // for country selection through pop up
 
-  
+
 
   Route::get('/select-country', function () {
     return view('main.global.country-selection');
@@ -179,7 +180,7 @@ Route::get('/get-product-colors/{id}', [QuoteController::class, 'getProductColor
   Route::get('/delivery-info', [DeliveryInfoController::class, 'index'])->name('deliveryinfo');
   Route::get('/home', [HomeController::class, 'index'])->name('home');
   Route::get('/contact', [ContactController::class, 'index'])->name('contact');
-  
+
   Route::get('/faqs', [FAQsController::class, 'index'])->name('faqs');
 
   // Routes for registration that do not require authentication
@@ -226,8 +227,8 @@ foreach ($roles as $role => $prefix) {
 
         Route::post('/abandon-cart-comment', [EcommerceAbandonCartController::class, 'store'])->name('abandonCartComment.store');
 
-             Route::get('/quote/list', [EcommerceQuoteController::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-quote-list'));
-        
+        Route::get('/quote/list', [EcommerceQuoteController::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-quote-list'));
+
 
         Route::get('/category', [EcommerceProductCategory::class, 'index'])->name(Route::prefixed($prefix, 'app-ecommerce-product-category'));
         Route::get('/category/add', [EcommerceProductCategory::class, 'create'])->name(Route::prefixed($prefix, 'category.add'));

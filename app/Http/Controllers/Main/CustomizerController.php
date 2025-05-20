@@ -80,9 +80,9 @@ class CustomizerController extends Controller
         $userCustomization->product_id = $product->id;
         $userCustomization->quantity = $request->quantity;
         $userCustomization->size = $request->size;
-      if ($request->has('from_quote') && $request->get('from_quote') == 1) {
-    $userCustomization->is_quote = 1;
-}
+        if ($request->has('from_quote') && $request->get('from_quote') == 1) {
+          $userCustomization->is_quote = 1;
+        }
 
 
         $imageFields = [
@@ -122,19 +122,18 @@ class CustomizerController extends Controller
         // Save the user customization record
         $userCustomization->save();
         // Check if this was a quote submission
-if ($userCustomization->is_quote == 1 && session()->has('quote_form')) {
-    $quoteData = session('quote_form');
+        if ($userCustomization->is_quote == 1 && session()->has('quote_form')) {
+          $quoteData = session('quote_form');
 
-    // Attach the customization ID to the quote data
-    $quoteData['customization_id'] = $userCustomization->id;
+          // Attach the customization ID to the quote data
+          $quoteData['customization_id'] = $userCustomization->id;
 
-    // Save the quote
-    \App\Models\Quote::create($quoteData); // Make sure you imported the Quote model at the top
+          // Save the quote
+          \App\Models\Quote::create($quoteData); // Make sure you imported the Quote model at the top
 
-    // Clear session data to avoid duplicate quote creation
-    session()->forget('quote_form');
-}
-
+          // Clear session data to avoid duplicate quote creation
+          session()->forget('quote_form');
+        }
       }
 
       return response()->json([
@@ -154,6 +153,90 @@ if ($userCustomization->is_quote == 1 && session()->has('quote_form')) {
       // Handle any other exceptions
       return response()->json([
         'message' => 'An error occurred while processing your request',
+        'success' => false,
+        'error' => $e->getMessage(),
+      ], 500);
+    }
+  }
+
+  public function updateQuote(Request $request, $id)
+  {
+    try {
+      $request->validate([
+        'previews' => 'nullable|array',
+        'texts' => 'nullable|array',
+      ]);
+
+      $userCustomization = UserCustomization::findOrFail($id);
+      $previews = $request->input('previews', []); // Get the previews array
+      $texts = $request->input('texts', []); // Get the texts array
+
+      // Map view names to DB columns
+      $viewMap = [
+        'front' => 'front_image',
+        'back' => 'back_image',
+        'left' => 'left_image',
+        'right' => 'right_image',
+      ];
+
+      $fontFields = [
+        'front' => 'front_font',
+        'back' => 'back_font',
+        'left' => 'left_font',
+        'right' => 'right_font',
+      ];
+
+      // Process text elements
+      foreach ($fontFields as $view => $column) {
+        if (!empty($texts[$view])) {
+          // Store all text elements for this view
+          $userCustomization->$column = json_encode($texts[$view]);
+        }
+      }
+
+      foreach ($viewMap as $view => $column) {
+        if (!empty($previews[$view])) {
+          $imageData = $previews[$view];
+
+          if (preg_match('/^data:image\/(\w+);base64,/', $imageData, $type)) {
+            $image = substr($imageData, strpos($imageData, ',') + 1);
+            $image = base64_decode($image);
+
+            $imageExtension = strtolower($type[1]); // e.g., png, jpeg
+            $fileName = uniqid($view . '_') . '.' . $imageExtension;
+            $filePath = 'storage/customizations/' . $fileName;
+
+            // Ensure directory exists
+            $destination = public_path('storage/customizations');
+            if (!is_dir($destination)) {
+              mkdir($destination, 0755, true);
+            }
+
+            // Save the image
+            file_put_contents(public_path($filePath), $image);
+
+            // Save path to DB
+            $userCustomization->$column = $filePath;
+          }
+        }
+      }
+
+      $userCustomization->save();
+
+      return response()->json([
+        'message' => 'Customization images updated successfully.',
+        'success' => true,
+        'data' => $userCustomization,
+      ]);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+      return response()->json([
+        'message' => 'Validation failed',
+        'success' => false,
+        'errors' => $e->errors(),
+      ], 422);
+    } catch (\Exception $e) {
+      return response()->json([
+        'message' => 'Error occurred',
         'success' => false,
         'error' => $e->getMessage(),
       ], 500);
@@ -220,14 +303,14 @@ if ($userCustomization->is_quote == 1 && session()->has('quote_form')) {
       ]);
 
       $texts = $request->input('texts', []); // Get the texts array
- 
+
       $fontFields = [
         'front' => 'front_font',
         'back' => 'back_font',
         'left' => 'left_font',
         'right' => 'right_font',
       ];
- 
+
       foreach ($fontFields as $view => $column) {
         if (!empty($texts[$view])) {
           // If there are multiple text elements, store them all
