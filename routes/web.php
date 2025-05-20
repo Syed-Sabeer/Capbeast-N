@@ -135,6 +135,7 @@ Route::get('/get-product-colors/{id}', [QuoteController::class, 'getProductColor
 
   // for country selection through pop up
 
+  
 
   Route::get('/select-country', function () {
     return view('main.global.country-selection');
