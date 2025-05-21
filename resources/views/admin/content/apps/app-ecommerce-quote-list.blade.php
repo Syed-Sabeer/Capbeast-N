@@ -42,7 +42,7 @@
                         <tr>
                             <td></td>
                             <td>{{ $quote->firstname }} {{ $quote->lastname }}</td>
-                            <td>{{ Auth::user()->email }}</td>
+                            <td>{{ $quote->email }}</td>
                             <td>{{ $quote->phone }}</td>
                             <td>
                                 <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
