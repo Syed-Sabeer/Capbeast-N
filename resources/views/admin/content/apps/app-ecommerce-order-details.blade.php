@@ -557,6 +557,7 @@
                                   class="fs-12 fw-500 color-primary"
                                   download="{{ \Illuminate\Support\Str::slug($item->title) . '.' . pathinfo($item->file, PATHINFO_EXTENSION) }}">
                                   Download
+                                  
                                 </a>
                                 <a href="{{ route($prefix . '.order.file.delete', $item->id) }}"
                                   class="fs-12 fw-500 delete_confirm" style="color: red;">
